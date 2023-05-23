@@ -1,0 +1,92 @@
+##
+## EPITECH PROJECT, 2022
+## Epitech-Template
+## File description:
+## workflow.yml
+##
+
+# The goal of this workflow is to merge the remote branch into the Epitech remote, but only if the tests pass.
+
+name: "Push to remote"
+on: push
+
+jobs:
+  test:
+    name: Run tests before pushing to remote
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ steps.extract_branch.outputs.branch }}
+          fetch-depth: 0
+
+      - name: Install criterion
+        run: |
+            URL="https://github.com/Snaipe/Criterion/releases/download/v2.3.2"
+            TARBALL="criterion-v2.3.2-linux-x86_64.tar.bz2"
+            DIR="criterion-v2.3.2"
+            DST="/usr/local/"
+            SUDO=/usr/bin/sudo
+
+            if [ $UID -eq "0" ]; then
+              SUDO=""
+              echo "[no sudo for root]"
+            fi
+
+            cd /tmp
+            rm -f $TARBALL
+            rm -fr $DIR
+
+            wget $URL/$TARBALL
+            if [ $? != 0 ]; then
+              echo "failled, exiting"
+              exit 1;
+            fi
+
+            echo
+            echo "untaring $TARBALL"
+            tar xjf $TARBALL
+            if [ $? != 0 ]; then
+              echo "failled, exiting"
+              exit 1;
+            fi
+
+            echo "creating custom ld.conf"
+            $SUDO sh -c "echo "/usr/local/lib" > /etc/ld.so.conf.d/criterion.conf"
+            echo "cp headers to $DST/include..."
+            $SUDO cp -r $DIR/include/* $DST/include/
+            echo "cp lib to $DST/include..."
+            $SUDO cp -r $DIR/lib/* $DST/lib/
+            echo "run ldconfig."
+            $SUDO ldconfig
+            echo "all good."
+
+      - name: Check coding style
+        run: "pip install websocket-client && python './.github/c_checker.py' --hard"
+
+      - name: Check if it compiles
+        shell: bash
+        run: |
+          make
+          make clean
+          make fclean
+          make re
+          ls zappy_server zappy_gui zappy_ai
+
+      - name: Run tests
+        run: "make tests_run"
+
+      - name: Push to Epitech
+        uses: pixta-dev/repository-mirroring-action@v1
+        with:
+          target_repo_url:
+            git@github.com:EpitechPromo2026/B-YEP-400-LIL-4-1-zappy-quentin.desmettre.git
+          ssh_private_key:
+            ${{ secrets.SSH_PRIVATE_KEY }}

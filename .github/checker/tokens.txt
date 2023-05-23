@@ -1,0 +1,22 @@
+/*
+** EPITECH PROJECT, 2023
+** Epitech-MyTeams
+** File description:
+** tmp
+*/10ccomment
+62newline
+70newline#include <unistd.h>80pp_hheader
+819newline#include <fcntl.h>90pp_hheader
+918newline                100spaceint1016int 1019spacemain1020identifier(1024leftparenvoid1025void)1029rightparen
+1030newline{110leftbrace
+111newline        120spaceint128int 1211spacea1212identifier,1213comma 1214spaceb1215identifier,1216comma 1217spacec1218identifier;1219semicolon
+1220newline
+130newline    140spacea144identifier 145space=146assign 147spaceb148identifier 149space=1410assign 1411spacec1412identifier 1413space=1414assign 1415space01416intlit;1417semicolon
+1418newline    150spaceint154int 157spacefd158identifier 1510space=1511assign 1512spaceopen1513identifier(1517leftparen"tmp"1518stringlit,1523comma 1524spaceO_WRONLY1525identifier 1533space|1534or 1535spaceO_CREAT1536identifier,1543comma06441544intlit,1548comma11549intlit)1550rightparen;1551semicolon
+1552newlinewrite160identifier(165leftparenfd166identifier,168comma 169space"Hello"1610stringlit,1617comma         1618space51627intlit)1628rightparen;1629semicolon
+1630newline        170spaceclose178identifier(1713leftparenfd1714identifier)1716rightparen                   1717space;1736semicolon
+1737newline                180spaceif1816if 1818space(1819leftparen11820intlit)1821rightparen{1822leftbrace
+1823newline                190space}1916rightbrace 1917spaceint1918int 1921spacez1922identifier 1923space=1924assign 1925space31926intlit;1927semicolon
+1928newline    200spacereturn204return 2010space02011intlit                        2012space;2036semicolon
+2037newline                        210space}2124rightbrace
+2125newline220eof
