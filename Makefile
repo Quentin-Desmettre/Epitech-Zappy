@@ -33,7 +33,8 @@ $(SERVER_NAME): $(OBJ_SERVER)
 $(GUI_NAME): $(OBJ_GUI)
 	$(CXX) -o $(GUI_NAME) $(OBJ_GUI) $(CXXFLAGS)
 
-# tests_run:
+tests_run:
+	echo "No tests for this project"
 # 	make -C tests
 # 	cd tests && ./tests ; rm tests
 
