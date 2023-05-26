@@ -7,13 +7,12 @@
 
 rwildc = $(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildc,$d/,$2))
 
-
 SOURCEDIR_SERVER = src/server
 SRC_SERVER = $(call rwildc,$(SOURCEDIR_SERVER),*.c)
 OBJ_SERVER = $(SRC_SERVER:.c=.o)
 SERVER_NAME = zappy_server
 CC = gcc
-CFLAGS = -Wall -Wextra -I ./include/server -g
+CFLAGS = -Wall -Wextra -I ./include/server
 
 SOURCEDIR_GUI = src/gui
 SRC_GUI = $(call rwildc,$(SOURCEDIR_GUI),*.cpp)
@@ -22,10 +21,20 @@ GUI_NAME = zappy_gui
 CXX = g++
 CXXFLAGS = -Wall -Wextra -I ./include/gui -std=c++20
 
-all: $(SERVER_NAME) $(GUI_NAME)
+all: $(SERVER_NAME) $(GUI_NAME) zappy_ai
 
 server: $(SERVER_NAME)
 gui: $(GUI_NAME)
+zappy_ai: server
+	cp $(SERVER_NAME) zappy_ai
+
+re-server:
+	rm -f $(OBJ_SERVER) $(SERVER_NAME)
+	@make server
+
+re-gui:
+	rm -f $(OBJ_GUI) $(GUI_NAME)
+	@make gui
 
 $(SERVER_NAME): $(OBJ_SERVER)
 	$(CC) -o $(SERVER_NAME) $(OBJ_SERVER) $(CFLAGS)
