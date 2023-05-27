@@ -38,7 +38,7 @@ void free_str_array(char **array)
     free(array);
 }
 
-void *memdup(void *src, size_t size)
+void *memdup(const void *src, size_t size)
 {
     void *dst = calloc(1, size);
 

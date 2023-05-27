@@ -11,7 +11,7 @@
 
 void append_str_array(char ***array, char *what);
 void free_str_array(char **array);
-void *memdup(void *src, size_t size);
+void *memdup(const void *src, size_t size);
 int bytes_available(int fd);
 char **dupstrarray(const char * const *arr);
 

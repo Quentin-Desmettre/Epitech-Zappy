@@ -30,15 +30,6 @@ int main(int ac, char **av)
             fprintf(stderr, "%s\n", err);
         return 84;
     }
-    printf("Port: %d\n", server->params.port);
-    printf("Width: %d\n", server->params.width);
-    printf("Height: %d\n", server->params.height);
-    printf("Team names: ");
-    for (int i = 0; server->params.names[i]; i++)
-        printf("%s ", server->params.names[i]);
-    printf("\n");
-    printf("Slots: %d\n", server->params.slots);
-    printf("Freq: %d\n", server->params.freq);
     run_server(server);
     destroy_server(server);
     return 0;
