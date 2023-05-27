@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
+#include "garbage_collector.h"
 
 int bytes_available(int fd)
 {
@@ -24,7 +25,7 @@ void append_str_array(char ***array, char *what)
 
     if (*array)
         for (; (*array)[len]; len++);
-    *array = realloc(*array, sizeof(char *) * (len + 2));
+    *array = my_realloc(*array, sizeof(char *) * (len + 2));
     (*array)[len] = what;
     (*array)[len + 1] = NULL;
 }
@@ -34,13 +35,13 @@ void free_str_array(char **array)
     if (!array)
         return;
     for (int i = 0; array[i]; i++)
-        free(array[i]);
-    free(array);
+        my_free(array[i]);
+    my_free(array);
 }
 
 void *memdup(const void *src, size_t size)
 {
-    void *dst = calloc(1, size);
+    void *dst = my_calloc(1, size);
 
     memcpy(dst, src, size);
     return (dst);
@@ -52,8 +53,8 @@ char **dupstrarray(const char * const *arr)
     char **dup = NULL;
 
     for (; arr[size]; size++);
-    dup = calloc(size + 1, sizeof(char *));
+    dup = my_calloc(size + 1, sizeof(char *));
     for (int i = 0; arr[i]; i++)
-        dup[i] = strdup(arr[i]);
+        dup[i] = my_strdup(arr[i]);
     return dup;
 }

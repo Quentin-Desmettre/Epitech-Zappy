@@ -13,8 +13,8 @@
     #include <errno.h>
     #include "trantor.h"
     #include "args.h"
-
-    #define MAX_CLIENTS (FD_SETSIZE - 5)
+    #include "safe_write.h"
+    #include "garbage_collector.h"
 
 typedef struct server_init {
     int fd;

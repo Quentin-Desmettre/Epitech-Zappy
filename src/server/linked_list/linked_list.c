@@ -6,11 +6,12 @@
 */
 
 #include "linked_list.h"
+#include "garbage_collector.h"
 #include <stdlib.h>
 
 void append_node(list_t **begin, void *data)
 {
-    list_t *node = calloc(1, sizeof(list_t));
+    list_t *node = my_calloc(1, sizeof(list_t));
 
     node->data = data;
     if (!(*begin)) {
@@ -46,7 +47,7 @@ void remove_node(list_t **begin, int offset, void (*freer)(void *))
         next->prev = prev;
         *begin = next;
     }
-    free(s);
+    my_free(s);
 }
 
 void free_list(list_t **list, void (*freer)(void *))

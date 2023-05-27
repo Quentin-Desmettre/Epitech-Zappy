@@ -7,6 +7,7 @@
 
 #include "linked_list.h"
 #include <stdlib.h>
+#include "garbage_collector.h"
 
 bool remove_if_remove_node(list_t **list, list_t **s, void (*free_data)(void *))
 {
@@ -16,7 +17,7 @@ bool remove_if_remove_node(list_t **list, list_t **s, void (*free_data)(void *))
     if (free_data)
         free_data((*s)->data);
     if (*s == (*s)->next) {
-        free(*s);
+        my_free(*s);
         *list = NULL;
         return false;
     }
@@ -24,7 +25,7 @@ bool remove_if_remove_node(list_t **list, list_t **s, void (*free_data)(void *))
     next = (*s)->next;
     prev->next = next;
     next->prev = prev;
-    free(*s);
+    my_free(*s);
     *s = next;
     return true;
 }

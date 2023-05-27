@@ -5,14 +5,13 @@
 ** main
 */
 
-#include <stdio.h>
 #include <stddef.h>
 #include <string.h>
 #include "server.h"
 
 char *perror_str(const char *str)
 {
-    char *err = calloc(1, strlen(str) + strlen(strerror(errno)) + 3);
+    char *err = my_calloc(1, strlen(str) + strlen(strerror(errno)) + 3);
 
     strcat(err, str);
     strcat(err, ": ");
@@ -26,8 +25,8 @@ int main(int ac, char **av)
     server_t *server = init_server(ac, av, &err);
 
     if (!server) {
-        if (err)
-            fprintf(stderr, "%s\n", err);
+        safe_write(2, err, strlen(err));
+        safe_write(2, "\n", 1);
         return 84;
     }
     run_server(server);

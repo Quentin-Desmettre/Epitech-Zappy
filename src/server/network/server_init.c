@@ -41,11 +41,11 @@ server_t *init_server(int ac, char **av, char **err)
 
     if (!get_args(ac, av, &args, err))
         return NULL;
-    server = calloc(1, sizeof(server_t));
+    server = my_calloc(1, sizeof(server_t));
     server->params = args;
     server->trantor = init_trantor(args.width, args.height);
     if (!init_server_network(server, err)) {
-        free(server);
+        my_free(server);
         return NULL;
     }
     return server;
@@ -62,5 +62,5 @@ void destroy_server(server_t *server)
     destroy_clients(&server->clients);
     destroy_trantor(server->trantor);
     free_str_array(server->params.names);
-    free(server);
+    my_free(server);
 }

@@ -9,6 +9,7 @@
     #define EPITECH_ZAPPY_ARGS_H
     #include <stddef.h>
     #include <stdbool.h>
+    #include "garbage_collector.h"
 
     // Defaults
     #define DEFAULT_PORT 4242

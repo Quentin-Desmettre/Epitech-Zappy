@@ -56,10 +56,10 @@ static bool fetch_team_names(args_t *args, int ac, char **av, char **err)
         return false;
     }
     free_str_array(args->names);
-    args->names = calloc(1, sizeof(char *));
+    args->names = my_calloc(1, sizeof(char *));
     optind--;
     while (optind < ac && av[optind][0] != '-') {
-        append_str_array(&args->names, strdup(av[optind]));
+        append_str_array(&args->names, my_strdup(av[optind]));
         optind++;
     }
     return true;
