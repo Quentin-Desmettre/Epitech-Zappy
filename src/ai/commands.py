@@ -141,6 +141,8 @@ class Command:
             raise NotImplementedError("Command %s not implemented" % self.type)
         send_to_server(server, str(self))
         msg = recv_from_server(server)
+        if self.type == CommandNames.INCANTATION:
+            msg = recv_from_server(server)
         if not self.check_return(msg):
             return None
         return command_parsers[self.type](self, msg)

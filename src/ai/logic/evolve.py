@@ -1,5 +1,6 @@
+import socket
+from src.ai.commands import Objects, Command, CommandNames
 
-from src.ai.commands import Objects
 
 def get_elevation_needs(current_level: int) -> dict[Objects, int]:
     tab = [
@@ -50,4 +51,30 @@ def get_elevation_needs(current_level: int) -> dict[Objects, int]:
             Objects.THYSTAME: 1,
         }
     ]
-    return tab[current_level]
+    return tab[current_level - 1]
+
+def has_stones(inventory: dict[Objects, int], current_level: int) -> bool:
+    required = get_elevation_needs(current_level)
+    for stone in required:
+        if stone != Objects.PLAYER and (stone.value not in inventory \
+        or inventory[stone.value] < required[stone]):
+            return False
+    return True
+
+def get_needed_stones(inventory: dict[Objects, int], current_level: int) -> list[Objects]:
+    required = get_elevation_needs(current_level)
+    needed = []
+    for stone in required.keys():
+        if stone != Objects.PLAYER and (stone.value not in inventory \
+        or inventory[stone.value] < required[stone]):
+            needed.append(stone)
+    return needed
+
+def drop_stones(server: socket.socket, inventory: dict[Objects, int], current_level: int):
+    required = get_elevation_needs(current_level)
+    for stone in required:
+        if stone != Objects.PLAYER and stone.value in inventory \
+        and inventory[stone.value] >= required[stone]:
+            for _ in range(required[stone]):
+                Command(CommandNames.SET, stone.value).send(server)
+
