@@ -39,7 +39,7 @@ void remove_if(list_t **list, void *data, bool (*eq_cmp)(void *, void *),
 
     if (!s)
         return;
-    label:
+label:
     do {
         if (!((!eq_cmp && data == s->data) ||
         (eq_cmp && eq_cmp(s->data, data)))) {
@@ -48,8 +48,7 @@ void remove_if(list_t **list, void *data, bool (*eq_cmp)(void *, void *),
         }
         if (!remove_if_remove_node(list, &s, free_data))
             return;
-        if (s == *list)
-            go_to label;
+        go_to label;
     } while (s != *list);
 }
 
