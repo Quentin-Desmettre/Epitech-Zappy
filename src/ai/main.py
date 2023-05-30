@@ -2,7 +2,7 @@
 
 import sys, socket
 from src.ai.utils import send_to_server, recv_from_server
-from ai.logic.brain import take_decision
+from src.ai.logic.brain import take_decision
 
 
 def print_usage():
@@ -69,8 +69,8 @@ def main():
 
 
 if __name__ == "__main__":
-    # try:
+    try:
         main()
-    # except Exception as e:
-    #     print(e)
-    #     exit(84)
+    except Exception as e:
+        print(e)
+        exit(84)
