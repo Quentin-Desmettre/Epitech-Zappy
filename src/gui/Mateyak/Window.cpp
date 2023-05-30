@@ -15,16 +15,16 @@ bool Mateyak::Window::ShouldClose()
 {
     return WindowShouldClose();
 }
-//
-//void Mateyak::Window::draw(const Triangle &triangle)
-//{
-//    DrawTriangle3D(triangle._a.getRayVec3(), triangle._b.getRayVec3(), triangle._c.getRayVec3(), triangle._color);
-//}
-//
-//void Mateyak::Window::draw(const Triangle &triangle, Color color)
-//{
-//    DrawTriangle3D(triangle._a.getRayVec3(), triangle._b.getRayVec3(), triangle._c.getRayVec3(), color);
-//}
+
+void Mateyak::Window::draw(const Triangle &triangle)
+{
+    DrawTriangle3D(triangle._a.getRayVec3(), triangle._b.getRayVec3(), triangle._c.getRayVec3(), triangle._color);
+}
+
+void Mateyak::Window::draw(const Triangle &triangle, Color color)
+{
+    DrawTriangle3D(triangle._a.getRayVec3(), triangle._b.getRayVec3(), triangle._c.getRayVec3(), color);
+}
 
 void Mateyak::Window::startDrawing(Color color)
 {

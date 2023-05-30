@@ -35,8 +35,8 @@ namespace Mateyak
 
         void startDrawing(Color color = BLACK);
         void begin3D(const Mateyak::Camera &camera);
-//            static void draw(const Triangle &triangle);
-//            static void draw(const Triangle &triangle, Color color);
+        static void draw(const Triangle &triangle);
+        static void draw(const Triangle &triangle, Color color);
         void end3D();
         void endDrawing();
 
