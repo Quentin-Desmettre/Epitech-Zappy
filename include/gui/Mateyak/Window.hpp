@@ -11,7 +11,8 @@
 #include <string>
 #include <raymath.h>
 //#include "Triangle.hpp"
-//#include "Camera.hpp"
+#include "Camera.hpp"
+#include "Vector2.hpp"
 //
 //#ifndef RLIGHTS_IMPLEMENTATION
 //    #include "rlights.h"
@@ -33,15 +34,15 @@ namespace Mateyak
         bool ShouldClose();
 
         void startDrawing(Color color = BLACK);
-//            void begin3D(const Mateyak::Camera &camera);
+        void begin3D(const Mateyak::Camera &camera);
 //            static void draw(const Triangle &triangle);
 //            static void draw(const Triangle &triangle, Color color);
         void end3D();
         void endDrawing();
 
-//            Vec2f getMousePosition() const {
-//                return Vec2f{static_cast<float>(GetMouseX()), static_cast<float>(GetMouseY())};
-//            }
+        Vec2f getMousePosition() const {
+            return Vec2f{static_cast<float>(GetMouseX()), static_cast<float>(GetMouseY())};
+        }
 
     private:
     };
