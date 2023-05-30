@@ -9,7 +9,7 @@
     #define EPITECH_ZAPPY_ARGS_H
     #include <stddef.h>
     #include <stdbool.h>
-    #include "garbage_collector.h"
+    #include "utility/garbage_collector.h"
 
     // Defaults
     #define DEFAULT_PORT 4242
@@ -19,11 +19,12 @@
     #define DEFAULT_SLOTS 3
     #define ARGS_STR "p:x:y:n:c:f:"
     #define SIZE_T_MAX ((size_t)-1)
+
 extern const char *DEFAULT_TEAMS[];
 
     // Errors
     #define ERR_PORT "Error: invalid port"
-    #define ERR_FREQ "Error: invalid frequency"
+    #define ERR_FREQ "Error: frequency must be in the interval [2, 1000]"
     #define ERR_WIDTH "Error: width must be in the interval [10, 30]"
     #define ERR_HEIGHT "Error: height must be in the interval [10, 30]"
     #define ERR_TEAMS "Error: invalid team names"

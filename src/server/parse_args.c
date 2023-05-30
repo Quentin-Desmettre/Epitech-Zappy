@@ -6,7 +6,7 @@
 */
 
 #include "args.h"
-#include "strings.h"
+#include "utility/strings.h"
 #include <stdbool.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -69,7 +69,7 @@ static bool check_args(args_t *args, char **err)
 {
     if (args->port <= 0)
         *err = ERR_PORT;
-    if (args->freq <= 0)
+    if (args->freq < 2 || args->freq > 10000)
         *err = ERR_FREQ;
     if (args->width < 10 || args->width > 30)
         *err = ERR_WIDTH;

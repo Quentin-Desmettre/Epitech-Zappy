@@ -13,14 +13,24 @@
     #include <errno.h>
     #include "trantor.h"
     #include "args.h"
-    #include "safe_write.h"
-    #include "garbage_collector.h"
+    #include "utility/safe_write.h"
+    #include "utility/garbage_collector.h"
+
+    #define UINT64_MAX 18446744073709551615ULL
+    #define GRAPHIC_COMMAND "GRAPHIC"
+    #define ERR_NO_SLOTS "ko: Not enough opened slots\n"
+    #define ERR_NO_TEAM "ko: No such team\n"
+    #define ERR_NO_CMD "ko: No such command\n"
+    #define AI_MAX_COMMANDS 10
+    #define WELCOME_MESSAGE "WELCOME\n"
+    #define UNUSED __attribute__((unused))
 
 typedef struct server_init {
     int fd;
     list_t *clients;
     trantor_t *trantor;
     args_t params;
+    bool run;
 } server_t;
 
 // Client handling
@@ -33,63 +43,30 @@ typedef enum client_state {
 typedef struct client {
     client_state_t state;
     int fd;
-    void *data;
+    player_t *data;
+    char *buffer;
+    size_t buffer_size;
 } client_t;
 
 // GUI request handling
-typedef char *(*gui_cmd_handler_t)(server_t *server, const char * const *args);
+typedef char *(*gui_cmd_handler_t)(server_t *server, char **args);
 typedef struct {
     const char *cmd;
     gui_cmd_handler_t handler;
 } gui_cmd_t;
 
-char *gui_map_size_handler(server_t *server, const char * const * args);
-char *gui_tile_content_handler(server_t *server, const char * const * args);
-char *gui_tiles_content_handler(server_t *server, const char * const * args);
-char *gui_team_names_handler(server_t *server, const char * const * args);
-char *gui_player_position_handler(server_t *server, const char * const * args);
-char *gui_player_level_handler(server_t *server, const char * const * args);
-char *gui_player_inventory_handler(server_t *server, const char * const * args);
-char *gui_time_request_handler(server_t *server, const char * const * args);
-char *gui_time_change_handler(server_t *server, const char * const * args);
+char *gui_map_size_handler(server_t *server, char **args);
+char *gui_tile_content_handler(server_t *server, char **args);
+char *gui_tiles_content_handler(server_t *server, char **args);
+char *gui_team_names_handler(server_t *server, char **args);
+char *gui_player_position_handler(server_t *server, char **args);
+char *gui_player_level_handler(server_t *server, char **args);
+char *gui_player_inventory_handler(server_t *server, char **args);
+char *gui_time_request_handler(server_t *server, char **args);
+char *gui_time_change_handler(server_t *server, char **args);
+char *gui_pnw_response(player_t *player);
 
-static const gui_cmd_t gui_handlers[] = {
-//        {"msz", &gui_map_size_handler},
-//        {"bct", &gui_tile_content_handler},
-//        {"mct", &gui_tiles_content_handler},
-//        {"tna", &gui_team_names_handler},
-//        {"ppo", &gui_player_position_handler},
-//        {"plv", &gui_player_level_handler},
-//        {"pin", &gui_player_inventory_handler},
-//        {"sgt", &gui_time_request_handler},
-//        {"sst", &gui_time_change_handler},
-};
-
-// AI request handling
-typedef char *(*ai_cmd_handler_t)(server_t *server, const char * const *args);
-typedef struct action_data {
-    int ticks;
-    const char *name;
-    ai_cmd_handler_t handler_start;
-    ai_cmd_handler_t handler_end;
-} action_data_t;
-typedef struct action {
-    struct timespec start_time;
-    action_data_t data;
-} action_t;
-
-char *ai_forward_handler(server_t *server, const char * const * args);
-char *ai_right_handler(server_t *server, const char * const * args);
-char *ai_left_handler(server_t *server, const char * const * args);
-char *ai_look_handler(server_t *server, const char * const * args);
-char *ai_inventory_handler(server_t *server, const char * const * args);
-char *ai_broadcast_handler(server_t *server, const char * const * args);
-char *ai_connect_nbr_handler(server_t *server, const char * const * args);
-char *ai_fork_handler(server_t *server, const char * const * args);
-char *ai_eject_handler(server_t *server, const char * const * args);
-char *ai_take_handler(server_t *server, const char * const * args);
-char *ai_set_handler(server_t *server, const char * const * args);
-char *ai_incantation_handler(server_t *server, const char * const * args);
+extern const gui_cmd_t GUI_HANDLERS[];
 
 /**
  * Logique du serveur
@@ -110,5 +87,37 @@ char *ai_incantation_handler(server_t *server, const char * const * args);
 server_t *init_server(int ac, char **av, char **err);
 void destroy_server(server_t *server);
 void run_server(server_t *server);
+void handle_clients(server_t *server, fd_set *read_fds);
+team_t *get_team_by_name(server_t *server, const char *team);
+
+// State handling
+typedef void (*state_handler_t)(server_t *, client_t *, const char *cmd);
+extern const state_handler_t STATE_HANDLER[];
+void handle_connected(server_t *server, client_t *cli, const char *cmd);
+void handle_gui(server_t *server, UNUSED client_t *cli, const char *cmd);
+void handle_ai(server_t *server, client_t *cli, const char *cmd);
+
+/**
+ * @brief Performs the pre-check of the action.
+ *
+ * Once the pre-check has been performed, its output is sent to the client
+ * if it failed.
+ * @param action
+ * @param server
+ * @param cli
+ * @return True if the action does not have a pre-check or if it
+ * was successful, false otherwise.
+ */
+bool do_action_pre_check(action_t *action, trantor_t *trantor, client_t *cli);
+
+/**
+ * @brief Performs an action.
+ *
+ * This function executes the action, then removes it from the client wait-list
+ * @param action
+ * @param server
+ * @param cli
+ */
+void do_action(action_t *action, trantor_t *trantor, client_t *cli);
 
 #endif //EPITECH_ZAPPY_SERVER_H
