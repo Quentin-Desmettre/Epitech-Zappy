@@ -40,7 +40,7 @@ $(SERVER_NAME): $(OBJ_SERVER)
 	$(CC) -o $(SERVER_NAME) $(OBJ_SERVER) $(CFLAGS)
 
 $(GUI_NAME): $(OBJ_GUI)
-	$(CXX) -o $(GUI_NAME) $(OBJ_GUI) $(CXXFLAGS)
+	$(CXX) -o $(GUI_NAME) $(OBJ_GUI) $(CXXFLAGS) -lraylib
 
 tests_run:
 	echo "No tests for this project"
