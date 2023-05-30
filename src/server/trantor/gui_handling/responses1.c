@@ -4,3 +4,9 @@
 ** File description:
 ** responses
 */
+
+#include "server.h"
+
+char *gui_pnw_response(player_t *player)
+{
+}

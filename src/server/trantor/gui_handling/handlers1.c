@@ -4,3 +4,25 @@
 ** File description:
 ** handlers1
 */
+
+#include "server.h"
+
+char *gui_map_size_handler(server_t *server, char **args)
+{
+}
+
+char *gui_tile_content_handler(server_t *server, char **args)
+{
+}
+
+char *gui_tiles_content_handler(server_t *server, char **args)
+{
+}
+
+char *gui_team_names_handler(server_t *server, char **args)
+{
+}
+
+char *gui_player_position_handler(server_t *server, char **args)
+{
+}

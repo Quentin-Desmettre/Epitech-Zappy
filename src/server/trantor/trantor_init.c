@@ -7,7 +7,7 @@
 
 #include "trantor.h"
 #include <stdlib.h>
-#include "garbage_collector.h"
+#include "utility/garbage_collector.h"
 
 static map_t *init_map(int width, int height)
 {
