@@ -49,7 +49,7 @@ def get_object_path(object: Objects, tiles: list[list[str]]) -> list[Directions]
     return get_path_from_index(closest_index)
 
 
-def go_to_object(server: socket.socket, desired: Objects, tiles: list[list[str]] | None) -> None:
+def go_to_object(server: socket.socket, desired: Objects, tiles: list[list[str]] | None) -> bool:
     """Take the shortest path to the desired object and loot it if possible."""
     if tiles is None:
         tiles = Command(CommandNames.LOOK).send(server)
@@ -61,3 +61,4 @@ def go_to_object(server: socket.socket, desired: Objects, tiles: list[list[str]]
             break
     if len(directions) != 0 and desired != Objects.PLAYER:
         Command(CommandNames.TAKE, desired.value).send(server)
+    return len(directions) != 0
