@@ -2,8 +2,7 @@
 
 import sys, socket
 from src.ai.utils import send_to_server, recv_from_server
-from src.ai.commands import Command, CommandNames, Directions, Objects
-from src.ai.brain import take_decision
+from ai.logic.brain import take_decision
 
 
 def print_usage():
