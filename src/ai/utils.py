@@ -1,4 +1,4 @@
-import socket, functools, math
+import socket, functools
 
 parser_funcs_names = []
 
@@ -49,6 +49,7 @@ def recv_from_server(server: socket.socket) -> str:
     return msg
 
 
-def is_perfect_square(i) -> bool:
-    sqrt_i = math.isqrt(i)
-    return sqrt_i * sqrt_i == i
+def add_to_dict(dict: dict[int, list], index: int, value) -> None:
+    if index not in dict:
+        dict[index] = []
+    dict[index].append(value)

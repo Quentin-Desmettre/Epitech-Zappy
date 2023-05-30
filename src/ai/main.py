@@ -2,8 +2,7 @@
 
 import sys, socket
 from src.ai.utils import send_to_server, recv_from_server
-from src.ai.commands import Command, CommandNames, Directions, Objects
-from src.ai.brain import take_decision
+from src.ai.logic.brain import Ai
 
 
 def print_usage():
@@ -65,13 +64,14 @@ def main():
     map_size = (int(map_size[0]), int(map_size[1]))
     print("cli_num: " + str(cli_num) + "\nmap_size: " + str(map_size))
 
+    ai = Ai(server)
     while True:
-        take_decision(server)
+        ai.make_decision()
 
 
 if __name__ == "__main__":
-    # try:
+    try:
         main()
-    # except Exception as e:
-    #     print(e)
-    #     exit(84)
+    except Exception as e:
+        print(e)
+        exit(84)
