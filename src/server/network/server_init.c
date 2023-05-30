@@ -8,9 +8,9 @@
 #include "server.h"
 #include "args.h"
 #include <sys/socket.h>
-#include <string.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include "utility/strings.h"
 
 static bool init_server_network(server_t *server, char **err)
 {
@@ -43,6 +43,7 @@ server_t *init_server(int ac, char **av, char **err)
         return NULL;
     server = my_calloc(1, sizeof(server_t));
     server->params = args;
+    server->run = true;
     server->trantor = init_trantor(args.width, args.height);
     if (!init_server_network(server, err)) {
         my_free(server);
