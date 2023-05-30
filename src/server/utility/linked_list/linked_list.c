@@ -5,8 +5,8 @@
 ** linked_list
 */
 
-#include "linked_list.h"
-#include "garbage_collector.h"
+#include "utility/linked_list.h"
+#include "utility/garbage_collector.h"
 #include <stdlib.h>
 
 void append_node(list_t **begin, void *data)
@@ -29,25 +29,12 @@ void append_node(list_t **begin, void *data)
 void remove_node(list_t **begin, int offset, void (*freer)(void *))
 {
     list_t *s = *begin;
-    list_t *next;
-    list_t *prev;
 
     if (!s)
         return;
     for (int i = 0; i < offset; i++)
         s = s->next;
-    if (freer)
-        freer(s->data);
-    if (s == s->next)
-        *begin = NULL;
-    else {
-        prev = s->prev;
-        next = s->next;
-        prev->next = next;
-        next->prev = prev;
-        *begin = next;
-    }
-    my_free(s);
+    remove_if_remove_node(begin, &s, freer);
 }
 
 void free_list(list_t **list, void (*freer)(void *))

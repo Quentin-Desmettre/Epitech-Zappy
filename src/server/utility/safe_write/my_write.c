@@ -5,13 +5,13 @@
 ** my_write
 */
 
-#include "safe_write.h"
+#include "utility/safe_write.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/select.h>
-#include "linked_list.h"
-#include "strings.h"
+#include "utility/linked_list.h"
+#include "utility/strings.h"
 
 list_t **packet_waitlist(void)
 {
@@ -20,7 +20,7 @@ list_t **packet_waitlist(void)
     return &list;
 }
 
-static void *my_write(int fd, const void *data, size_t size)
+static void *try_write(int fd, const void *data, size_t size)
 {
     ssize_t res = write(fd, data, size);
 
@@ -31,28 +31,6 @@ static void *my_write(int fd, const void *data, size_t size)
     if (res != (ssize_t)size)
         return create_packet(fd, data + res, size - res);
     return NULL;
-}
-
-void write_packets_for_fd(int fd)
-{
-    list_t *list = *packet_waitlist();
-    list_t *packets_to_send = NULL;
-    packet_t *packet;
-    packet_t *tmp;
-
-    if (!list)
-        return;
-    do {
-        tmp = NULL;
-        packet = list->data;
-        if (packet->fd == fd)
-            tmp = my_write(fd, packet->data, packet->size);
-        if (tmp)
-            append_node(&packets_to_send, tmp);
-        list = list->next;
-    } while (list != *packet_waitlist());
-    remove_if(packet_waitlist(), &fd, compare_packet, free_packet);
-    append_list(packet_waitlist(), packets_to_send, true);
 }
 
 void write_packets_for_fds(fd_set *fds)
@@ -68,13 +46,13 @@ void write_packets_for_fds(fd_set *fds)
         tmp = NULL;
         packet = list->data;
         if (FD_ISSET(packet->fd, fds))
-            tmp = my_write(packet->fd, packet->data, packet->size);
+            tmp = try_write(packet->fd, packet->data, packet->size);
         if (tmp)
             append_node(&packets_to_send, tmp);
         list = list->next;
     } while (list != *packet_waitlist());
     remove_if(packet_waitlist(), fds, compare_packet, free_packet);
-    append_list(packet_waitlist(), packets_to_send, true);
+    append_list(packet_waitlist(), packets_to_send, true, NULL);
 }
 
 void safe_write(int fd, void *data, size_t size)
@@ -93,7 +71,7 @@ void safe_write(int fd, void *data, size_t size)
     }
     if (select_rval == 0)
         return append_node(packet_waitlist(), create_packet(fd, data, size));
-    tmp = my_write(fd, data, size);
+    tmp = try_write(fd, data, size);
     if (tmp)
         append_node(packet_waitlist(), tmp);
 }

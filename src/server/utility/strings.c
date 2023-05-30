@@ -5,41 +5,76 @@
 ** main.c
 */
 
-#include <stdlib.h>
+#include "utility/garbage_collector.h"
+#include <stdarg.h>
 #include <string.h>
-#include <sys/ioctl.h>
-#include "garbage_collector.h"
-#include <stdio.h>
+#include <stdbool.h>
 
-int bytes_available(int fd)
+char *str_concat_free(size_t *len, int nb_strings, ...)
 {
-    int bytes_available = 0;
+    va_list ap;
+    char *str = NULL;
+    char *tmp;
 
-    if (ioctl(fd, FIONREAD, &bytes_available) == -1) {
-        perror("ioctl");
-        exit(84);
+    *len = 0;
+    va_start(ap, nb_strings);
+    for (int i = 0; i < nb_strings; i++) {
+        tmp = va_arg(ap, char *);
+        len += strlen(tmp);
     }
-    return (bytes_available);
+    va_end(ap);
+    str = my_calloc(*len + 1, sizeof(char));
+    va_start(ap, nb_strings);
+    for (int i = 0; i < nb_strings; i++) {
+        tmp = va_arg(ap, char *);
+        strcat(str, tmp);
+        my_free(tmp);
+    }
+    va_end(ap);
+    return str;
 }
 
-void append_str_array(char ***array, char *what)
+char *str_concat(size_t *len, int nb_strings, ...)
 {
-    int len = 0;
+    va_list ap;
+    char *str = NULL;
+    char *tmp;
 
-    if (*array)
-        for (; (*array)[len]; len++);
-    *array = my_realloc(*array, sizeof(char *) * (len + 2));
-    (*array)[len] = what;
-    (*array)[len + 1] = NULL;
+    *len = 0;
+    va_start(ap, nb_strings);
+    for (int i = 0; i < nb_strings; i++) {
+        tmp = va_arg(ap, char *);
+        len += strlen(tmp);
+    }
+    va_end(ap);
+    str = my_calloc(*len + 1, sizeof(char));
+    va_start(ap, nb_strings);
+    for (int i = 0; i < nb_strings; i++) {
+        tmp = va_arg(ap, char *);
+        strcat(str, tmp);
+    }
+    va_end(ap);
+    return str;
 }
 
-void free_str_array(char **array)
+bool str_ends_with(const char *str, const char *suffix)
 {
-    if (!array)
-        return;
-    for (int i = 0; array[i]; i++)
-        my_free(array[i]);
-    my_free(array);
+    size_t str_len = strlen(str);
+    size_t suffix_len = strlen(suffix);
+
+    if (suffix_len > str_len)
+        return false;
+    return strcmp(str + str_len - suffix_len, suffix) == 0;
+}
+
+void str_append_free(char **str, size_t *len, char *append)
+{
+    size_t append_len = strlen(append);
+
+    *str = my_realloc(*str, *len + 1);
+    memcpy(*str + *len, append, append_len + 1);
+    *len += append_len;
+    my_free(append);
 }
 
 void *memdup(const void *src, size_t size)
@@ -48,16 +83,4 @@ void *memdup(const void *src, size_t size)
 
     memcpy(dst, src, size);
     return (dst);
-}
-
-char **dupstrarray(const char * const *arr)
-{
-    int size = 0;
-    char **dup = NULL;
-
-    for (; arr[size]; size++);
-    dup = my_calloc(size + 1, sizeof(char *));
-    for (int i = 0; arr[i]; i++)
-        dup[i] = my_strdup(arr[i]);
-    return dup;
 }

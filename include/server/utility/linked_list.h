@@ -9,6 +9,7 @@
     #define LINKED_LIST_H_
     #include <stdbool.h>
     #include <sys/select.h>
+    #define go_to goto
 
 typedef struct list {
     void *data;
@@ -23,6 +24,9 @@ int list_size(list_t *list);
 void push_to_front(list_t **begin, void *data);
 void remove_if(list_t **list, void *data, bool (*cmp)(void *, void *),
     void (*free_data)(void *));
-void append_list(list_t **list, list_t *to_append, bool free_to_append);
+void append_list(list_t **list, list_t *to_append, bool free_to_append,
+    void (*free_data)(void *));
+bool remove_if_remove_node(list_t **list,
+        list_t **s, void (*free_data)(void *));
 
 #endif /* !LINKED_LIST_H_ */

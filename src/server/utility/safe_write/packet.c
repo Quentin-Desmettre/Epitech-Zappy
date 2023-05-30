@@ -5,10 +5,10 @@
 ** packet
 */
 
-#include "safe_write.h"
-#include "strings.h"
+#include "utility/safe_write.h"
+#include "utility/strings.h"
 #include <stdlib.h>
-#include "garbage_collector.h"
+#include "utility/garbage_collector.h"
 
 void *create_packet(int fd, const void *data, size_t size)
 {
