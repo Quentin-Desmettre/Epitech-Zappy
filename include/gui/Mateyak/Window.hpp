@@ -10,7 +10,7 @@
 #include <raylib.h>
 #include <string>
 #include <raymath.h>
-//#include "Triangle.hpp"
+#include "Triangle.hpp"
 #include "Camera.hpp"
 #include "Vector2.hpp"
 //
