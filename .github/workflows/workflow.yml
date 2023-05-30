@@ -32,7 +32,8 @@ jobs:
           sudo apt-get install -y build-essential git cmake libasound2-dev libpulse-dev libfreetype6-dev libudev-dev libxi-dev libxrandr-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev
           git clone https://github.com/raysan5/raylib.git raylib
           cd raylib/src
-          make install PLATFORM=PLATFORM_DESKTOP RAYLIB_LIBTYPE=SHARED
+          make PLATFORM=PLATFORM_DESKTOP RAYLIB_LIBTYPE=SHARED
+          sudo make install PLATFORM=PLATFORM_DESKTOP RAYLIB_LIBTYPE=SHARED
           cd ../..
           rm -rf raylib
 
