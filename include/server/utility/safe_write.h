@@ -9,6 +9,8 @@
     #define EPITECH_ZAPPY_SAFE_WRITE_H
     #include <stddef.h>
     #include <stdbool.h>
+    #include <sys/select.h>
+    #include "linked_list.h"
 
 typedef struct {
     int fd;
@@ -41,14 +43,15 @@ void free_packet(void *packet);
 bool compare_packet(void *fd, void *packet);
 
 /**
- * @brief Write all packets that have been queued for the given fd.
+ * @brief Write all packets that have been queued for the given fds
  *
  * This function then removes the packets from the queue.
  * If a packet could not be written in its entirety, only the part that was
  * written is removed from the queue.
- * @param fd The fd to write packets for
+ * @param fds The fds to write to
  */
-void write_packets_for_fd(int fd);
+void write_packets_for_fds(fd_set *fds);
+
 
 /**
  * @brief Write data to a fd, or queue it if the fd is not ready
@@ -57,5 +60,11 @@ void write_packets_for_fd(int fd);
  * @param size The size of the data
  */
 void safe_write(int fd, void *data, size_t size);
+
+/**
+ * @brief Get the packet waitlist object
+ * @return list_t** The packet waitlist
+ */
+list_t **packet_waitlist(void);
 
 #endif //EPITECH_ZAPPY_SAFE_WRITE_H

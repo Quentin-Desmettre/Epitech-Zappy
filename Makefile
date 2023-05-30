@@ -43,9 +43,7 @@ $(GUI_NAME): $(OBJ_GUI)
 	$(CXX) -o $(GUI_NAME) $(OBJ_GUI) $(CXXFLAGS)
 
 tests_run:
-	echo "No tests for this project"
-# 	make -C tests
-# 	cd tests && ./tests ; rm tests
+	@make -C tests/server run
 
 clean:
 	rm -f $(OBJ_SERVER) $(OBJ_GUI)

@@ -5,7 +5,7 @@
 ** garbage_handling
 */
 
-#include "garbage_collector.h"
+#include "utility/garbage_collector.h"
 
 s_list_t **malloc_stack(void)
 {

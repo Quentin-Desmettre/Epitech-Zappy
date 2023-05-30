@@ -9,13 +9,16 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include "garbage_collector.h"
+#include <stdio.h>
 
 int bytes_available(int fd)
 {
     int bytes_available = 0;
 
-    if (ioctl(fd, FIONREAD, &bytes_available) == -1)
-        return (-1);
+    if (ioctl(fd, FIONREAD, &bytes_available) == -1) {
+        perror("ioctl");
+        exit(84);
+    }
     return (bytes_available);
 }
 

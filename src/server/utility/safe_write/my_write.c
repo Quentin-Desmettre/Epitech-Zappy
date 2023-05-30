@@ -13,7 +13,7 @@
 #include "linked_list.h"
 #include "strings.h"
 
-static list_t **packet_waitlist(void)
+list_t **packet_waitlist(void)
 {
     static list_t *list = NULL;
 
@@ -52,6 +52,28 @@ void write_packets_for_fd(int fd)
         list = list->next;
     } while (list != *packet_waitlist());
     remove_if(packet_waitlist(), &fd, compare_packet, free_packet);
+    append_list(packet_waitlist(), packets_to_send, true);
+}
+
+void write_packets_for_fds(fd_set *fds)
+{
+    list_t *list = *packet_waitlist();
+    list_t *packets_to_send = NULL;
+    packet_t *packet;
+    packet_t *tmp;
+
+    if (!list)
+        return;
+    do {
+        tmp = NULL;
+        packet = list->data;
+        if (FD_ISSET(packet->fd, fds))
+            tmp = my_write(packet->fd, packet->data, packet->size);
+        if (tmp)
+            append_node(&packets_to_send, tmp);
+        list = list->next;
+    } while (list != *packet_waitlist());
+    remove_if(packet_waitlist(), fds, compare_packet, free_packet);
     append_list(packet_waitlist(), packets_to_send, true);
 }
 

@@ -7,7 +7,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "garbage_collector.h"
+#include "utility/garbage_collector.h"
 #include <stdio.h>
 
 s_list_t **malloc_stack(void);
@@ -51,13 +51,10 @@ void *my_calloc(size_t nmemb, size_t size)
 
 void *my_realloc(void *ptr, size_t size)
 {
-    void *r = realloc(ptr, size);
+    void *r = my_malloc(size);
 
-    if (!r) {
-        perror("realloc");
-        exit(84);
-    }
-    push_to_stack(malloc_stack(), r);
+    memcpy(r, ptr, size);
+    my_free(ptr);
     return r;
 }
 
