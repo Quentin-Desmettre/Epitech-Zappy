@@ -26,7 +26,7 @@ all: $(SERVER_NAME) $(GUI_NAME) zappy_ai
 server: $(SERVER_NAME)
 gui: $(GUI_NAME)
 zappy_ai: server
-	cp $(SERVER_NAME) zappy_ai
+	cp src/ai/main.py zappy_ai
 
 re-server:
 	rm -f $(OBJ_SERVER) $(SERVER_NAME)
