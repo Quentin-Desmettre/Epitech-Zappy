@@ -62,6 +62,15 @@ Test(my_malloc, my_realloc_normal)
     cr_assert((*malloc_stack())->next == NULL);
 }
 
+Test(my_malloc, my_realloc_null)
+{
+    char *str = my_realloc(NULL, 20);
+
+    cr_assert_not_null(str);
+    cr_assert(str == (*malloc_stack())->data);
+    cr_assert((*malloc_stack())->next == NULL);
+}
+
 Test(my_malloc, my_strdup_normal)
 {
     char *str = my_strdup("Hello World");

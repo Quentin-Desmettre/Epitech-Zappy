@@ -19,27 +19,6 @@ char *perror_str(const char *str)
     return err;
 }
 
-char **str_to_word_array(const char *str, const char *delim, int *len)
-{
-    char **arr = NULL;
-    char *tmp = NULL;
-    char *saveptr = NULL;
-    int i = 0;
-
-    tmp = my_strdup(str);
-    for (char *token = strtok_r(tmp, delim, &saveptr); token;
-        token = strtok_r(NULL, delim, &saveptr)) {
-        arr = my_realloc(arr, (i + 2) * sizeof(char *));
-        arr[i] = my_strdup(token);
-        i++;
-    }
-    arr[i] = NULL;
-    my_free(tmp);
-    if (len)
-        *len = i;
-    return arr;
-}
-
 void append_str_array(char ***array, char *what)
 {
     int len = 0;
@@ -60,7 +39,7 @@ void free_str_array(char **array)
     my_free(array);
 }
 
-char **dupstrarray(const char * const *arr)
+char **dupstrarray(const char **arr)
 {
     int size = 0;
     char **dup = NULL;
@@ -70,4 +49,26 @@ char **dupstrarray(const char * const *arr)
     for (int i = 0; arr[i]; i++)
         dup[i] = my_strdup(arr[i]);
     return dup;
+}
+
+char **split_on(char *str, char *delim, int *len)
+{
+    char **array = NULL;
+    char *occ;
+    char *tmp;
+
+    if (len)
+        *len = 0;
+    INCREMENT_IF_NOT_NULL(len);
+    if (!strpbrk(str, delim))
+        return dupstrarray((const char *[]){str, NULL});
+    while ((occ = strpbrk(str, delim))) {
+        tmp = strndup(str, occ - str);
+        append_str_array(&array, my_strdup(tmp));
+        free(tmp);
+        str = occ + 1;
+        INCREMENT_IF_NOT_NULL(len);
+    }
+    append_str_array(&array, my_strdup(str));
+    return array;
 }

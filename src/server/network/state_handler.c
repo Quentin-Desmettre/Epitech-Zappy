@@ -79,11 +79,15 @@ void handle_connected(server_t *server, client_t *cli, const char *cmd)
 void handle_gui(server_t *server, UNUSED client_t *cli, const char *cmd)
 {
     char **args = str_to_word_array(cmd, " ", NULL);
+    char *output;
+    size_t len;
 
     for (int i = 0; GUI_HANDLERS[i].cmd; i++) {
         if (strcmp(GUI_HANDLERS[i].cmd, args[0]) != 0)
             continue;
-        GUI_HANDLERS[i].handler(server, args);
+        output = str_concat_free(&len, 2,
+                    GUI_HANDLERS[i].handler(server, args), "\n");
+        safe_write(cli->fd, output, len);
         break;
     }
     free_str_array(args);

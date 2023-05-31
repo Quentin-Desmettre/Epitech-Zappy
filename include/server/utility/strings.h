@@ -8,12 +8,15 @@
 #ifndef EPITECH_ZAPPY_STRINGS_H
     #define EPITECH_ZAPPY_STRINGS_H
     #include <stddef.h>
+    #include <stdbool.h>
+    #include <sys/select.h>
 
 // str array
 char **str_to_word_array(const char *str, const char *delim, int *len);
 void append_str_array(char ***array, char *what);
 void free_str_array(char **array);
-char **dupstrarray(const char * const *arr);
+char **dupstrarray(const char **arr);
+char **split_on(char *str, char *delim, int *len);
 
 // Strings
 void *memdup(const void *src, size_t size);

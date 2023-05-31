@@ -10,7 +10,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <sys/socket.h>
 
 const state_handler_t STATE_HANDLER[] = {
         handle_connected,
@@ -62,7 +61,7 @@ static void handle_client_input(server_t *server, client_t *cli)
         return disconnect_client(server, cli);
     if (strchr(cli->buffer, '\n') == NULL)
         return;
-    args = str_to_word_array(cli->buffer, "\n", &nb_args);
+    args = split_on(cli->buffer, "\n", &nb_args);
     free(cli->buffer);
     cli->buffer = NULL;
     cli->buffer_size = 0;

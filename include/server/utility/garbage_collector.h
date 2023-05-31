@@ -8,6 +8,7 @@
 #ifndef EPITECH_ZAPPY_GARBAGE_COLLECTOR_H
     #define EPITECH_ZAPPY_GARBAGE_COLLECTOR_H
     #include <stdlib.h>
+    #define INCREMENT_IF_NOT_NULL(x) if (x) (*len)++
 
 typedef struct s_list {
     void *data;

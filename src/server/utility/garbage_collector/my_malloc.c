@@ -53,6 +53,8 @@ void *my_realloc(void *ptr, size_t size)
 {
     void *r = my_malloc(size);
 
+    if (!ptr)
+        return r;
     memcpy(r, ptr, size);
     my_free(ptr);
     return r;
