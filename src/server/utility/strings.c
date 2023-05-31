@@ -20,7 +20,7 @@ char *str_concat_free(size_t *len, int nb_strings, ...)
     va_start(ap, nb_strings);
     for (int i = 0; i < nb_strings; i++) {
         tmp = va_arg(ap, char *);
-        len += strlen(tmp);
+        *len += strlen(tmp);
     }
     va_end(ap);
     str = my_calloc(*len + 1, sizeof(char));
@@ -44,7 +44,7 @@ char *str_concat(size_t *len, int nb_strings, ...)
     va_start(ap, nb_strings);
     for (int i = 0; i < nb_strings; i++) {
         tmp = va_arg(ap, char *);
-        len += strlen(tmp);
+        *len += strlen(tmp);
     }
     va_end(ap);
     str = my_calloc(*len + 1, sizeof(char));

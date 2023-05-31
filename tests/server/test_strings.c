@@ -194,3 +194,119 @@ Test(split_on, split_on)
 
     CHECK_ALL_FREE;
 }
+
+Test(str_ends_with, str_ends_with)
+{
+    cr_assert(str_ends_with("Hello", "lo"));
+    cr_assert(str_ends_with("Hello", "o"));
+    cr_assert(str_ends_with("Hello", "Hello"));
+    cr_assert(str_ends_with("Hello", ""));
+    cr_assert(!str_ends_with("Hello", "World"));
+    cr_assert(!str_ends_with("Hello", "H"));
+    cr_assert(!str_ends_with("Hello", "He"));
+    cr_assert(!str_ends_with("Hello", "Hel"));
+    cr_assert(!str_ends_with("Hello", "Hell"));
+    cr_assert(!str_ends_with("Hello", "Helloo"));
+}
+
+Test(memdup, memdup)
+{
+    char *str = "Hello World";
+    char *dup = memdup(str, 12);
+
+    cr_assert_str_eq(dup, str);
+    cr_assert_neq(dup, str);
+
+    my_free(dup);
+
+    CHECK_ALL_FREE;
+}
+
+Test(str_append_free, str_append_free)
+{
+    char *base_str = my_strdup("Hello");
+    size_t len = strlen(base_str);
+    str_append_free(&base_str, &len, my_strdup(" World"));
+    cr_assert_str_eq(base_str, "Hello World");
+    cr_assert_eq(len, 11);
+    my_free(base_str);
+
+    base_str = my_strdup("");
+    len = strlen(base_str);
+    str_append_free(&base_str, &len, my_strdup(" World"));
+    cr_assert_str_eq(base_str, " World");
+    cr_assert_eq(len, 6);
+    my_free(base_str);
+
+    base_str = my_strdup("Hello");
+    len = strlen(base_str);
+    str_append_free(&base_str, &len, my_strdup(""));
+    cr_assert_str_eq(base_str, "Hello");
+    cr_assert_eq(len, 5);
+    my_free(base_str);
+
+    CHECK_ALL_FREE;
+}
+
+Test(str_concat, str_concat)
+{
+    size_t final_len = 0;
+    char *end_str = str_concat(&final_len, 2, "Hello", " World");
+    cr_assert_str_eq(end_str, "Hello World");
+    cr_assert_eq(final_len, 11);
+    my_free(end_str);
+
+    end_str = str_concat(&final_len, 2, "", " World");
+    cr_assert_str_eq(end_str, " World");
+    cr_assert_eq(final_len, 6);
+    my_free(end_str);
+
+    end_str = str_concat(&final_len, 2, "Hello", "");
+    cr_assert_str_eq(end_str, "Hello");
+    cr_assert_eq(final_len, 5);
+    my_free(end_str);
+
+    end_str = str_concat(&final_len, 1, "Hello");
+    cr_assert_str_eq(end_str, "Hello");
+    cr_assert_eq(final_len, 5);
+    my_free(end_str);
+
+
+    end_str = str_concat(&final_len, 0);
+    cr_assert_str_eq(end_str, "");
+    cr_assert_eq(final_len, 0);
+    my_free(end_str);
+
+    CHECK_ALL_FREE;
+}
+
+Test(str_concat_free, str_concat_free)
+{
+    size_t final_len = 0;
+    char *end_str = str_concat_free(&final_len, 2, my_strdup("Hello"), my_strdup(" World"));
+    cr_assert_str_eq(end_str, "Hello World");
+    cr_assert_eq(final_len, 11);
+    my_free(end_str);
+
+    end_str = str_concat_free(&final_len, 2, my_strdup(""), my_strdup(" World"));
+    cr_assert_str_eq(end_str, " World");
+    cr_assert_eq(final_len, 6);
+    my_free(end_str);
+
+    end_str = str_concat_free(&final_len, 2, my_strdup("Hello"), my_strdup(""));
+    cr_assert_str_eq(end_str, "Hello");
+    cr_assert_eq(final_len, 5);
+    my_free(end_str);
+
+    end_str = str_concat_free(&final_len, 1, my_strdup("Hello"));
+    cr_assert_str_eq(end_str, "Hello");
+    cr_assert_eq(final_len, 5);
+    my_free(end_str);
+
+    end_str = str_concat_free(&final_len, 0);
+    cr_assert_str_eq(end_str, "");
+    cr_assert_eq(final_len, 0);
+    my_free(end_str);
+
+    CHECK_ALL_FREE;
+}
