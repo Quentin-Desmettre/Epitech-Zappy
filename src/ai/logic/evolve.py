@@ -77,4 +77,3 @@ def drop_stones(server: socket.socket, inventory: dict[Objects, int], current_le
         and inventory[stone.value] >= required[stone]:
             for _ in range(required[stone]):
                 Command(CommandNames.SET, stone.value).send(server)
-

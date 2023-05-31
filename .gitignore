@@ -10,3 +10,4 @@ a.out
 cmake-build-debug
 .idea
 __pycache__
+out

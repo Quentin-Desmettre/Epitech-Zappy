@@ -1,7 +1,7 @@
 import socket, random, time
 from src.ai.commands import Command, CommandNames, Objects
 from src.ai.logic.finding import go_to_object
-from src.ai.logic.evolve import get_elevation_needs, has_stones, get_needed_stones, drop_stones
+from src.ai.logic.evolve import has_stones, get_needed_stones, drop_stones
 
 class Ai:
     """Artificial intelligence class."""
@@ -28,15 +28,17 @@ class Ai:
                 print("Error: could not loot %s" % object.name)
             else:
                 return True
-        elif go_to_object(self.server, Objects.FOOD, tiles) == False and can_move_randomly:
+        elif go_to_object(self.server, object, tiles) == False and can_move_randomly:
             self.move_randomly()
         return False
 
     def make_decision(self):
         """Takes a decision based on the current state of the game."""
         inventory = Command(CommandNames.INVENTORY).send(self.server)
-        if "food" not in inventory or inventory["food"] < 20:
-            self.loot_object(Objects.FOOD)
+        if "food" not in inventory or inventory["food"] < 10:
+            for i in range(20 - inventory["food"]):
+                if self.loot_object(Objects.FOOD) == False:
+                    i -= 1
         elif has_stones(inventory, self.level):
             drop_stones(self.server, inventory, self.level)
             Command(CommandNames.LOOK).send(self.server)
@@ -48,4 +50,5 @@ class Ai:
             needed = get_needed_stones(inventory, self.level)
             while len(needed) > 0:
                 if self.loot_object(needed.pop(), False):
-                    break
+                    return
+            self.move_randomly()
