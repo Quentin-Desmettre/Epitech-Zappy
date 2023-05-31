@@ -271,7 +271,6 @@ Test(str_concat, str_concat)
     cr_assert_eq(final_len, 5);
     my_free(end_str);
 
-
     end_str = str_concat(&final_len, 0);
     cr_assert_str_eq(end_str, "");
     cr_assert_eq(final_len, 0);
