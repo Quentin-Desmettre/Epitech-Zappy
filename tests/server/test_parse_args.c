@@ -311,8 +311,8 @@ bool is_args_eq(args_t *args, const args_t_raw *test)
         printf("freq: got %d, expected %d\n", args->freq, test->freq);
         return false;
     }
-    if (str_array_len(args->names) != str_array_len(test->names)) {
-        printf("names: got %d, expected %d\n", str_array_len(args->names), str_array_len(test->names));
+    if (str_array_len(args->names) != str_array_len((char **)test->names)) {
+        printf("names: got %d, expected %d\n", str_array_len(args->names), str_array_len((char **)test->names));
         return false;
     }
     for (int i = 0; test->names[i] != NULL; i++) {
@@ -322,7 +322,7 @@ bool is_args_eq(args_t *args, const args_t_raw *test)
     return true;
 }
 
-Test(get_args, get_args)
+Test(get_args, get_args, .init = redirect_all_stdout)
 {
     char *err = NULL;
 
@@ -330,7 +330,7 @@ Test(get_args, get_args)
         optind = 1;
         const arg_test_t *test = &tests[i];
         args_t args = {0};
-        bool valid = get_args(str_array_len(test->args), test->args, &args, &err);
+        bool valid = get_args(str_array_len((char **)test->args), (char **)test->args, &args, &err);
 
         cr_assert_eq(valid, test->valid, "Test %d: Expected %d, got %d", i + 1, test->valid, valid);
         if (!valid)

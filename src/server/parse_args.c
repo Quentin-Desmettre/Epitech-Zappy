@@ -59,7 +59,7 @@ static void fetch_team_names(args_t *args, int ac, char **av, char **err)
         optind++;
     }
 }
-#include <stdio.h>
+
 static bool check_args(args_t *args, char **err)
 {
     if (args->port <= 0)
