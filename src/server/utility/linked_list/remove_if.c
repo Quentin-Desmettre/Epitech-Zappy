@@ -36,20 +36,20 @@ void remove_if(list_t **list, void *data, bool (*eq_cmp)(void *, void *),
                 void (*free_data)(void *))
 {
     list_t *s = *list;
+    bool cont = true;
 
     if (!s)
         return;
-label:
-    do {
-        if (!((!eq_cmp && data == s->data) ||
+    while (cont) {
+        if (((!eq_cmp && data == s->data) ||
         (eq_cmp && eq_cmp(data, s->data)))) {
-            s = s->next;
+            cont = remove_if_remove_node(list, &s, free_data);
             continue;
         }
-        if (!remove_if_remove_node(list, &s, free_data))
+        s = s->next;
+        if (s == *list)
             return;
-        go_to label;
-    } while (s != *list);
+    }
 }
 
 void append_list(list_t **list, list_t *to_append,

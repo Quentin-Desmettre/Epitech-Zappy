@@ -9,7 +9,6 @@
     #define LINKED_LIST_H_
     #include <stdbool.h>
     #include <sys/select.h>
-    #define go_to goto
 
 typedef struct list {
     void *data;

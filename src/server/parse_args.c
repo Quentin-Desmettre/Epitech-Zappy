@@ -49,12 +49,8 @@ static size_t offset_of_arg(int arg)
     return SIZE_T_MAX;
 }
 
-static bool fetch_team_names(args_t *args, int ac, char **av, char **err)
+static void fetch_team_names(args_t *args, int ac, char **av, char **err)
 {
-    if (optarg == NULL) {
-        *err = "Missing team names";
-        return false;
-    }
     free_str_array(args->names);
     args->names = my_calloc(1, sizeof(char *));
     optind--;
@@ -62,9 +58,8 @@ static bool fetch_team_names(args_t *args, int ac, char **av, char **err)
         append_str_array(&args->names, my_strdup(av[optind]));
         optind++;
     }
-    return true;
 }
-
+#include <stdio.h>
 static bool check_args(args_t *args, char **err)
 {
     if (args->port <= 0)
@@ -77,7 +72,7 @@ static bool check_args(args_t *args, char **err)
         *err = ERR_HEIGHT;
     if (args->slots <= 0)
         *err = ERR_SLOTS;
-    if (args->names == NULL || args->names[0] == NULL)
+    if (args->names[0] == NULL)
         *err = ERR_TEAMS;
     return *err == NULL;
 }
@@ -91,10 +86,11 @@ bool get_args(int ac, char **av, args_t *args, char **err)
     while ((opt = getopt(ac, av, ARGS_STR)) != -1) {
         if (opt == '?')
             return false;
-        if (opt == 'n' && !fetch_team_names(args, ac, av, err))
-            return false;
-        if (opt != 'n')
-            *(int *)((char *) args + offset_of_arg(opt)) = atoi(optarg);
+        if (opt == 'n') {
+            fetch_team_names(args, ac, av, err);
+            continue;
+        }
+        *(int *)((char *) args + offset_of_arg(opt)) = atoi(optarg);
     }
     return check_args(args, err);
 }
