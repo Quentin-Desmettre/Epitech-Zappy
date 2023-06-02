@@ -1,4 +1,4 @@
-import socket, enum
+import socket, enum, queue
 from src.ai.utils import send_to_server, recv_from_server, on, create_command_parsers
 
 command_parsers = {}
@@ -17,14 +17,15 @@ class Objects(enum.Enum):
 
 class Directions(enum.Enum):
     """Enum representing all the possible directions."""
+    HERE = 0
     FORWARD = 1
-    LEFT = 3
-    RIGHT = 7
-    BACKWARD = 5
     TOP_LEFT = 2
-    TOP_RIGHT = 8
+    LEFT = 3
     BOTTOM_LEFT = 4
+    BACKWARD = 5
     BOTTOM_RIGHT = 6
+    RIGHT = 7
+    TOP_RIGHT = 8
 
 
 class CommandNames(enum.Enum):
@@ -45,8 +46,6 @@ class CommandNames(enum.Enum):
 
 class Command:
     """Class representing a command."""
-    type = None
-    arg = None
 
     def __init__(self, cmd: CommandNames, arg: str | None = None) -> None:
         if type(cmd) == Directions:
@@ -135,16 +134,53 @@ class Command:
             return False
         return True
 
-    def send(self, server: socket.socket):
+    def read_until_broadcast(self, server: socket.socket, queue: queue.Queue) -> str:
+        """Reads the server until no more broadcast are received."""
+        msg = recv_from_server(server)
+        while msg.startswith("message"):
+            if queue is not None:
+                while queue.qsize() > 0:
+                    queue.get()
+                queue.put(msg)
+            msg = recv_from_server(server)
+        return msg
+
+    def send(self, server: socket.socket, queue: queue.Queue = None):
         """Sends the command to the server and returns the parsed result."""
         if self.type not in command_parsers:
             raise NotImplementedError("Command %s not implemented" % self.type)
         send_to_server(server, str(self))
-        msg = recv_from_server(server)
+        msg = self.read_until_broadcast(server, queue)
         if self.type == CommandNames.INCANTATION:
-            msg = recv_from_server(server)
+            msg = self.read_until_broadcast(server, queue)
         if not self.check_return(msg):
             return None
         return command_parsers[self.type](self, msg)
+
+
+def go_to_direction(server: socket.socket, direction: Directions, queue: queue.Queue = None) -> None:
+    """Goes to the given direction."""
+    if direction == Directions.FORWARD:
+        Command(CommandNames.FORWARD).send(server, queue)
+    elif direction == Directions.RIGHT or direction == Directions.LEFT:
+        Command(direction).send(server, queue)
+        Command(CommandNames.FORWARD).send(server, queue)
+    elif direction == Directions.BACKWARD:
+        Command(CommandNames.LEFT).send(server, queue)
+        Command(CommandNames.LEFT).send(server, queue)
+        Command(CommandNames.FORWARD).send(server, queue)
+    elif direction == Directions.TOP_RIGHT or direction == Directions.TOP_LEFT:
+        Command(CommandNames.FORWARD).send(server, queue)
+        if direction == Directions.TOP_RIGHT:
+            go_to_direction(server, Directions.RIGHT, queue)
+        else:
+            go_to_direction(server, Directions.LEFT, queue)
+    elif direction == Directions.BOTTOM_RIGHT or direction == Directions.BOTTOM_LEFT:
+        go_to_direction(server, Directions.BACKWARD, queue)
+        if direction == Directions.BOTTOM_RIGHT:
+            go_to_direction(server, Directions.LEFT, queue)
+        else:
+            go_to_direction(server, Directions.RIGHT, queue)
+
 
 command_parsers = create_command_parsers(Command)

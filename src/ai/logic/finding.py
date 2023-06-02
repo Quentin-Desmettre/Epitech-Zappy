@@ -1,4 +1,4 @@
-import math, socket
+import math, socket, queue
 from src.ai.utils import add_to_dict
 from src.ai.commands import Objects, Directions, Command, CommandNames
 
@@ -49,16 +49,16 @@ def get_object_path(object: Objects, tiles: list[list[str]]) -> list[Directions]
     return get_path_from_index(closest_index)
 
 
-def go_to_object(server: socket.socket, desired: Objects, tiles: list[list[str]] | None) -> bool:
+def go_to_object(server: socket.socket, desired: Objects, tiles: list[list[str]] | None, queue: queue.Queue) -> bool:
     """Take the shortest path to the desired object and loot it if possible."""
     if tiles is None:
-        tiles = Command(CommandNames.LOOK).send(server)
+        tiles = Command(CommandNames.LOOK).send(server, queue)
     if tiles is None:
-        return
+        return False
     directions = get_object_path(desired, tiles)
     for direction in directions:
-        if Command(direction).send(server) == None:
+        if Command(direction).send(server, queue) == None:
             break
     if len(directions) != 0 and desired != Objects.PLAYER:
-        Command(CommandNames.TAKE, desired.value).send(server)
+        Command(CommandNames.TAKE, desired.value).send(server, queue)
     return len(directions) != 0

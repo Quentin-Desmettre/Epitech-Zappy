@@ -51,20 +51,20 @@ def main():
 
     recv_from_server(server)
     send_to_server(server, name)
-    cli_num = recv_from_server(server)
-    if cli_num == "ko":
+    left = recv_from_server(server)
+    if left == "ko":
         print("Error: bad team name")
         exit(84)
-    cli_num = int(cli_num)
+    left = int(left)
     map_size = recv_from_server(server)
     if map_size == "ko":
         print("Error: too many clients")
         exit(84)
     map_size = map_size.split(" ")
     map_size = (int(map_size[0]), int(map_size[1]))
-    print("cli_num: " + str(cli_num) + "\nmap_size: " + str(map_size))
+    print("left: " + str(left) + "\nmap_size: " + str(map_size))
 
-    ai = Ai(server)
+    ai = Ai(server, name)
     while True:
         ai.make_decision()
 
