@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/select.h>
+#include <fcntl.h>
+#include <errno.h>
 #include "utility/linked_list.h"
 #include "utility/strings.h"
 
@@ -20,15 +22,37 @@ list_t **packet_waitlist(void)
     return &list;
 }
 
+static void set_socket_blocking(int fd, bool block)
+{
+    int flags = fcntl(fd, F_GETFL, 0);
+
+    if (flags == -1) {
+        perror("fcntl");
+        exit(84);
+    }
+    if (block)
+        flags &= ~O_NONBLOCK;
+    else
+        flags |= O_NONBLOCK;
+    if (fcntl(fd, F_SETFL, flags) == -1) {
+        perror("fcntl");
+        exit(84);
+    }
+}
+
 static void *try_write(int fd, const void *data, size_t size)
 {
-    ssize_t res = write(fd, data, size);
+    ssize_t res;
 
-    if (res == -1) {
+    set_socket_blocking(fd, false);
+    res = write(fd, data, size);
+    set_socket_blocking(fd, true);
+    if (res < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
         perror("write");
         exit(84);
     }
-    if (res != (ssize_t)size)
+    res = NULL_IF_NEG(res);
+    if ((size_t)res != size)
         return create_packet(fd, data + res, size - res);
     return NULL;
 }
@@ -64,11 +88,7 @@ void safe_write(int fd, void *data, size_t size)
 
     FD_ZERO(&set);
     FD_SET(fd, &set);
-    select_rval = select(fd + 1, NULL, &set, NULL, &timeout);
-    if (select_rval == -1) {
-        perror("select");
-        exit(84);
-    }
+    select_rval = try_select(fd + 1, NULL, &set, &timeout);
     if (select_rval == 0)
         return append_node(packet_waitlist(), create_packet(fd, data, size));
     tmp = try_write(fd, data, size);

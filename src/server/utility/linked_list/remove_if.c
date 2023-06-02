@@ -42,7 +42,7 @@ void remove_if(list_t **list, void *data, bool (*eq_cmp)(void *, void *),
 label:
     do {
         if (!((!eq_cmp && data == s->data) ||
-        (eq_cmp && eq_cmp(s->data, data)))) {
+        (eq_cmp && eq_cmp(data, s->data)))) {
             s = s->next;
             continue;
         }

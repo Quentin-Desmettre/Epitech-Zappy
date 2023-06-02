@@ -8,7 +8,13 @@
 #include "utility/garbage_collector.h"
 #include <criterion/criterion.h>
 #include <stdio.h>
+#include <criterion/redirect.h>
 
+static void redirect_stdout_err(void)
+{
+    cr_redirect_stderr();
+    cr_redirect_stdout();
+}
 s_list_t **malloc_stack(void);
 
 Test(my_malloc, my_malloc_normal)
@@ -89,12 +95,12 @@ Test(my_malloc, my_strdup_normal)
     cr_assert(*malloc_stack() == NULL);
 }
 
-Test(my_malloc, enormous_malloc, .exit_code = 84)
+Test(my_malloc, enormous_malloc, .exit_code = 84, .init = redirect_stdout_err)
 {
     my_malloc(1000000000000);
 }
 
-Test(my_malloc, enormous_calloc, .exit_code = 84)
+Test(my_malloc, enormous_calloc, .exit_code = 84, .init = redirect_stdout_err)
 {
     my_calloc(1000000000000, 1000000000000);
 }

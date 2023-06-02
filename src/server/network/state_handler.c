@@ -65,7 +65,7 @@ void handle_connected(server_t *server, client_t *cli, const char *cmd)
         cli->state = GUI;
         answer = get_gui_connected_answer(server);
         safe_write(cli->fd, answer, strlen(answer));
-        return free(answer);
+        return my_free(answer);
     }
     team = get_team_by_name(server, cmd);
     if (!team || team->available_slots == 0) {

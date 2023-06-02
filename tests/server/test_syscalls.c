@@ -9,6 +9,13 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include "utility/strings.h"
+#include <criterion/redirect.h>
+
+static void redirect_stdout_err(void)
+{
+    cr_redirect_stderr();
+    cr_redirect_stdout();
+}
 
 Test(bytes_available, bytes_available)
 {
@@ -22,7 +29,7 @@ Test(bytes_available, bytes_available)
     cr_assert_eq(bytes_available(fd), 4);
 }
 
-Test(bytes_available, bytes_available_invalid_fd, .exit_code = 84)
+Test(bytes_available, bytes_available_invalid_fd, .exit_code = 84, .init = redirect_stdout_err)
 {
     bytes_available(-1);
 }
@@ -50,7 +57,7 @@ Test(select, select)
     cr_assert_eq(try_select(1, &read_fds, NULL, &timeout), 0);
 }
 
-Test(select, select_error, .exit_code = 84)
+Test(select, select_error, .exit_code = 84, .init = redirect_stdout_err)
 {
     fd_set read_fds;
 

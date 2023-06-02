@@ -10,6 +10,7 @@
     #include <stddef.h>
     #include <stdbool.h>
     #include <sys/select.h>
+    #define NULL_IF_NEG(x) ((x) & ~((x) >> (sizeof(int) * 8 - 1)))
 
 // str array
 char **str_to_word_array(const char *str, const char *delim, int *len);

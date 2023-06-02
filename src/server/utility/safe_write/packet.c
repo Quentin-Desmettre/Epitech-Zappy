@@ -7,7 +7,6 @@
 
 #include "utility/safe_write.h"
 #include "utility/strings.h"
-#include <stdlib.h>
 #include "utility/garbage_collector.h"
 
 void *create_packet(int fd, const void *data, size_t size)
@@ -26,9 +25,7 @@ void free_packet(void *packet)
     my_free(packet);
 }
 
-bool compare_packet(void *fd, void *packet)
+bool compare_packet(void *fds, void *packet)
 {
-    int int_fd = *(int *)fd;
-
-    return ((packet_t *)packet)->fd == int_fd;
+    return FD_ISSET(((packet_t *)(packet))->fd, (fd_set *)(fds));
 }
