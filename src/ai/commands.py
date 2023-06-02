@@ -1,5 +1,5 @@
-import socket, enum, queue
-from src.ai.utils import send_to_server, recv_from_server, on, create_command_parsers
+import socket, enum, queue, time, regex
+from src.ai.utils import send_to_server, recv_from_server, on, create_command_parsers, clean_queue
 
 command_parsers = {}
 
@@ -44,6 +44,36 @@ class CommandNames(enum.Enum):
     INCANTATION = "Incantation"
 
 
+class PossibleResponsesRegex(enum.Enum):
+    """Enum representing all the possible responses from the server."""
+    FORWARD = [r"^ok$"]
+    RIGHT = [r"^ok$"]
+    LEFT = [r"^ok$"]
+    LOOK = [r"\[\s*(?:\w+\s*)*\s*(?:,\s*(?:\w+\s*)*)*\]"]
+    INVENTORY = [r"\[\s*\w+\s*\d+\s*(?:,\s*(?:\w+)\s*\d+\s*)*\]"]
+    BROADCAST = [r"^ok$"]
+    CONNECT_NBR = [r"^[0-9]+$",]
+    FORK = [r"^ok$",]
+    EJECT = [r"^ok$", r"^ko$"]
+    TAKE = [r"^ok$", r"^ko$"]
+    SET = [r"^ok$", r"^ko$"]
+    INCANTATION = [r"^Elevation underway$", r"^Current level: [0-9]+$", r"^ko$"]
+    MESSAGE = [r"^message [0-9]+, .+$"]
+
+
+def get_regexes(cmd: CommandNames) -> list[regex.Pattern]:
+    """Returns the regexes corresponding to the given command."""
+    return [regex.compile(regex_str) for regex_str in PossibleResponsesRegex[cmd.name].value]
+
+
+class ElevationException(Exception):
+    """Exception raised to catch elevation message."""
+
+    def __init__(self, cmd_type: CommandNames, msg: str) -> None:
+        self.cmd_type = cmd_type
+        self.msg = msg
+
+
 class Command:
     """Class representing a command."""
 
@@ -70,18 +100,33 @@ class Command:
 
     @on(CommandNames.FORWARD)
     def parse_forward(self, result: str):
-        return result
+        for reg in PossibleResponsesRegex.FORWARD.value:
+            if regex.match(reg, result):
+                return result
+        raise ValueError("Invalid response %s for command %s" % (result, self.type))
 
     @on(CommandNames.RIGHT)
     def parse_right(self, result: str):
-        return result
+        for reg in PossibleResponsesRegex.RIGHT.value:
+            if regex.match(reg, result):
+                return result
+        raise ValueError("Invalid response %s for command %s" % (result, self.type))
 
     @on(CommandNames.LEFT)
     def parse_left(self, result: str):
-        return result
+        for reg in PossibleResponsesRegex.LEFT.value:
+            if regex.match(reg, result):
+                return result
+        raise ValueError("Invalid response %s for command %s" % (result, self.type))
 
     @on(CommandNames.LOOK)
     def parse_look(self, result: str) -> list[list[str]]:
+        matched = False
+        for reg in PossibleResponsesRegex.LOOK.value:
+            if regex.match(reg, result):
+                matched = True
+        if not matched:
+            raise ValueError("Invalid response %s for command %s" % (result, self.type))
         if result == "[]":
             return []
         result = result.strip()[1:-1].split(",")
@@ -91,6 +136,12 @@ class Command:
 
     @on(CommandNames.INVENTORY)
     def parse_inventory(self, result: str) -> dict[str, int]:
+        matched = False
+        for reg in PossibleResponsesRegex.INVENTORY.value:
+            if regex.match(reg, result):
+                matched = True
+        if not matched:
+            raise ValueError("Invalid response %s for command %s" % (result, self.type))
         result = result.strip()[1:-1].split(",")
         result = [obj.strip().split(" ") for obj in result]
         result = {obj[0]: int(obj[1]) for obj in result if obj[0] != "" and obj[1] != ""}
@@ -98,37 +149,55 @@ class Command:
 
     @on(CommandNames.BROADCAST)
     def parse_broadcast(self, result: str):
-        return result
+        for reg in PossibleResponsesRegex.BROADCAST.value:
+            if regex.match(reg, result):
+                return result
+        raise ValueError("Invalid response %s for command %s" % (result, self.type))
 
     @on(CommandNames.CONNECT_NBR)
     def parse_connect_nbr(self, result: str):
-        return int(result)
+        for reg in PossibleResponsesRegex.CONNECT_NBR.value:
+            if regex.match(reg, result):
+                return result
+        raise ValueError("Invalid response %s for command %s" % (result, self.type))
 
     @on(CommandNames.FORK)
     def parse_fork(self, result: str):
-        return result
+        for reg in PossibleResponsesRegex.FORK.value:
+            if regex.match(reg, result):
+                return result
+        raise ValueError("Invalid response %s for command %s" % (result, self.type))
 
     @on(CommandNames.EJECT)
     def parse_eject(self, result: str):
-        return result
+        for reg in PossibleResponsesRegex.EJECT.value:
+            if regex.match(reg, result):
+                return result
+        raise ValueError("Invalid response %s for command %s" % (result, self.type))
 
     @on(CommandNames.TAKE)
     def parse_take(self, result: str):
-        return result
+        for reg in PossibleResponsesRegex.TAKE.value:
+            if regex.match(reg, result):
+                return result
+        raise ValueError("Invalid response %s for command %s" % (result, self.type))
 
     @on(CommandNames.SET)
     def parse_set(self, result: str):
-        return result
+        for reg in PossibleResponsesRegex.SET.value:
+            if regex.match(reg, result):
+                return result
+        raise ValueError("Invalid response %s for command %s" % (result, self.type))
 
     @on(CommandNames.INCANTATION)
     def parse_incantation(self, result: str):
-        return result
+        for reg in PossibleResponsesRegex.INCANTATION.value:
+            if regex.match(reg, result):
+                return result
+        raise ValueError("Invalid response %s for command %s" % (result, self.type))
 
     def check_return(self, result: str) -> bool:
         """Checks if the command was successful."""
-        if result == "dead":
-            print("You died")
-            exit(0)
         if result == "ko":
             print("Command %s failed" % self.type.value)
             return False
@@ -137,12 +206,15 @@ class Command:
     def read_until_broadcast(self, server: socket.socket, queue: queue.Queue) -> str:
         """Reads the server until no more broadcast are received."""
         msg = recv_from_server(server)
-        while msg.startswith("message"):
+        while regex.match(PossibleResponsesRegex.MESSAGE.value[0], msg):
             if queue is not None:
-                while queue.qsize() > 0:
-                    queue.get()
-                queue.put(msg)
+                if msg.count("incantation") > 0:
+                    clean_queue(queue)
+                queue.put([msg, time.time()])
             msg = recv_from_server(server)
+        if regex.match(PossibleResponsesRegex.INCANTATION.value[0], msg)\
+        or regex.match(PossibleResponsesRegex.INCANTATION.value[1], msg):
+            raise ElevationException(self.type, msg)
         return msg
 
     def send(self, server: socket.socket, queue: queue.Queue = None):
@@ -151,8 +223,8 @@ class Command:
             raise NotImplementedError("Command %s not implemented" % self.type)
         send_to_server(server, str(self))
         msg = self.read_until_broadcast(server, queue)
-        if self.type == CommandNames.INCANTATION:
-            msg = self.read_until_broadcast(server, queue)
+        # if self.type == CommandNames.INCANTATION:
+        #     msg = self.read_until_broadcast(server, queue)
         if not self.check_return(msg):
             return None
         return command_parsers[self.type](self, msg)

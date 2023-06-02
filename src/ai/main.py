@@ -3,6 +3,7 @@
 import sys, socket
 from src.ai.utils import send_to_server, recv_from_server
 from src.ai.logic.brain import Ai
+from src.ai.commands import ElevationException
 
 
 def print_usage():
@@ -65,13 +66,20 @@ def main():
     print("left: " + str(left) + "\nmap_size: " + str(map_size))
 
     ai = Ai(server, name)
+    exception = None
     while True:
-        ai.make_decision()
+        try:
+            if exception is not None:
+                ai.elevate(False, exception.cmd_type, exception.msg)
+                exception = None
+            ai.make_decision()
+        except ElevationException as e:
+            exception = e
 
 
 if __name__ == "__main__":
-    try:
+    # try:
         main()
-    except Exception as e:
-        print(e)
-        exit(84)
+    # except Exception as e:
+    #     print(e)
+    #     exit(84)
