@@ -74,6 +74,8 @@ void handle_connected(server_t *server, client_t *cli, const char *cmd)
     }
     cli->state = AI;
     cli->data = create_player(server->trantor, cmd);
+    notify_gui(server, PLAYER_CONNECTION, cli->data->id, cli->data->x,
+    cli->data->y, cli->data->dir, cli->data->level, cli->data->team_name);
 }
 
 void handle_gui(server_t *server, UNUSED client_t *cli, const char *cmd)

@@ -25,6 +25,31 @@
     #define WELCOME_MESSAGE "WELCOME\n"
     #define UNUSED __attribute__((unused))
 
+enum gui_event {
+    PLAYER_CONNECTION,
+    EXPULSION,
+    BROADCAST,
+    START_INCANTATION,
+    END_INCANTATION,
+    EGG_LAYED_BY_ME,
+    RESOURCE_DROP,
+    RESOURCE_COLLECT,
+    PLAYER_DEATH,
+    EGG_LAYED_BY_OTHER,
+    EGG_HATCHED,
+    EGG_DEAD,
+    END_OF_GAME,
+    SERVER_MESSAGE,
+    NUM_GUI_EVENTS
+};
+
+typedef struct {
+    enum gui_event event;
+    const char *format_str;
+} gui_event_t;
+
+extern const gui_event_t GUI_EVENTS[];
+
 typedef struct server_init {
     int fd;
     list_t *clients;
@@ -119,5 +144,7 @@ bool do_action_pre_check(action_t *action, trantor_t *trantor, client_t *cli);
  * @param cli
  */
 void do_action(action_t *action, trantor_t *trantor, client_t *cli);
+
+void notify_gui(server_t *server, enum gui_event event, ...);
 
 #endif //EPITECH_ZAPPY_SERVER_H

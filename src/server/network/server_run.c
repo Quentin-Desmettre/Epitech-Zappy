@@ -11,7 +11,7 @@
 #include "utility/strings.h"
 #include <string.h>
 
-void handle_actions(server_t *server)
+static void handle_actions(server_t *server)
 {
     list_t *tmp = server->clients;
     action_t *action;

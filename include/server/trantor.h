@@ -99,6 +99,7 @@ typedef struct player {
     int level;
     int x;
     int y;
+    int id;
     direction_t dir;
 
     /**
@@ -109,6 +110,7 @@ typedef struct player {
 
     action_t *current_action;
     list_t *buffered_actions;
+    const char *team_name;
 } player_t;
 
 player_t *create_player(trantor_t *trantor, const char *team_name);
