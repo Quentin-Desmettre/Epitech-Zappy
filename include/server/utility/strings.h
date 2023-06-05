@@ -31,5 +31,7 @@ int bytes_available(int fd);
 void get_time(struct timespec *timeout);
 int try_select(int fd_max, fd_set *read_fds,
                 fd_set *write_fds, struct timeval *timeout);
+bool is_timespec_less(struct timespec *t1, struct timespec *t2);
+bool is_timespec_equal(struct timespec *t1, struct timespec *t2);
 
 #endif //EPITECH_ZAPPY_STRINGS_H

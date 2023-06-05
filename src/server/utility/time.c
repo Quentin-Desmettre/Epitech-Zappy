@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sys/ioctl.h>
+#include <stdbool.h>
 
 int bytes_available(int fd)
 {
@@ -39,4 +40,18 @@ int try_select(int fd_max, fd_set *read_fds,
         exit(84);
     }
     return ret;
+}
+
+bool is_timespec_less(struct timespec *t1, struct timespec *t2)
+{
+    if (t1->tv_sec < t2->tv_sec)
+        return (true);
+    if (t1->tv_sec == t2->tv_sec && t1->tv_nsec < t2->tv_nsec)
+        return (true);
+    return (false);
+}
+
+bool is_timespec_equal(struct timespec *t1, struct timespec *t2)
+{
+    return (t1->tv_sec == t2->tv_sec && t1->tv_nsec / 1000000 == t2->tv_nsec / 1000000);
 }
