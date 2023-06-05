@@ -1,0 +1,1 @@
+rm -rf build cmake-build-debug zappy_server zappy_ai zappy_gui
