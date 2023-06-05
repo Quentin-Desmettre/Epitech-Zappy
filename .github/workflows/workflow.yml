@@ -29,13 +29,15 @@ jobs:
 
       - name: Install raylib
         run: |
-          sudo apt install build-essential git
+          sudo apt install build-essential git cmake
           sudo apt install libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev
           git clone https://github.com/raysan5/raylib.git raylib
-          cd raylib/src
-          make PLATFORM=PLATFORM_DESKTOP RAYLIB_LIBTYPE=SHARED
-          sudo make install PLATFORM=PLATFORM_DESKTOP RAYLIB_LIBTYPE=SHARED
-          cd ../..
+          cd raylib
+          mkdir build && cd build
+          cmake -DBUILD_SHARED_LIBS=ON ..
+          make
+          sudo make install
+          cd ../../
           rm -rf raylib
 
 #      - name: Install criterion

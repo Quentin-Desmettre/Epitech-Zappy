@@ -4,6 +4,7 @@ project(Epitech-Zappy)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+set(CMAKE_C_FLAGS "-Wall -Wextra")
 set(PAULIIINNN zappy_gui)
 
 if (APPLE) # Mac OS X
@@ -14,24 +15,18 @@ include_directories(include)
 include_directories(include/gui)
 include_directories(include/server)
 
-find_package(Boost REQUIRED)
+find_package(Boost QUIET)
 include_directories(${Boost_INCLUDE_DIR})
 
-find_package(raylib REQUIRED)
+find_package(raylib QUIET)
 include_directories(${RAYLIB_INCLUDE_DIRS})
 
 if (NOT Boost_FOUND)
-    message(FATAL_ERROR "Please install boost!")
-    message(FATAL_ERROR "On Ubuntu: sudo apt install libboost-all-dev")
-    message(FATAL_ERROR "On Mac OS X: brew install boost")
-    message(FATAL_ERROR "On Windows: https://www.boost.org/doc/libs/1_75_0/more/getting_started/windows.html")
+    message(FATAL_ERROR "Please install boost!\nOn Ubuntu: sudo apt install libboost-all-dev\nOn Mac OS X: brew install boost\nOn Windows: https://www.boost.org/doc/libs/1_75_0/more/getting_started/windows.html")
 endif ()
 
 if (NOT raylib_FOUND)
-    message(FATAL_ERROR "Please install raylib!")
-    message(FATAL_ERROR "On Ubuntu: sudo apt install libraylib-dev")
-    message(FATAL_ERROR "On Mac OS X: brew install raylib")
-    message(FATAL_ERROR "On Windows: ")
+    message(FATAL_ERROR "Please install raylib!\nOn Ubuntu: sudo apt install libraylib-dev\nOn Mac OS X: brew install raylib\nOn Windows:")
 endif ()
 
 add_executable(zappy_gui
