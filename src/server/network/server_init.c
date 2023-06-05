@@ -6,9 +6,8 @@
 */
 
 #include "server.h"
-#include "args.h"
+#include "strings.h"
 #include <sys/socket.h>
-#include <string.h>
 #include <netinet/in.h>
 #include <unistd.h>
 

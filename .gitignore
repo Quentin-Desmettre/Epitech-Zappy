@@ -9,3 +9,6 @@ CMakeLists.txt
 a.out
 cmake-build-debug
 .idea
+build
+.DS_Store
+test.sh
