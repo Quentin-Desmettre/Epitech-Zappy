@@ -87,7 +87,8 @@ jobs:
       - name: Check if it compiles
         shell: bash
         run: |
-          make zappy_server zappy_gui zappy_ai
+          cmake .
+          make
           ls zappy_server zappy_gui zappy_ai
 
       - name: Run tests
