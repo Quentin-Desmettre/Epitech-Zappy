@@ -1,8 +1,9 @@
 import socket, random, queue, time
-from src.ai.commands import Command, CommandNames, Objects, Directions, ElevationException, go_to_direction
+from src.ai.commands import Command, CommandNames, Objects, Directions, go_to_direction
 from src.ai.logic.finding import go_to_object
 from src.ai.logic.evolve import has_stones, get_needed_stones, get_items_on_ground, get_elevation_needs
-from src.ai.utils import recv_from_server, queue_contains, merge_dicts
+from src.ai.utils import merge_dicts, queue_contains, my_print, set_color, Colors
+
 
 class Ai:
     """Artificial intelligence class."""
@@ -14,6 +15,16 @@ class Ai:
         self.level = 1
         self.broadcast_queue = queue.Queue()
         self.last_movement = time.time()
+        self.delta = 0
+        self.can_send = True
+        self.calibrate()
+
+    def calibrate(self):
+        current_time = time.time()
+        Command(CommandNames.INVENTORY).send(self.server, self.broadcast_queue)
+        self.delta = time.time() - current_time
+        Command(CommandNames.INVENTORY).send(self.server, self.broadcast_queue)
+        self.delta = (time.time() - current_time - self.delta) / 2
 
     def add_to_shared_inventory(self, object: str, amount: int) -> None:
         """Adds an object to the inventory."""
@@ -39,37 +50,32 @@ class Ai:
             self.add_to_shared_inventory(msg.split(':')[2], 1)
         elif msg.startswith("dropped"):
             self.add_to_shared_inventory(msg.split(':')[2], -1)
-        elif msg.startswith("incantation") and direction != Directions.HERE:
+        elif msg.startswith("moved"):
+            self.can_send = True
+        elif msg.startswith("incantation"):
             # inventory = Command(CommandNames.INVENTORY).send(self.server, self.broadcast_queue)
-            # and not self.can_evolve(merge_dicts(get_items_on_ground(self.server, self.broadcast_queue), inventory))
-            if self.level > 1:
-                print("moving to other player")
+            if direction == Directions.HERE:
+                self.drop_elevation_stones(False)
+            else:
+            # and not self.can_evolve(merge_dicts(get_items_on_ground(self.server, self.broadcast_queue), inventory)):
+                my_print("moving to other player")
                 go_to_direction(self.server, direction, self.broadcast_queue)
                 self.last_movement = time.time()
-            tiles = Command(CommandNames.LOOK).send(self.server, self.broadcast_queue)
-            if list(tiles[0]).count("player") > 1:
-                msg = recv_from_server(self.server)
-                if msg == "Elevation underway" or msg.startswith("Current level:"):
-                    raise ElevationException(CommandNames.INCANTATION, msg)
-                self.broadcast_queue.put([msg, time.time()])
-        else:
-            self.drop_elevation_stones(False)
 
     def elevate(self, send_cmd: bool = True, cmd_type: CommandNames = None, msg: str = None):
         if send_cmd:
             Command(CommandNames.INCANTATION).send(self.server, self.broadcast_queue)
         elif cmd_type != None:
-            if not msg.startswith("Current level:"):
-                msg = Command(CommandNames.INCANTATION).read_until_broadcast(self.server, self.broadcast_queue)
+            # if cmd_type != CommandNames.INCANTATION:
+            #     my_print("read useless message")
+            #     recv_from_server(self.server)
             if msg.startswith("Current level:"):
                 self.level = int(msg.split(" ")[2])
-                print("Elevated to level %d" % self.level)
-                # if self.level == 8:
-                #     exit(42)
+                my_print("Elevated to level %d !!!" % self.level)
+                if self.level == 8:
+                    exit(42)
             else:
-                print("Error: could not elevate")
-            if cmd_type != CommandNames.INCANTATION:
-                recv_from_server(self.server)
+                my_print("Error: could not elevate")
 
     def can_evolve(self, inventory: dict[str, int]):
         """Returns whether the player can evolve or not."""
@@ -90,9 +96,9 @@ class Ai:
         tiles = Command(CommandNames.LOOK).send(self.server, self.broadcast_queue)
         if tiles == None:
             return False
-        if object.value in tiles[0]:
+        if object.value in tiles[0] and (tiles[0].count(Objects.PLAYER.value) <= 1 or object == Objects.FOOD):
             if Command(CommandNames.TAKE, object.value).send(self.server, self.broadcast_queue) == "ko":
-                print("Error: could not loot %s" % object.name)
+                my_print("Error: could not loot %s" % object.name)
                 return False
         elif go_to_object(self.server, object, tiles, self.broadcast_queue) == False:
             if can_move_randomly:
@@ -127,50 +133,68 @@ class Ai:
         inventory[stone.value] += 1
         if not self.can_evolve(merge_dicts(get_items_on_ground(self.server, self.broadcast_queue), inventory)):
             Command(CommandNames.BROADCAST, "looted:" + self.team + ":" + stone.value).send(self.server, self.broadcast_queue)
+            time.sleep(self.delta)
 
     def drop_elevation_stones(self, is_main_player = False) -> bool:
         """Drops all the stones needed to evolve and returns whether the player can evolve or not."""
         inventory = Command(CommandNames.INVENTORY).send(self.server, self.broadcast_queue)
         ground = get_items_on_ground(self.server, self.broadcast_queue)
         total = merge_dicts(inventory, ground)
-        to_drop = get_needed_stones(ground, self.level)
         if is_main_player:
             if len(get_needed_stones(total, self.level)) != 0:
-                print("Not enough stones to evolve.")
+                my_print("Not enough stones to evolve.")
                 return False
-            if ground[Objects.PLAYER.value] < get_elevation_needs(self.level)[Objects.PLAYER]:
-                print("Not enough players to evolve.")
+            if ground[Objects.PLAYER.value] < 8:
+                my_print("Not enough players to evolve.")
                 return False
-        for stone in to_drop:
-            while inventory[stone.value] > 0 and stone in to_drop:
-                Command(CommandNames.SET, stone.value).send(self.server, self.broadcast_queue)
-                Command(CommandNames.BROADCAST, "dropped:" + self.team + ":" + stone.value).send(self.server, self.broadcast_queue)
-                inventory[stone.value] -= 1
-        print("Dropped all stones needed to evolve.")
+        for stone in inventory:
+            while inventory[stone] > 0 and stone != Objects.FOOD.value:
+                if Command(CommandNames.SET, stone).send(self.server, self.broadcast_queue) != None:
+                    Command(CommandNames.BROADCAST, "dropped:" + self.team + ":" + stone).send(self.server, self.broadcast_queue)
+                    inventory[stone] -= 1
+                    time.sleep(self.delta)
+        my_print("Dropped all stones needed to evolve.")
         return True
 
     def make_decision(self):
         """Takes a decision based on the current state of the game."""
+        set_color(None)
+        my_print("Making decision")
         inventory = Command(CommandNames.INVENTORY).send(self.server, self.broadcast_queue)
-        if inventory == None:
+        if inventory is None:
             return
+        can_evolve = self.can_evolve(merge_dicts(get_items_on_ground(self.server, self.broadcast_queue), inventory))
+        print(can_evolve)
         if "food" not in inventory or inventory["food"] < 5:
-            print("Looting food")
+            set_color(Colors.WARNING)
+            my_print("Looting food")
             self.take_food(inventory)
+            self.can_send = True
         elif self.broadcast_queue.qsize() > 0:
+            set_color(Colors.OKCYAN)
             msg = self.broadcast_queue.get()
-            if msg[0].count("incantation") == 0 or msg[1] > self.last_movement:
-                print("Analyzing broadcast")
+            if msg[0].count("incantation") == 0\
+            or (msg[1] > self.last_movement and msg[0].count(str(self.level + 1)) > 0):
+                my_print("Analyzing broadcast %s" % msg[0])
                 self.parse_message(msg[0])
-        elif self.can_evolve(merge_dicts(get_items_on_ground(self.server, self.broadcast_queue), inventory)):
-            # if queue_contains(self.broadcast_queue, "incantation"):
-            #     return
-            print("Trying to evolve to level %d" % (self.level + 1))
-            if not self.drop_elevation_stones(True):
-                Command(CommandNames.BROADCAST, "incantation:" + self.team).send(self.server, self.broadcast_queue)
-                time.sleep(0.1)
-            else:
+            if msg[0].count("incantation") > 0:
+                Command(CommandNames.BROADCAST, "moved:" + self.team).send(self.server, self.broadcast_queue)
+                time.sleep(self.delta)
+        elif can_evolve:
+            set_color(Colors.HEADER)
+            if queue_contains(self.broadcast_queue, "incantation"):
+                return
+            my_print("Trying to evolve to level %d" % (self.level + 1))
+            if self.drop_elevation_stones(True):
                 self.elevate()
+            elif self.can_send:
+                cmd = Command(CommandNames.BROADCAST, "incantation:" + self.team + ":" + str(self.level + 1))
+                # if not cmd.read_before_write(self.server, self.broadcast_queue):
+                cmd.send(self.server, self.broadcast_queue)
+                self.can_send = False
+            else:
+                my_print("cannot send :(")
         else:
-            print("Looting stones")
+            set_color(Colors.OKGREEN)
+            my_print("Looting stones")
             self.take_stones(inventory)

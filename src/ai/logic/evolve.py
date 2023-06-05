@@ -74,7 +74,10 @@ def get_needed_stones(inventory: dict[Objects, int], current_level: int) -> list
 
 
 def get_items_on_ground(server: socket.socket, queue: queue.Queue) -> dict[str, int]:
-    tile = Command(CommandNames.LOOK).send(server, queue)[0]
+    tile = Command(CommandNames.LOOK).send(server, queue)
+    if tile is None:
+        return {}
+    tile = tile[0]
     items = {}
     for item in tile:
         if item in items:

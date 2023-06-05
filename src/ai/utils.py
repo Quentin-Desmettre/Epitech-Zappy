@@ -1,6 +1,40 @@
 import socket, functools, queue
+from typing import Literal
+
+
+class Colors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 
 parser_funcs_names = []
+current_color = Colors.HEADER
+
+
+def my_print(*values: object,
+    sep: str | None = " ",
+    end: str | None = "\n") -> None:
+    """Prints a message with a color."""
+    global current_color
+    if current_color is not None:
+        print(current_color, end="")
+    print(*values, sep=sep, end=end)
+    if current_color is not None:
+        print(Colors.ENDC, end="")
+
+
+def set_color(color: Colors | None) -> None:
+    """Sets the color for the next printed messages."""
+    global current_color
+    current_color = color
+
 
 def on(command):
     """Function decorator to mark function as parser for specific command."""
@@ -36,7 +70,7 @@ def create_command_parsers(obj) -> dict[str, callable]:
 def send_to_server(server: socket.socket, msg: str) -> None:
     """Sends a message to the server."""
     server.send((msg + "\n").encode())
-    print("sending: " + msg)
+    my_print("sending: " + msg)
 
 
 def recv_from_server(server: socket.socket) -> str:
@@ -45,9 +79,9 @@ def recv_from_server(server: socket.socket) -> str:
     while not msg.endswith("\n"):
         msg += server.recv(1).decode()
     if msg == "dead\n":
-        print("You died")
+        my_print("You died")
         exit(0)
-    print("received: " + msg, end="")
+    my_print("received: " + msg, end="")
     msg = msg[:-1]
     return msg
 
@@ -84,5 +118,9 @@ def queue_contains(to_check: queue.Queue, msg: str) -> bool:
 def merge_dicts(dict1: dict, dict2: dict) -> dict:
     """Merges two dictionaries."""
     merged = dict1.copy()
-    merged.update(dict2)
+    for key, value in dict2.items():
+        if key in merged:
+            merged[key] += value
+        else:
+            merged[key] = value
     return merged

@@ -60,5 +60,7 @@ def go_to_object(server: socket.socket, desired: Objects, tiles: list[list[str]]
         if Command(direction).send(server, queue) == None:
             break
     if len(directions) != 0 and desired != Objects.PLAYER:
-        Command(CommandNames.TAKE, desired.value).send(server, queue)
+        look = Command(CommandNames.LOOK).send(server, queue)
+        if look is not None and (look[0].count(Objects.PLAYER.value) <= 1 or desired == Objects.FOOD):
+            Command(CommandNames.TAKE, desired.value).send(server, queue)
     return len(directions) != 0

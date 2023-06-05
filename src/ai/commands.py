@@ -1,5 +1,5 @@
 import socket, enum, queue, time, regex
-from src.ai.utils import send_to_server, recv_from_server, on, create_command_parsers, clean_queue
+from src.ai.utils import send_to_server, recv_from_server, on, create_command_parsers, clean_queue, queue_contains
 
 command_parsers = {}
 
@@ -46,14 +46,14 @@ class CommandNames(enum.Enum):
 
 class PossibleResponsesRegex(enum.Enum):
     """Enum representing all the possible responses from the server."""
-    FORWARD = [r"^ok$"]
-    RIGHT = [r"^ok$"]
-    LEFT = [r"^ok$"]
-    LOOK = [r"\[\s*(?:\w+\s*)*\s*(?:,\s*(?:\w+\s*)*)*\]"]
-    INVENTORY = [r"\[\s*\w+\s*\d+\s*(?:,\s*(?:\w+)\s*\d+\s*)*\]"]
-    BROADCAST = [r"^ok$"]
-    CONNECT_NBR = [r"^[0-9]+$",]
-    FORK = [r"^ok$",]
+    FORWARD = [r"^ok$", r"^ko$"]
+    RIGHT = [r"^ok$", r"^ko$"]
+    LEFT = [r"^ok$", r"^ko$"]
+    LOOK = [r"\[\s*(?:\w+\s*)*\s*(?:,\s*(?:\w+\s*)*)*\]", r"^ko$"]
+    INVENTORY = [r"\[\s*\w+\s*\d+\s*(?:,\s*(?:\w+)\s*\d+\s*)*\]", r"^ko$"]
+    BROADCAST = [r"^ok$", r"^ko$"]
+    CONNECT_NBR = [r"^[0-9]+$", r"^ko$"]
+    FORK = [r"^ok$", r"^ko$"]
     EJECT = [r"^ok$", r"^ko$"]
     TAKE = [r"^ok$", r"^ko$"]
     SET = [r"^ok$", r"^ko$"]
@@ -203,28 +203,53 @@ class Command:
             return False
         return True
 
+    def check_matches(self, msg: str) -> bool:
+        regexes = get_regexes(self.type)
+        for reg in regexes:
+            if regex.match(PossibleResponsesRegex.INCANTATION.value[1], msg):
+                raise ElevationException(self.type, msg)
+            if regex.match(reg, msg):
+                return True
+        return False
+
     def read_until_broadcast(self, server: socket.socket, queue: queue.Queue) -> str:
         """Reads the server until no more broadcast are received."""
         msg = recv_from_server(server)
-        while regex.match(PossibleResponsesRegex.MESSAGE.value[0], msg):
-            if queue is not None:
+        while not self.check_matches(msg):
+            if queue is not None and regex.match(PossibleResponsesRegex.MESSAGE.value[0], msg):
                 if msg.count("incantation") > 0:
                     clean_queue(queue)
                 queue.put([msg, time.time()])
             msg = recv_from_server(server)
-        if regex.match(PossibleResponsesRegex.INCANTATION.value[0], msg)\
-        or regex.match(PossibleResponsesRegex.INCANTATION.value[1], msg):
-            raise ElevationException(self.type, msg)
         return msg
+
+    def read_before_write(self, server: socket.socket, queue: queue.Queue = None):
+        """read all the broadcast possible (non blocking)"""
+        return_value = False
+        server.setblocking(False)
+        while True:
+            try:
+                msg = recv_from_server(server)
+                if queue is not None and regex.match(PossibleResponsesRegex.MESSAGE.value[0], msg):
+                    if msg.count("incantation") > 0:
+                        clean_queue(queue)
+                        return_value = True
+                    queue.put([msg, time.time()])
+            except BlockingIOError:
+                break
+        server.setblocking(True)
+        return return_value
 
     def send(self, server: socket.socket, queue: queue.Queue = None):
         """Sends the command to the server and returns the parsed result."""
         if self.type not in command_parsers:
             raise NotImplementedError("Command %s not implemented" % self.type)
+        # if self.read_all_broadcast(server, queue) and self.arg is not None and self.arg.count("incantation") > 0:
+        #     return None
         send_to_server(server, str(self))
         msg = self.read_until_broadcast(server, queue)
-        # if self.type == CommandNames.INCANTATION:
-        #     msg = self.read_until_broadcast(server, queue)
+        if regex.match(PossibleResponsesRegex.INCANTATION.value[0], msg):
+            msg = self.read_until_broadcast(server, queue)
         if not self.check_return(msg):
             return None
         return command_parsers[self.type](self, msg)
