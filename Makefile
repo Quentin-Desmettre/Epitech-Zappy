@@ -21,11 +21,22 @@ GUI_NAME = zappy_gui
 CXX = g++
 CXXFLAGS = -Wall -Wextra -I ./include/gui -std=c++20
 
+ifeq ($(OS),Windows_NT)
+    detected_OS := Windows
+else
+    detected_OS := $(shell uname)
+endif
+
+ifeq ($(detected_OS),Darwin)
+	CXXFLAGS += -Wno-missing-field-initializers -L /opt/homebrew/opt/raylib/lib -I /opt/homebrew/opt/raylib/include
+endif
+
 all: $(SERVER_NAME) $(GUI_NAME) zappy_ai
 
 server: $(SERVER_NAME)
 gui: $(GUI_NAME)
 zappy_ai: server
+	echo $(OS)
 	cp $(SERVER_NAME) zappy_ai
 
 re-server:
