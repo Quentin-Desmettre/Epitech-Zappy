@@ -18,6 +18,7 @@ Mateyak::Camera::Camera(Vec3f position, Vec3f target, Vec3f up, float fov, int m
     _cam.projection = CAMERA_PERSPECTIVE;
 
     _oldCamPos = {static_cast<float>(GetMouseX()), static_cast<float>(GetMouseY())};
+    DisableCursor();
 }
 
 Matrix ConvertVectorToMatrix(const Vector3& vector) {

@@ -36,11 +36,11 @@ void Mateyak::Window::endDrawing()
 {
     EndDrawing();
 }
-//
-//void Mateyak::Window::begin3D(const Mateyak::Camera &camera)
-//{
-//    BeginMode3D(camera.getRayCam());
-//}
+
+void Mateyak::Window::begin3D(const Mateyak::Camera &camera)
+{
+    BeginMode3D(camera.getRayCam());
+}
 
 void Mateyak::Window::end3D()
 {

@@ -28,7 +28,7 @@ else
 endif
 
 ifeq ($(detected_OS),Darwin)
-	CXXFLAGS += -Wno-missing-field-initializers -L /opt/homebrew/opt/raylib/lib -I /opt/homebrew/opt/raylib/include
+	CXXFLAGS += -Wno-missing-field-initializers -Wno-unused-command-line-argument -L /opt/homebrew/opt/raylib/lib -I /opt/homebrew/opt/raylib/include
 endif
 
 all: $(SERVER_NAME) $(GUI_NAME) zappy_ai
