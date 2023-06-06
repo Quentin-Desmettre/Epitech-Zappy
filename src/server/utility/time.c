@@ -53,5 +53,5 @@ bool is_timespec_less(struct timespec *t1, struct timespec *t2)
 
 bool is_timespec_equal(struct timespec *t1, struct timespec *t2)
 {
-    return (t1->tv_sec == t2->tv_sec && t1->tv_nsec / 1000000 == t2->tv_nsec / 1000000);
+    return (t1->tv_sec == t2->tv_sec && t1->tv_nsec == t2->tv_nsec);
 }

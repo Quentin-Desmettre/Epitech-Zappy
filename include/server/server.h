@@ -7,6 +7,8 @@
 
 #ifndef EPITECH_ZAPPY_SERVER_H
     #define EPITECH_ZAPPY_SERVER_H
+    #define _GNU_SOURCE
+    #include <stdio.h>
     #include <stdlib.h>
     #include <time.h>
     #include <stdbool.h>
@@ -17,11 +19,13 @@
     #include "utility/garbage_collector.h"
 
     #define UINT64_MAX 18446744073709551615ULL
+    #define INT64_MAX 9223372036854775807LL
     #define GRAPHIC_COMMAND "GRAPHIC"
     #define ERR_NO_SLOTS "ko: Not enough opened slots\n"
     #define ERR_NO_TEAM "ko: No such team\n"
     #define ERR_NO_CMD "ko: No such command\n"
     #define AI_MAX_COMMANDS 10
+    #define MAX_CLIENTS 1000
     #define WELCOME_MESSAGE "WELCOME\n"
     #define UNUSED __attribute__((unused))
 
@@ -53,9 +57,16 @@ extern const gui_event_t GUI_EVENTS[];
 typedef struct server_init {
     int fd;
     list_t *clients;
+
+    // Actions
+    action_t *actions[MAX_CLIENTS];
+    int action_count;
+
     trantor_t *trantor;
     args_t params;
     bool run;
+
+    fd_set read_fds;
 } server_t;
 
 // Client handling
@@ -143,8 +154,10 @@ bool do_action_pre_check(action_t *action, trantor_t *trantor, client_t *cli);
  * @param server
  * @param cli
  */
-void do_action(action_t *action, trantor_t *trantor, client_t *cli);
+void do_action(action_t *action, trantor_t *trantor);
 
+void handle_actions(server_t *server);
+void put_action_in_waitlist(server_t *server, action_t *action);
 void notify_gui(server_t *server, enum gui_event event, ...);
 
 #endif //EPITECH_ZAPPY_SERVER_H

@@ -71,13 +71,13 @@ typedef enum ai_response_type {
 typedef struct ai_cmd_response {
     ai_response_type_t type;
     char *data;
-} ai_cmd_reponse_t;
+} ai_cmd_response_t;
 
-    #define AI_CMD_RESPONSE_OK (ai_cmd_reponse_t){OK, NULL}
-    #define AI_CMD_RESPONSE_KO (ai_cmd_reponse_t){KO, NULL}
-    #define AI_CMD_RESPONSE_TEXT(text) (ai_cmd_reponse_t){TEXT, text}
+    #define AI_CMD_RESPONSE_OK (ai_cmd_response_t){OK, NULL}
+    #define AI_CMD_RESPONSE_KO (ai_cmd_response_t){KO, NULL}
+    #define AI_CMD_RESPONSE_TEXT(text) (ai_cmd_response_t){TEXT, text}
 
-typedef ai_cmd_reponse_t
+typedef ai_cmd_response_t
         (*ai_cmd_handler_t)(void *action, trantor_t *, void *player);
 typedef struct action_data {
     int ticks;
@@ -88,8 +88,10 @@ typedef struct action_data {
 } action_data_t;
 typedef struct action {
     struct timespec start_time;
+    struct timespec end_time;
     action_data_t data;
     const char *arg;
+    void *cli; // client_t
 } action_t;
 
 /**
@@ -118,35 +120,34 @@ void destroy_player(trantor_t *trantor, player_t *player);
 
 // Ai request handling
 extern const action_data_t AI_ACTIONS[];
-ai_cmd_reponse_t ai_forward_handler(action_t *action,
+ai_cmd_response_t ai_forward_handler(action_t *action,
                                     trantor_t *trantor, player_t *player);
-ai_cmd_reponse_t ai_right_handler(action_t *action,
+ai_cmd_response_t ai_right_handler(action_t *action,
                                     trantor_t *trantor, player_t *player);
-ai_cmd_reponse_t ai_left_handler(action_t *action,
+ai_cmd_response_t ai_left_handler(action_t *action,
                                     trantor_t *trantor, player_t *player);
-ai_cmd_reponse_t ai_look_handler(action_t *action,
+ai_cmd_response_t ai_look_handler(action_t *action,
                                     trantor_t *trantor, player_t *player);
-ai_cmd_reponse_t ai_inventory_handler(action_t *action,
+ai_cmd_response_t ai_inventory_handler(action_t *action,
                                     trantor_t *trantor, player_t *player);
-ai_cmd_reponse_t ai_broadcast_handler(action_t *action,
+ai_cmd_response_t ai_broadcast_handler(action_t *action,
                                     trantor_t *trantor, player_t *player);
-ai_cmd_reponse_t ai_connect_nbr_handler(action_t *action,
+ai_cmd_response_t ai_connect_nbr_handler(action_t *action,
                                     trantor_t *trantor, player_t *player);
-ai_cmd_reponse_t ai_fork_handler(action_t *action,
+ai_cmd_response_t ai_fork_handler(action_t *action,
                                     trantor_t *trantor, player_t *player);
-ai_cmd_reponse_t ai_eject_handler(action_t *action,
+ai_cmd_response_t ai_eject_handler(action_t *action,
                                     trantor_t *trantor, player_t *player);
-ai_cmd_reponse_t ai_take_handler(action_t *action,
+ai_cmd_response_t ai_take_handler(action_t *action,
                                     trantor_t *trantor, player_t *player);
-ai_cmd_reponse_t ai_set_handler(action_t *action,
+ai_cmd_response_t ai_set_handler(action_t *action,
                                     trantor_t *trantor, player_t *player);
-ai_cmd_reponse_t ai_incantation_start_handler(action_t *action,
+ai_cmd_response_t ai_incantation_start_handler(action_t *action,
                                     trantor_t *trantor, player_t *player);
-ai_cmd_reponse_t ai_incantation_end_handler(action_t *action,
+ai_cmd_response_t ai_incantation_end_handler(action_t *action,
                                     trantor_t *trantor, player_t *player);
 
-struct timespec get_action_end(action_t *ac, int f);
-void destroy_action(action_t *action);
-action_t *create_action(const char *cmd);
+bool is_action_finished(action_t *action, struct timespec *now);
+action_t *create_action(const char *cmd, void *client_t, int f);
 
 #endif //EPITECH_ZAPPY_TRANTOR_H

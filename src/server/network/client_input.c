@@ -30,6 +30,7 @@ void destroy_client(server_t *server, void *data)
 
 static void disconnect_client(server_t *server, client_t *cli)
 {
+    FD_CLR(cli->fd, &server->read_fds);
     destroy_client(server, cli);
     remove_if(&server->clients, cli, NULL, NULL);
 }

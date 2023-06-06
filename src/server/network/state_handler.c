@@ -101,17 +101,18 @@ void handle_ai(server_t *server, client_t *cli, const char *cmd)
 
     if (list_size(cli->data->buffered_actions) + 1 >= AI_MAX_COMMANDS)
         return;
-    action = create_action(cmd);
+    action = create_action(cmd, cli, server->params.freq);
     if (!action)
         return safe_write(cli->fd, ERR_NO_CMD, strlen(ERR_NO_CMD));
     if (!do_action_pre_check(action, server->trantor, cli))
-        return destroy_action(action);
+        return free(action);
     if (action->data.ticks == 0) {
-        do_action(action, server->trantor, cli);
-        return destroy_action(action);
+        do_action(action, server->trantor);
+        return free(action);
     }
-    if (!cli->data->current_action)
+    if (!cli->data->current_action) {
         cli->data->current_action = action;
-    else
+        put_action_in_waitlist(server, action);
+    } else
         append_node(&cli->data->buffered_actions, action);
 }

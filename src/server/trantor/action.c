@@ -28,45 +28,64 @@ const action_data_t AI_ACTIONS[] = {
         {0, 0, NULL, NULL, NULL}
 };
 
-struct timespec get_action_end(action_t *ac, int f)
+static action_t *init_action(const action_data_t *data,
+                    const char *arg, client_t *client, int f)
 {
-    return (struct timespec){
-            ac->start_time.tv_sec + ac->data.ticks / f,
-            ac->start_time.tv_nsec + (ac->data.ticks % f) * 1000000000 / f
+    action_t *action = my_calloc(sizeof(action_t), 1);
+    struct timespec end_time;
+
+    action->data = *data;
+    action->arg = arg ? my_strdup(arg + 1) : NULL;
+    action->cli = client;
+    get_time(&action->start_time);
+    end_time = (struct timespec){
+            action->start_time.tv_sec + data->ticks / f,
+            action->start_time.tv_nsec + (data->ticks % f) * 1000000000L / f
     };
+    if (end_time.tv_nsec >= 1000000000) {
+        end_time.tv_sec++;
+        end_time.tv_nsec -= 1000000000;
+    }
+    action->end_time = end_time;
+    return action;
 }
 
-void destroy_action(action_t *action)
+bool is_action_finished(action_t *action, struct timespec *now)
 {
-    my_free(action);
+    struct timespec my_now;
+
+    if (!now) {
+        get_time(&my_now);
+        now = &my_now;
+    }
+    return now->tv_sec > action->end_time.tv_sec ||
+    (now->tv_sec == action->end_time.tv_sec &&
+    now->tv_nsec >= action->end_time.tv_nsec);
 }
 
-action_t *create_action(const char *cmd)
+action_t *create_action(const char *cmd, void *client, int f)
 {
     char *argument = strchr(cmd, ' ');
     char *cmd_name = argument ? strndup(cmd, argument - cmd) : strdup(cmd);
-    action_t *action;
 
     for (int i = 0; AI_ACTIONS[i].name; i++) {
         if (strcmp(cmd_name, AI_ACTIONS[i].name) != 0)
             continue;
         free(cmd_name);
         if ((argument && !AI_ACTIONS[i].has_arg) ||
-        (!argument && AI_ACTIONS[i].has_arg) || strlen(argument))
+        (!argument && AI_ACTIONS[i].has_arg))
             return NULL;
-        action = my_calloc(sizeof(action_t), 1);
-        action->data = AI_ACTIONS[i];
-        action->arg = argument ? my_strdup(argument + 1) : NULL;
-        return action;
+        return init_action(&AI_ACTIONS[i], argument, client, f);
     }
     free(cmd_name);
     return NULL;
 }
 
-void do_action(action_t *action, trantor_t *trantor, client_t *cli)
+void do_action(action_t *action, trantor_t *trantor)
 {
-    ai_cmd_reponse_t resp;
+    ai_cmd_response_t resp;
     char *answer;
+    client_t *cli = action->cli;
     size_t len = 3;
 
     resp = action->data.handler(action, trantor, cli->data);
@@ -77,13 +96,13 @@ void do_action(action_t *action, trantor_t *trantor, client_t *cli)
     else
         answer = str_concat(&len, 2, resp.data, "\n");
     safe_write(cli->fd, answer, len);
-    free(resp.data);
-    free(answer);
+    my_free(resp.data);
+    my_free(answer);
 }
 
 bool do_action_pre_check(action_t *action, trantor_t *trantor, client_t *cli)
 {
-    ai_cmd_reponse_t resp;
+    ai_cmd_response_t resp;
 
     if (!action->data.pre_check)
         return true;

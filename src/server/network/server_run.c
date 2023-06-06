@@ -11,40 +11,25 @@
 #include "utility/strings.h"
 #include <string.h>
 
-static void handle_actions(server_t *server)
+static void init_read_set(server_t *server)
 {
     list_t *tmp = server->clients;
-    action_t *action;
-    struct timespec now;
-    struct timespec end_time;
-    client_t *cli;
 
-    get_time(&now);
+    FD_ZERO(&server->read_fds);
+    FD_SET(server->fd, &server->read_fds);
+    if (!tmp)
+        return;
     do {
-        cli = (client_t *)tmp->data;
-        action = cli->data->current_action;
-        end_time = get_action_end(action, server->params.freq);
-        if (end_time.tv_sec <= now.tv_sec ||
-        (end_time.tv_sec == now.tv_sec && end_time.tv_nsec <= now.tv_nsec))
-            do_action(action, server->trantor, cli);
+        FD_SET(((client_t *)tmp->data)->fd, &server->read_fds);
         tmp = tmp->next;
     } while (tmp != server->clients);
 }
 
-static void init_fd_sets(server_t *server, fd_set *read_fds, fd_set *write_fds)
+static void init_write_set(fd_set *write_fds)
 {
-    list_t *tmp = server->clients;
+    list_t *tmp = *packet_waitlist();
 
-    FD_ZERO(read_fds);
     FD_ZERO(write_fds);
-    FD_SET(server->fd, read_fds);
-    if (tmp) {
-        do {
-            FD_SET(((client_t *)tmp->data)->fd, read_fds);
-            tmp = tmp->next;
-        } while (tmp != server->clients);
-    }
-    tmp = *packet_waitlist();
     if (!tmp)
         return;
     do {
@@ -55,24 +40,17 @@ static void init_fd_sets(server_t *server, fd_set *read_fds, fd_set *write_fds)
 
 static void fetch_timeout(server_t *server, struct timeval *timeout)
 {
-    list_t *tmp = server->clients;
     action_t *action;
     struct timespec now;
-    struct timespec tmp_timeout = {UINT64_MAX, UINT64_MAX};
-    struct timespec action_end;
 
-    do {
-        action = ((client_t *)tmp->data)->data->current_action;
-        action_end = get_action_end(action, server->params.freq);
-        if (action_end.tv_sec < tmp_timeout.tv_sec ||
-        (action_end.tv_sec == tmp_timeout.tv_sec &&
-        action_end.tv_nsec < tmp_timeout.tv_nsec))
-            tmp_timeout = action_end;
-        tmp = tmp->next;
-    } while (tmp != server->clients);
+    if (!server->action_count) {
+        *timeout = (struct timeval) {.tv_sec = INT64_MAX, .tv_usec = 0};
+        return;
+    }
+    action = server->actions[0];
     get_time(&now);
-    timeout->tv_sec = tmp_timeout.tv_sec - now.tv_sec;
-    timeout->tv_usec = tmp_timeout.tv_nsec / 1000 - now.tv_nsec / 1000;
+    timeout->tv_sec = action->end_time.tv_sec - now.tv_sec;
+    timeout->tv_usec = action->end_time.tv_nsec / 1000 - now.tv_nsec / 1000;
 }
 
 static void accept_client(server_t *server)
@@ -87,6 +65,7 @@ static void accept_client(server_t *server)
     cli->state = CONNECTED;
     append_node(&server->clients, cli);
     safe_write(cli->fd, WELCOME_MESSAGE, strlen(WELCOME_MESSAGE));
+    FD_SET(cli->fd, &server->read_fds);
 }
 
 void run_server(server_t *server)
@@ -96,9 +75,11 @@ void run_server(server_t *server)
     struct timeval timeout = {0, 0};
     int select_rval;
 
+    init_read_set(server);
     while (server->run) {
-        init_fd_sets(server, &readfds, &writefds);
+        init_write_set(&writefds);
         fetch_timeout(server, &timeout);
+        readfds = server->read_fds;
         select_rval = try_select(FD_SETSIZE, &readfds, &writefds, &timeout);
         if (select_rval == 0) {
             handle_actions(server);

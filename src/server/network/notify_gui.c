@@ -5,11 +5,9 @@
 ** notify_gui
 */
 
-#define _GNU_SOURCE
-#include <stdarg.h>
-#include <stdio.h>
-#include <string.h>
 #include "server.h"
+#include <stdarg.h>
+#include <string.h>
 
 const gui_event_t GUI_EVENTS[] = {
         {PLAYER_CONNECTION, "pnw #%d %d %d %d %d %s\n"},
@@ -42,16 +40,24 @@ static void send_to_gui(server_t *server, char *msg)
     } while (tmp != server->clients);
 }
 
-void notify_gui(server_t *server, enum gui_event event, ...)
+static char *fetch_gui_message(enum gui_event event, va_list args)
 {
     const char *format_str = GUI_EVENTS[event].format_str;
-    va_list args;
     char *msg;
 
     if (!format_str)
-        return;
-    va_start(args, event);
+        return NULL;
     vasprintf(&msg, format_str, args);
+    return msg;
+}
+
+void notify_gui(server_t *server, enum gui_event event, ...)
+{
+    va_list args;
+    char *msg;
+
+    va_start(args, event);
+    msg = fetch_gui_message(event, args);
     va_end(args);
     send_to_gui(server, msg);
 }

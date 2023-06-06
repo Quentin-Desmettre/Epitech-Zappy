@@ -69,3 +69,99 @@ Test(select, select_error, .exit_code = 84, .init = redirect_stdout_err)
     close(0);
     cr_assert_eq(try_select(1, &read_fds, NULL, &timeout), -1);
 }
+
+Test(is_timespec_equal, exactly_the_same)
+{
+    struct timespec t1;
+    struct timespec t2;
+
+    t1.tv_sec = 1;
+    t1.tv_nsec = 0;
+    t2.tv_sec = 1;
+    t2.tv_nsec = 0;
+    cr_assert(is_timespec_equal(&t1, &t2));
+}
+
+Test(is_timespec_equal, almost_the_same)
+{
+    struct timespec t1;
+    struct timespec t2;
+
+    t1.tv_sec = 1;
+    t1.tv_nsec = 0;
+    t2.tv_sec = 1;
+    t2.tv_nsec = 100000;
+    cr_assert_not(is_timespec_equal(&t1, &t2));
+}
+
+Test(is_timespec_equal, 1ms_diff)
+{
+    struct timespec t1;
+    struct timespec t2;
+
+    t1.tv_sec = 1;
+    t1.tv_nsec = 0;
+    t2.tv_sec = 1;
+    t2.tv_nsec = 1000000;
+    cr_assert_not(is_timespec_equal(&t1, &t2));
+}
+
+Test(is_timespec_equal, sec_diff)
+{
+    struct timespec t1;
+    struct timespec t2;
+
+    t1.tv_sec = 1;
+    t1.tv_nsec = 0;
+    t2.tv_sec = 2;
+    t2.tv_nsec = 0;
+    cr_assert_not(is_timespec_equal(&t1, &t2));
+}
+
+Test(is_timespec_less, less_seconds)
+{
+    struct timespec t1;
+    struct timespec t2;
+
+    t1.tv_sec = 1;
+    t1.tv_nsec = 0;
+    t2.tv_sec = 2;
+    t2.tv_nsec = 0;
+    cr_assert(is_timespec_less(&t1, &t2));
+}
+
+Test(is_timespec_less, less_nano)
+{
+    struct timespec t1;
+    struct timespec t2;
+
+    t1.tv_sec = 1;
+    t1.tv_nsec = 0;
+    t2.tv_sec = 1;
+    t2.tv_nsec = 1000000;
+    cr_assert(is_timespec_less(&t1, &t2));
+}
+
+Test(is_timespec_less, bigger_sec)
+{
+    struct timespec t1;
+    struct timespec t2;
+
+    t1.tv_sec = 2;
+    t1.tv_nsec = 0;
+    t2.tv_sec = 1;
+    t2.tv_nsec = 0;
+    cr_assert_not(is_timespec_less(&t1, &t2));
+}
+
+Test(is_timespec_less, bigger_nano)
+{
+    struct timespec t1;
+    struct timespec t2;
+
+    t1.tv_sec = 1;
+    t1.tv_nsec = 1000000;
+    t2.tv_sec = 1;
+    t2.tv_nsec = 0;
+    cr_assert_not(is_timespec_less(&t1, &t2));
+}

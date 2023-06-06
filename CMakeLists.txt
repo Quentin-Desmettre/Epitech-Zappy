@@ -122,6 +122,6 @@ add_executable(server_tests
         tests/server/test_syscalls.c
         tests/server/test_safe_write.c
         tests/server/test_utility.c
-        tests/server/test_actions.c)
+        tests/server/test_actions.c tests/server/test_handle_actions.c)
 target_link_libraries(server_tests --coverage -lcriterion -g)
 set_target_properties(zappy_server PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})

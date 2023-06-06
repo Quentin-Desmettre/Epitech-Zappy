@@ -27,7 +27,7 @@ static bool init_server_network(server_t *server, char **err)
         *err = perror_str("bind");
         return false;
     }
-    if (listen(server->fd, 3) < 0) {
+    if (listen(server->fd, MAX_CLIENTS) < 0) {
         *err = perror_str("listen");
         return false;
     }

@@ -18,6 +18,7 @@ void append_str_array(char ***array, char *what);
 void free_str_array(char **array);
 char **dupstrarray(const char **arr);
 char **split_on(char *str, char *delim, int *len);
+bool has_duplicates(char **arr);
 
 // Strings
 void *memdup(const void *src, size_t size);

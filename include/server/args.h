@@ -29,6 +29,7 @@ extern const char *DEFAULT_TEAMS[];
     #define ERR_HEIGHT "Error: height must be in the interval [10, 30]"
     #define ERR_TEAMS "Error: invalid team names"
     #define ERR_SLOTS "Error: invalid slots"
+    #define ERR_MULTI_TEAMS "ko: Multiple teams with the same name\n"
 
 typedef struct {
     char optname;
