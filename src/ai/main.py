@@ -2,8 +2,8 @@
 
 import sys, socket
 from src.ai.utils import send_to_server, recv_from_server, my_print, set_color, Colors
-from src.ai.logic.brain import Ai
 from src.ai.commands import ElevationException
+from src.ai.logic import Ai
 
 
 def print_usage(exit_code=84):

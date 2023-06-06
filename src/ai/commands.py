@@ -1,4 +1,4 @@
-import socket, enum, queue, time, regex
+import socket, enum, queue, time, regex, random
 from src.ai.utils import send_to_server, recv_from_server, on, create_command_parsers, clean_queue, queue_contains
 
 command_parsers = {}
@@ -13,6 +13,60 @@ class Objects(enum.Enum):
     PHIRAS = "phiras"
     THYSTAME = "thystame"
     PLAYER = "player"
+
+
+def get_elevation_needs(current_level: int) -> dict[Objects, int]:
+    tab = [
+        {
+            Objects.PLAYER: 1,
+            Objects.LINEMATE: 1,
+        },
+        {
+            Objects.PLAYER: 2,
+            Objects.LINEMATE: 1,
+            Objects.DERAUMERE: 1,
+            Objects.SIBUR: 1,
+        },
+        {
+            Objects.PLAYER: 2,
+            Objects.LINEMATE: 2,
+            Objects.SIBUR: 1,
+            Objects.PHIRAS: 2,
+        },
+        {
+            Objects.PLAYER: 4,
+            Objects.LINEMATE: 1,
+            Objects.DERAUMERE: 1,
+            Objects.SIBUR: 2,
+            Objects.PHIRAS: 1,
+        },
+        {
+            Objects.PLAYER: 4,
+            Objects.LINEMATE: 1,
+            Objects.DERAUMERE: 2,
+            Objects.SIBUR: 1,
+            Objects.MENDIANE: 3,
+        },
+        {
+            Objects.PLAYER: 6,
+            Objects.LINEMATE: 1,
+            Objects.DERAUMERE: 2,
+            Objects.SIBUR: 3,
+            Objects.PHIRAS: 1,
+        },
+        {
+            Objects.PLAYER: 6,
+            Objects.LINEMATE: 2,
+            Objects.DERAUMERE: 2,
+            Objects.SIBUR: 2,
+            Objects.MENDIANE: 2,
+            Objects.PHIRAS: 2,
+            Objects.THYSTAME: 1,
+        }
+    ]
+    if current_level > len(tab) or current_level <= 0:
+        return {}
+    return tab[current_level - 1]
 
 
 class Directions(enum.Enum):
@@ -253,31 +307,6 @@ class Command:
         if not self.check_return(msg):
             return None
         return command_parsers[self.type](self, msg)
-
-
-def go_to_direction(server: socket.socket, direction: Directions, queue: queue.Queue = None) -> None:
-    """Goes to the given direction."""
-    if direction == Directions.FORWARD:
-        Command(CommandNames.FORWARD).send(server, queue)
-    elif direction == Directions.RIGHT or direction == Directions.LEFT:
-        Command(direction).send(server, queue)
-        Command(CommandNames.FORWARD).send(server, queue)
-    elif direction == Directions.BACKWARD:
-        Command(CommandNames.LEFT).send(server, queue)
-        Command(CommandNames.LEFT).send(server, queue)
-        Command(CommandNames.FORWARD).send(server, queue)
-    elif direction == Directions.TOP_RIGHT or direction == Directions.TOP_LEFT:
-        Command(CommandNames.FORWARD).send(server, queue)
-        if direction == Directions.TOP_RIGHT:
-            go_to_direction(server, Directions.RIGHT, queue)
-        else:
-            go_to_direction(server, Directions.LEFT, queue)
-    elif direction == Directions.BOTTOM_RIGHT or direction == Directions.BOTTOM_LEFT:
-        go_to_direction(server, Directions.BACKWARD, queue)
-        if direction == Directions.BOTTOM_RIGHT:
-            go_to_direction(server, Directions.LEFT, queue)
-        else:
-            go_to_direction(server, Directions.RIGHT, queue)
 
 
 command_parsers = create_command_parsers(Command)

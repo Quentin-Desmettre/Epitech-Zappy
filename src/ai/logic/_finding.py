@@ -1,5 +1,5 @@
-import math, socket, queue
-from src.ai.utils import add_to_dict
+import math, socket, queue, time
+from src.ai.utils import add_to_dict, my_print
 from src.ai.commands import Objects, Directions, Command, CommandNames
 
 
@@ -49,18 +49,36 @@ def get_object_path(object: Objects, tiles: list[list[str]]) -> list[Directions]
     return get_path_from_index(closest_index)
 
 
-def go_to_object(server: socket.socket, desired: Objects, tiles: list[list[str]] | None, queue: queue.Queue) -> bool:
+def go_to_object(self, desired: Objects, tiles: list[list[str]] | None) -> bool:
     """Take the shortest path to the desired object and loot it if possible."""
     if tiles is None:
-        tiles = Command(CommandNames.LOOK).send(server, queue)
+        tiles = self.send(CommandNames.LOOK)
     if tiles is None:
         return False
     directions = get_object_path(desired, tiles)
     for direction in directions:
-        if Command(direction).send(server, queue) == None:
+        if self.send(direction) is None:
             break
     if len(directions) != 0 and desired != Objects.PLAYER:
-        look = Command(CommandNames.LOOK).send(server, queue)
+        look = self.send(CommandNames.LOOK)
         if look is not None and (look[0].count(Objects.PLAYER.value) <= 1 or desired == Objects.FOOD):
-            Command(CommandNames.TAKE, desired.value).send(server, queue)
+            self.send(CommandNames.TAKE, desired.value)
     return len(directions) != 0
+
+
+def loot_object(self, object: Objects, can_move_randomly: bool = True, tiles = None) -> bool:
+    """Loots the object from the map if there is any, otherwise moves randomly."""
+    if tiles is None:
+        self.send(CommandNames.LOOK)
+    if tiles is None:
+        return False
+    if object.value in tiles[0] and (tiles[0].count(Objects.PLAYER.value) <= 1 or object is Objects.FOOD):
+        if self.send(CommandNames.TAKE, object.value) == "ko":
+            my_print("Error: could not loot %s" % object.name)
+            return False
+    elif self.go_to_object(object, tiles) == False:
+        if can_move_randomly:
+            self.move_randomly()
+        self.last_movement = time.time()
+        return False
+    return True
