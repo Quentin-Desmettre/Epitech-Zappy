@@ -30,13 +30,13 @@ const char *DEFAULT_TEAMS[] = {
         NULL
 };
 
-static void reset_args(args_t *args)
+static void reset_args(args_t *args, bool dup_names)
 {
     free_str_array(args->names);
     args->port = DEFAULT_PORT;
     args->width = DEFAULT_WIDTH;
     args->height = DEFAULT_HEIGHT;
-    args->names = dupstrarray(DEFAULT_TEAMS);
+    args->names = dup_names ? dupstrarray(DEFAULT_TEAMS) : NULL;
     args->slots = DEFAULT_SLOTS;
     args->freq = DEFAULT_FREQ;
 }
@@ -83,16 +83,22 @@ bool get_args(int ac, char **av, args_t *args, char **err)
 {
     int opt;
 
-    reset_args(args);
+    reset_args(args, true);
     *err = NULL;
     while ((opt = getopt(ac, av, ARGS_STR)) != -1) {
-        if (opt == '?')
+        if (opt == '?') {
+            reset_args(args, false);
             return false;
+        }
         if (opt == 'n') {
             fetch_team_names(args, ac, av, err);
             continue;
         }
         *(int *)((char *) args + offset_of_arg(opt)) = atoi(optarg);
     }
-    return check_args(args, err);
+    if (!check_args(args, err)) {
+        reset_args(args, false);
+        return false;
+    }
+    return true;
 }

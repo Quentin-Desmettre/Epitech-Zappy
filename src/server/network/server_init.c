@@ -46,7 +46,7 @@ server_t *init_server(int ac, char **av, char **err)
     server->run = true;
     server->trantor = init_trantor(args.width, args.height);
     if (!init_server_network(server, err)) {
-        my_free(server);
+        destroy_server(server);
         return NULL;
     }
     return server;

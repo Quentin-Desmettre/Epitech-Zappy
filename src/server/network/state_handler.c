@@ -72,10 +72,7 @@ void handle_connected(server_t *server, client_t *cli, const char *cmd)
         answer = team ? ERR_NO_SLOTS : ERR_NO_TEAM;
         return safe_write(cli->fd, answer, strlen(answer));
     }
-    cli->state = AI;
-    cli->data = create_player(server->trantor, cmd);
-    notify_gui(server, PLAYER_CONNECTION, cli->data->id, cli->data->x,
-    cli->data->y, cli->data->dir, cli->data->level, cli->data->team_name);
+    log_ai(cli, server, cmd, team);
 }
 
 void handle_gui(server_t *server, UNUSED client_t *cli, const char *cmd)
@@ -93,26 +90,4 @@ void handle_gui(server_t *server, UNUSED client_t *cli, const char *cmd)
         break;
     }
     free_str_array(args);
-}
-
-void handle_ai(server_t *server, client_t *cli, const char *cmd)
-{
-    action_t *action;
-
-    if (list_size(cli->data->buffered_actions) + 1 >= AI_MAX_COMMANDS)
-        return;
-    action = create_action(cmd, cli, server->params.freq);
-    if (!action)
-        return safe_write(cli->fd, ERR_NO_CMD, strlen(ERR_NO_CMD));
-    if (!do_action_pre_check(action, server->trantor, cli))
-        return free(action);
-    if (action->data.ticks == 0) {
-        do_action(action, server->trantor);
-        return free(action);
-    }
-    if (!cli->data->current_action) {
-        cli->data->current_action = action;
-        put_action_in_waitlist(server, action);
-    } else
-        append_node(&cli->data->buffered_actions, action);
 }

@@ -19,8 +19,10 @@ void handle_sig(int sig)
 
 void handle_all_sigs(void)
 {
-    for (int i = 1; i < 32; i++)
-        signal(i, handle_sig);
+    for (int i = 1; i < 32; i++) {
+        if (i != SIGSEGV && i != SIGFPE && i != SIGKILL && i != SIGSTOP)
+            signal(i, handle_sig);
+    }
 }
 
 int main(int ac, char **av)

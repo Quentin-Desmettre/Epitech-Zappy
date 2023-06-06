@@ -59,5 +59,7 @@ void notify_gui(server_t *server, enum gui_event event, ...)
     va_start(args, event);
     msg = fetch_gui_message(event, args);
     va_end(args);
+    if (!msg)
+        return;
     send_to_gui(server, msg);
 }

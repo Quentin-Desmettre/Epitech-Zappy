@@ -37,4 +37,5 @@ void destroy_trantor(trantor_t *trantor)
 {
     destroy_teams(&trantor->teams);
     destroy_map(trantor->map);
+    my_free(trantor);
 }

@@ -47,8 +47,9 @@ static bool fetch_client_data(client_t *cli)
         perror("read");
         exit(84);
     }
-    cli->buffer = my_realloc(cli->buffer, cli->buffer_size + bytes);
+    cli->buffer = my_realloc(cli->buffer, cli->buffer_size + bytes + 1);
     memcpy(cli->buffer + cli->buffer_size, tmp_buf, bytes);
+    cli->buffer[cli->buffer_size + bytes] = '\0';
     cli->buffer_size += bytes;
     return true;
 }
@@ -63,13 +64,15 @@ static void handle_client_input(server_t *server, client_t *cli)
     if (strchr(cli->buffer, '\n') == NULL)
         return;
     args = split_on(cli->buffer, "\n", &nb_args);
-    free(cli->buffer);
-    cli->buffer = NULL;
-    cli->buffer_size = 0;
     if (!str_ends_with(cli->buffer, "\n")) {
+        free(cli->buffer);
         cli->buffer = args[nb_args - 1];
         args[nb_args - 1] = NULL;
         cli->buffer_size = strlen(cli->buffer);
+    } else {
+        free(cli->buffer);
+        cli->buffer = NULL;
+        cli->buffer_size = 0;
     }
     for (int i = 0; args[i]; i++)
         STATE_HANDLER[cli->state](server, cli, args[i]);

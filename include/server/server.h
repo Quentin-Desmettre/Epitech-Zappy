@@ -159,5 +159,6 @@ void do_action(action_t *action, trantor_t *trantor);
 void handle_actions(server_t *server);
 void put_action_in_waitlist(server_t *server, action_t *action);
 void notify_gui(server_t *server, enum gui_event event, ...);
+void log_ai(client_t *cli, server_t *server, const char *cmd, team_t *team);
 
 #endif //EPITECH_ZAPPY_SERVER_H
