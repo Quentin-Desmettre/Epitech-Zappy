@@ -1,0 +1,39 @@
+/*
+** EPITECH PROJECT, 2023
+** Epitech-Zappy
+** File description:
+** Player.hpp
+*/
+
+#pragma once
+#include <string>
+#include <vector>
+#include "Mateyak/Vector2.hpp"
+
+class Player
+{
+    public:
+        enum STATE {INCANTING, DEAD, EGG, BROADCASTING, DROPING, TAKING, NONE};
+        enum ORIENTATION {NORTH, EAST, SOUTH, WEST};
+        Player(std::string name, int x, int y, Player::ORIENTATION orientation, int level, std::string team);
+        ~Player() = default;
+
+        std::string getName() const;
+        void setPos(int x, int y);
+        void setOrientation(Player::ORIENTATION orientation);
+        void setState(STATE state);
+        void setLevel(int level);
+        void setInventory(std::vector<int> inventory);
+
+    private:
+        Mateyak::Vec2f _position;
+        Mateyak::Vec2f _nextPosition;
+        int _level;
+        int _inventory[7];
+        ORIENTATION _orientation;
+        std::string _team;
+        std::string _name;
+        STATE _state;
+        int _eggTime;
+        std::string _broadcastMessage;
+};

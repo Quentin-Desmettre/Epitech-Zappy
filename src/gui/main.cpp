@@ -7,40 +7,7 @@
 #include "Mateyak/Sprite.hpp"
 #include "Mateyak/Shaders.hpp"
 #include "Client/client.hpp"
-#include "Mateyak/Vector2.hpp"
-#include <boost/asio.hpp>
 
-class Player
-{
-    enum STATE {INCANTING, DEAD, EGG, BROADCASTING, DROPING, TAKING};
-
-    public:
-        Player() = default;
-        ~Player() = default;
-    private:
-        Mateyak::Vec2f position;
-        Mateyak::Vec2f nextPosition;
-        int level;
-        int inventory[7];
-        int orientation;
-        int team;
-        STATE state;
-        int eggTime;
-        std::string broadcastMessage;
-};
-
-
-class ServerInformations
-{
-    public:
-        ServerInformations() = default;
-        ~ServerInformations() = default;
-    private:
-        Mateyak::Vec2f mapSize;
-        std::vector<std::vector<int>> map;
-        std::vector<std::string> teams;
-        std::vector<Player> players;
-};
 
 void graph()
 {
@@ -82,79 +49,89 @@ void graph()
     }
 }
 
-void tcpClient()
+class ErrorHandling {
+    public:
+        class Error : public std::exception {
+            public:
+                Error(std::string const &message) : _message(message) {}
+                const char *what() const noexcept override { return _message.c_str(); }
+            private:
+                std::string _message;
+        };
+        void parse();
+        ErrorHandling(int ac, char **av);
+        std::string getPort() const;
+        std::string getIp() const;
+        ~ErrorHandling() = default;
+    private:
+        int _ac;
+        char **_av;
+        std::string _port;
+        std::string _ip;
+};
+
+ErrorHandling::ErrorHandling(int ac, char **av) : _ac(ac), _av(av)
 {
-    // Create an I/O context
-    boost::asio::io_context io_context;
-
-    // Create a TCP resolver
-    boost::asio::ip::tcp::resolver resolver(io_context);
-
-    // Resolve the server address and port
-    boost::asio::ip::tcp::resolver::results_type endpoints =
-            resolver.resolve("localhost", "4242");
-
-    // Create a TCP socket
-    boost::asio::ip::tcp::socket socket(io_context);
-
-    // Connect to the server
-    boost::asio::connect(socket, endpoints);
-
-    std::string message = "GRAPHIC\n";
-    boost::asio::write(socket, boost::asio::buffer(message));
-
-    char response[1024];
-    size_t bytesReceived = socket.read_some(boost::asio::buffer(response));
-
-    std::string buf;
-    bytesReceived = 1024;
-    while (bytesReceived == 1024) {
-        bzero(response, 1024);
-        bytesReceived = socket.read_some(boost::asio::buffer(response));
-        buf += response;
-    }
-    std::cout << "Server response: " << buf << std::endl;
+    if (!(ac == 3 || ac == 5))
+        throw Error("Invalid number of arguments");
 }
 
+void ErrorHandling::parse()
+{
+    for (int i = 1; i < _ac; i++) {
+        if (std::string(_av[i]) == "-p") {
+            if (i + 1 >= _ac)
+                throw Error("Port not defined after -p");
+            _port = _av[i + 1];
+            i++;
+        }
+        else if (std::string(_av[i]) == "-h") {
+            if (i + 1 >= _ac)
+                throw Error("Ip not defined after -h");
+            _ip = _av[i + 1];
+            i++;
+        }
+        else {
+            std::string test(_av[i]);
+            throw Error(test + std::string(" is not a valid argument"));
+        }
+    }
+    if (_port.empty())
+        throw Error("Port not defined");
+}
+
+std::string ErrorHandling::getPort() const
+{
+    return _port;
+}
+
+std::string ErrorHandling::getIp() const
+{
+    if (_ip.empty())
+        return std::string("localhost");
+    return _ip;
+}
 
 int main(int ac, char **av)
 {
-    try
-    {
-        //tcpClient();
+    ServerInformations serverInformations;
+
+    try {
+        ErrorHandling errorHandling(ac, av);
+        errorHandling.parse();
+        GuiClient client(serverInformations, errorHandling.getIp(), errorHandling.getPort());
+
+        if (!client.CheckValidServer())
+            return 84;
+
+        std::thread t(&GuiClient::compute, &client);
         graph();
-    }
-    catch (const std::exception& ex)
-    {
+        client.stop();
+        t.join();
+
+    } catch (const std::exception& ex) {
         std::cerr << "Exception: " << ex.what() << std::endl;
     }
 
     return 0;
-    std::vector<std::string> args(av, av + ac);
-
-    if (args.size() > 1 && args.size() < 5) {
-        std::cerr << "USAGE: ./zappy_ai -p port -h machine" << std::endl;
-        std::cerr << "\tport is the port number" << std::endl;
-        std::cerr << "\tmachine is the name of the machine; localhost by default" << std::endl;
-        return 84;
-    }
-
-    //std::cout << "Awaiting connection" << std::endl;
-    //Client client("127.0.0.1", 4242);
-//
-    //if (client.connect_client()) {
-    //    std::cout << "Not connected to a nice server" << std::endl;
-    //    return 84;
-    //}
-    //client.receive_message();
-//
-    //std::cout << "Game can start now" << std::endl;
-    //std::thread t1(computeClient, std::ref(client));
-    //t1.join();
-    return 0;
 }
-
-//(bct) ([0-9]+ ){8}[0-9]+
-//(msz) [0-9]+ [0-9]+
-//(sgt) [0-9]+
-//(tna) [a-zA-Z0-9]+
