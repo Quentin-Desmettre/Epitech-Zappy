@@ -1,4 +1,4 @@
-import socket
+import socket, queue
 from src.ai.commands import Objects, Command, CommandNames
 
 
@@ -53,6 +53,7 @@ def get_elevation_needs(current_level: int) -> dict[Objects, int]:
     ]
     return tab[current_level - 1]
 
+
 def has_stones(inventory: dict[Objects, int], current_level: int) -> bool:
     required = get_elevation_needs(current_level)
     for stone in required:
@@ -60,6 +61,7 @@ def has_stones(inventory: dict[Objects, int], current_level: int) -> bool:
         or inventory[stone.value] < required[stone]):
             return False
     return True
+
 
 def get_needed_stones(inventory: dict[Objects, int], current_level: int) -> list[Objects]:
     required = get_elevation_needs(current_level)
@@ -70,10 +72,22 @@ def get_needed_stones(inventory: dict[Objects, int], current_level: int) -> list
             needed.append(stone)
     return needed
 
-def drop_stones(server: socket.socket, inventory: dict[Objects, int], current_level: int):
+
+def get_items_on_ground(server: socket.socket, queue: queue.Queue) -> dict[str, int]:
+    tile = Command(CommandNames.LOOK).send(server, queue)
+    if tile is None:
+        return {}
+    tile = tile[0]
+    items = {}
+    for item in tile:
+        if item in items:
+            items[item] += 1
+        else:
+            items[item] = 1
+    return items
+
+
+def enought_players(server: socket.socket, current_level: int) -> bool:
     required = get_elevation_needs(current_level)
-    for stone in required:
-        if stone != Objects.PLAYER and stone.value in inventory \
-        and inventory[stone.value] >= required[stone]:
-            for _ in range(required[stone]):
-                Command(CommandNames.SET, stone.value).send(server)
+    players = required[Objects.PLAYER]
+    return players >= get_elevation_needs(current_level)[Objects.PLAYER]
