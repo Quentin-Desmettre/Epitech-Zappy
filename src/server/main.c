@@ -8,6 +8,20 @@
 #include <stddef.h>
 #include <string.h>
 #include "server.h"
+#include <signal.h>
+
+void handle_sig(int sig)
+{
+    (void)sig;
+    safe_write(1, "Signal received, shutting down server\n", 38);
+    exit(0);
+}
+
+void handle_all_sigs(void)
+{
+    for (int i = 1; i < 32; i++)
+        signal(i, handle_sig);
+}
 
 int main(int ac, char **av)
 {
@@ -19,6 +33,7 @@ int main(int ac, char **av)
         safe_write(2, "\n", 1);
         return 84;
     }
+    handle_all_sigs();
     run_server(server);
     destroy_server(server);
     return 0;

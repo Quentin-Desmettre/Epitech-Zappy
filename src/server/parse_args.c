@@ -74,6 +74,8 @@ static bool check_args(args_t *args, char **err)
         *err = ERR_SLOTS;
     if (args->names[0] == NULL)
         *err = ERR_TEAMS;
+    if (has_duplicates(args->names))
+        *err = ERR_MULTI_TEAMS;
     return *err == NULL;
 }
 

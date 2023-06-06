@@ -309,3 +309,26 @@ Test(str_concat_free, str_concat_free)
 
     CHECK_ALL_FREE;
 }
+
+Test(has_duplicates, has_duplicates)
+{
+    struct {
+        char *words[10];
+        bool expected;
+    } tests[] = {
+        {{"Hello", "World", NULL}, false},
+        {{"Hello", "World", "Hello", NULL}, true},
+        {{"Hello", "World", "World", NULL}, true},
+        {{"Hello", "World", "Hello", "World", NULL}, true},
+        {{"Hello", "World", "Hello", "World", "Hello", NULL}, true},
+        {{"Hello", "World", "Hello", "World", "Hello", "World", NULL}, true},
+        {{"Hello", "World", "Hello", "World", "Hello", "World", "Hello", NULL}, true},
+        {{"Hello", "World", "Hello", "World", "Hello", "World", "Hello", "World", NULL}, true},
+        {{"Hello", "World", "Hello", "World", "Hello", "World", "Hello", "World", "Hello", NULL}, true},
+        {{NULL}, false},
+    };
+
+    for (size_t i = 0; i < sizeof(tests) / sizeof(*tests); i++) {
+        cr_assert_eq(has_duplicates(tests[i].words), tests[i].expected);
+    }
+}

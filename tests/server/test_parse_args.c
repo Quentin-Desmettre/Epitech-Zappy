@@ -229,6 +229,20 @@ const arg_test_t tests[] = {
             .valid = true,
         },
 
+        // Multiple same team name
+        {
+            .args = {"./zappy_server", "-n", "Team1", "Team1", NULL},
+            .valid = false,
+        },
+        {
+            .args = {"./zappy_server", "-n", "Team1", "Team2", "Team1", NULL},
+            .valid = false,
+        },
+        {
+            .args = {"./zappy_server", "-n", "Team1", "Team2", "Team1", "Team2", NULL},
+            .valid = false,
+        },
+
         // Too small frequency
         {
             .args = {"./zappy_server", "-f", "1", NULL},
