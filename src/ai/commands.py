@@ -1,5 +1,5 @@
-import socket, enum, queue, time, regex, random
-from src.ai.utils import send_to_server, recv_from_server, on, create_command_parsers, clean_queue, queue_contains
+import enum, regex
+from src.ai.utils import on, create_command_parsers
 
 command_parsers = {}
 
@@ -250,63 +250,10 @@ class Command:
                 return result
         raise ValueError("Invalid response %s for command %s" % (result, self.type))
 
-    def check_return(self, result: str) -> bool:
-        """Checks if the command was successful."""
-        if result == "ko":
-            print("Command %s failed" % self.type.value)
-            return False
-        return True
-
-    def check_matches(self, msg: str) -> bool:
-        regexes = get_regexes(self.type)
-        for reg in regexes:
-            if regex.match(PossibleResponsesRegex.INCANTATION.value[1], msg):
-                raise ElevationException(self.type, msg)
-            if regex.match(reg, msg):
-                return True
-        return False
-
-    def read_until_broadcast(self, server: socket.socket, queue: queue.Queue) -> str:
-        """Reads the server until no more broadcast are received."""
-        msg = recv_from_server(server)
-        while not self.check_matches(msg):
-            if queue is not None and regex.match(PossibleResponsesRegex.MESSAGE.value[0], msg):
-                if msg.count("incantation") > 0:
-                    clean_queue(queue)
-                queue.put([msg, time.time()])
-            msg = recv_from_server(server)
-        return msg
-
-    def read_before_write(self, server: socket.socket, queue: queue.Queue = None):
-        """read all the broadcast possible (non blocking)"""
-        return_value = False
-        server.setblocking(False)
-        while True:
-            try:
-                msg = recv_from_server(server)
-                if queue is not None and regex.match(PossibleResponsesRegex.MESSAGE.value[0], msg):
-                    if msg.count("incantation") > 0:
-                        clean_queue(queue)
-                        return_value = True
-                    queue.put([msg, time.time()])
-            except BlockingIOError:
-                break
-        server.setblocking(True)
-        return return_value
-
-    def send(self, server: socket.socket, queue: queue.Queue = None):
-        """Sends the command to the server and returns the parsed result."""
+    def parse_response(self, response: str):
         if self.type not in command_parsers:
             raise NotImplementedError("Command %s not implemented" % self.type)
-        # if self.read_all_broadcast(server, queue) and self.arg is not None and self.arg.count("incantation") > 0:
-        #     return None
-        send_to_server(server, str(self))
-        msg = self.read_until_broadcast(server, queue)
-        if regex.match(PossibleResponsesRegex.INCANTATION.value[0], msg):
-            msg = self.read_until_broadcast(server, queue)
-        if not self.check_return(msg):
-            return None
-        return command_parsers[self.type](self, msg)
+        return command_parsers[self.type](self, response)
 
 
 command_parsers = create_command_parsers(Command)

@@ -1,19 +1,19 @@
-import socket, queue, time
-from src.ai.commands import Command, CommandNames, Objects
-from src.ai.utils import queue_contains, my_print, set_color, Colors
+import socket, time
+from src.ai.commands import CommandNames, Objects
+from src.ai.utils import my_print, set_color, Colors
+from src.ai.reader import Reader
 
 class Ai:
     """Artificial intelligence class."""
 
     def __init__(self, server: socket.socket, team: str) -> None:
-        self.server = server
         self.team = team
         self.shared_inventory = {}
         self.level = 1
-        self.broadcast_queue = queue.Queue()
         self.last_movement = time.time()
         self.delta = 0
         self.can_send = True
+        self.reader = Reader(server, team)
         self.calibrate()
 
     def calibrate(self):
@@ -27,7 +27,7 @@ class Ai:
 
     def send(self, cmd: CommandNames, arg: str | None = None):
         """Sends a command to the server."""
-        return Command(cmd, arg).send(self.server, self.broadcast_queue)
+        return self.reader.send(cmd, arg)
 
     from ._finding import loot_object, go_to_object
     from ._broadcast import parse_message
@@ -64,7 +64,7 @@ class Ai:
             self.send(CommandNames.BROADCAST, "looted:" + self.team + ":" + stone.value)
             time.sleep(self.delta * 2)
 
-    def handle_broadcast(self, msg: str, inventory: dict[str, int]):
+    def handle_broadcast(self, msg: tuple[str, int], inventory: dict[str, int]):
         if msg[0].count("incantation") == 0\
         or (msg[1] > self.last_movement and msg[0].count(str(self.level + 1)) > 0):
             my_print("Analyzing broadcast %s" % msg[0])
@@ -74,7 +74,7 @@ class Ai:
             time.sleep(self.delta * 2)
 
     def handle_evolve(self, inventory: dict[str, int], tiles = None):
-        if queue_contains(self.broadcast_queue, "incantation"):
+        if self.reader.broadcast_contains("incantation"):
             return
         my_print("Trying to evolve to level %d" % (self.level + 1))
         if self.drop_elevation_stones(True, inventory, tiles):
@@ -98,9 +98,9 @@ class Ai:
             set_color(Colors.WARNING)
             self.take_food(inventory, tiles)
             self.can_send = True
-        elif self.broadcast_queue.qsize() > 0:
+        elif self.reader.has_broadcast():
             set_color(Colors.OKCYAN)
-            self.handle_broadcast(self.broadcast_queue.get(), inventory)
+            self.handle_broadcast(self.reader.broadcast_pop(), inventory)
         elif self.can_evolve(inventory, tiles):
             set_color(Colors.HEADER)
             self.handle_evolve(inventory, tiles)

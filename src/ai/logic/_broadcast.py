@@ -1,5 +1,5 @@
-import time
-from src.ai.commands import Directions
+import time, random
+from src.ai.commands import Directions, CommandNames
 from src.ai.utils import my_print
 
 
@@ -23,6 +23,8 @@ def parse_message(self, msg: str, inventory = None) -> None:
     direction = Directions(int(splitted[0].split(' ')[1]))
     msg = splitted[1].strip()
     if msg.count(self.team) == 0:
+        if random.randint(0, 3) == 0:
+            self.send(CommandNames.BROADCAST, msg)
         return
     if msg.startswith("looted"):
         add_to_shared_inventory(self, msg.split(':')[2], 1)

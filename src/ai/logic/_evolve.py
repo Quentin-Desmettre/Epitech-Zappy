@@ -1,5 +1,5 @@
-import time
-from src.ai.commands import Objects, Command, CommandNames, get_elevation_needs
+import time, os, signal
+from src.ai.commands import Objects, CommandNames, get_elevation_needs
 from src.ai.utils import my_print, merge_dicts
 
 def has_stones(inventory: dict[Objects, int], current_level: int) -> bool:
@@ -45,7 +45,7 @@ def elevate(self, send_cmd: bool = True, cmd_type: CommandNames = None, msg: str
         if msg.startswith("Current level:"):
             self.level = int(msg.split(" ")[2])
             my_print("Elevated to level %d !!!" % self.level)
-            if self.level == 3:
+            if self.level == 2:
                 exit(42)
         else:
             my_print("Error: could not elevate")
@@ -72,7 +72,7 @@ def drop_elevation_stones(self, is_main_player = False, inventory = None, tiles 
         if len(self.get_needed_stones(total)) != 0:
             my_print("Not enough stones to evolve.")
             return False
-        if ground[Objects.PLAYER.value] < 6: # temporary fix to ensure that all players are on the same tile (original: get_elevation_needs(self.level)[Objects.PLAYER])
+        if ground[Objects.PLAYER.value] < 1: # temporary fix to ensure that all players are on the same tile (original: get_elevation_needs(self.level)[Objects.PLAYER])
             my_print("Not enough players to evolve.")
             return False
     for stone in inventory:

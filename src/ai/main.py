@@ -61,7 +61,7 @@ def main():
         print_error("Error: too many clients")
     map_size = map_size.split(" ")
     map_size = (int(map_size[0]), int(map_size[1]))
-    my_print("left: " + str(left) + "\nmap_size: " + str(map_size))
+    my_print("Slots left: " + str(left) + "\nMap_size: " + str(map_size))
 
     ai = Ai(server, name)
     exception = None
@@ -76,7 +76,11 @@ def main():
 
 
 if __name__ == "__main__":
-    # try:
+    try:
         main()
-    # except Exception as e:
-    #     print_error(e)
+    except Exception as e:
+        print_error(e)
+    except KeyboardInterrupt:
+        my_print("Interrupted by user")
+    except SystemExit:
+        my_print("Exiting...")
