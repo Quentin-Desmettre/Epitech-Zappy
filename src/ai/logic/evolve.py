@@ -51,6 +51,8 @@ def get_elevation_needs(current_level: int) -> dict[Objects, int]:
             Objects.THYSTAME: 1,
         }
     ]
+    if current_level > len(tab) or current_level <= 0:
+        return {}
     return tab[current_level - 1]
 
 
@@ -73,13 +75,14 @@ def get_needed_stones(inventory: dict[Objects, int], current_level: int) -> list
     return needed
 
 
-def get_items_on_ground(server: socket.socket, queue: queue.Queue) -> dict[str, int]:
-    tile = Command(CommandNames.LOOK).send(server, queue)
-    if tile is None:
+def get_items_on_ground(server: socket.socket, queue: queue.Queue, tiles = None) -> dict[str, int]:
+    if tiles is None:
+        tiles = Command(CommandNames.LOOK).send(server, queue)
+    if tiles is None:
         return {}
-    tile = tile[0]
+    ground = tiles[0]
     items = {}
-    for item in tile:
+    for item in ground:
         if item in items:
             items[item] += 1
         else:
