@@ -27,10 +27,11 @@ jobs:
           ref: ${{ steps.extract_branch.outputs.branch }}
           fetch-depth: 0
 
-      - name: Install raylib
+      - name: Install raylib/boost
         run: |
-          sudo apt install build-essential git cmake
-          sudo apt install libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev
+          sudo apt install build-essential git cmake -y
+          sudo apt install libboost-all-dev -y
+          sudo apt install libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev -y
           git clone https://github.com/raysan5/raylib.git raylib
           cd raylib
           mkdir build && cd build
