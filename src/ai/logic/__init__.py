@@ -39,7 +39,7 @@ class Ai:
         my_print("Looting food")
         if "food" not in inventory:
             inventory["food"] = 0
-        for i in range(20 - inventory["food"]):
+        for i in range(25 - inventory["food"]):
             if not self.loot_object(Objects.FOOD, tiles=tiles):
                 i -= 1
 
@@ -77,8 +77,6 @@ class Ai:
             time.sleep(self.delta * 2)
 
     def handle_evolve(self, inventory: dict[str, int], tiles = None):
-        if self.reader.broadcast_contains("incantation"):
-            return
         my_print("Trying to evolve to level %d" % (self.level + 1))
         if self.check_requirements(inventory, tiles):
             self.drop_elevation_stones()

@@ -60,9 +60,7 @@ def go_to_object(self, desired: Objects, tiles: list[list[str]] | None) -> bool:
         if self.send(direction) is None:
             break
     if len(directions) != 0 and desired != Objects.PLAYER:
-        look = self.send(CommandNames.LOOK)
-        if look is not None and (look[0].count(Objects.PLAYER.value) <= 1 or desired == Objects.FOOD):
-            self.send(CommandNames.TAKE, desired.value)
+        self.send(CommandNames.TAKE, desired.value)
     return len(directions) != 0
 
 
