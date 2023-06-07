@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include "Mateyak/Vector2.hpp"
+#include <array>
 
 class Player
 {
@@ -29,7 +30,7 @@ class Player
         Mateyak::Vec2f _position;
         Mateyak::Vec2f _nextPosition;
         int _level;
-        int _inventory[7];
+        std::array<int, 7> _inventory;
         ORIENTATION _orientation;
         std::string _team;
         std::string _name;

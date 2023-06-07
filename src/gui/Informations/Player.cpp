@@ -12,7 +12,7 @@ Player::Player(std::string name, int x, int y, Player::ORIENTATION orientation, 
     _nextPosition.x = _position.x = x;
     _nextPosition.y = _position.y = y;
     _level = level;
-    memset(_inventory, 0, sizeof(int) * 7);
+    _inventory.fill(0);
     _orientation = orientation;
     _team = team;
     _name = name;

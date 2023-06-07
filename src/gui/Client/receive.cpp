@@ -16,7 +16,8 @@ std::string GuiClient::getInformations()
     do {
         bzero(response, 1024);
         bytesReceived = _socket.read_some(boost::asio::buffer(response));
-        buf += response;
+        for (size_t i = 0; i < bytesReceived; i++)
+            buf += response[i];
     } while (bytesReceived == 1024);
     return buf;
 }
