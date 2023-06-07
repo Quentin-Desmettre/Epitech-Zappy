@@ -43,6 +43,8 @@ def elevate(self, send_cmd: bool = True, msg: str = None):
     elif msg.startswith("Current level:"):
         self.level = int(msg.split(" ")[2])
         my_print("Elevated to level %d !!!" % self.level)
+        if self.level == 8:
+            my_print("Congratulations, you won !!!")
         # if self.level == 3:
         #     exit(42)
     else:
