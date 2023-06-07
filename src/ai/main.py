@@ -2,8 +2,8 @@
 
 import sys, socket
 from src.ai.utils import send_to_server, recv_from_server, my_print, set_color, Colors
-from src.ai.logic.brain import Ai
 from src.ai.commands import ElevationException
+from src.ai.logic import Ai
 
 
 def print_usage(exit_code=84):
@@ -61,14 +61,14 @@ def main():
         print_error("Error: too many clients")
     map_size = map_size.split(" ")
     map_size = (int(map_size[0]), int(map_size[1]))
-    my_print("left: " + str(left) + "\nmap_size: " + str(map_size))
+    my_print("Slots left: " + str(left) + "\nMap_size: " + str(map_size))
 
     ai = Ai(server, name)
     exception = None
     while True:
         try:
             if exception is not None:
-                ai.elevate(False, exception.cmd_type, exception.msg)
+                ai.elevate(False, exception.msg)
                 exception = None
             ai.make_decision()
         except ElevationException as e:
@@ -76,7 +76,11 @@ def main():
 
 
 if __name__ == "__main__":
-    # try:
+    try:
         main()
-    # except Exception as e:
-    #     print_error(e)
+    except Exception as e:
+        print_error(e)
+    except KeyboardInterrupt:
+        my_print("Interrupted")
+    except SystemExit:
+        my_print("Exiting...")
