@@ -9,6 +9,7 @@
 
 #include <string>
 #include <vector>
+#include <array>
 #include <mutex>
 #include "Mateyak/Vector2.hpp"
 #include "Informations/Player.hpp"
@@ -33,7 +34,7 @@ class ServerInformations
 
     private:
         Mateyak::Vec2f mapSize;
-        std::vector<std::vector<int>> map;
+        std::vector<std::vector<std::array<int, 7>>> map;
         std::vector<std::string> teams;
         std::vector<Player> players;
         std::mutex mutex;

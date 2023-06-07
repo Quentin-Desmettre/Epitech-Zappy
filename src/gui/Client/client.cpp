@@ -15,12 +15,11 @@ GuiClient::GuiClient(ServerInformations &_serverInformations, std::string ip, st
 bool GuiClient::CheckValidServer()
 {
     std::string message = "GRAPHIC\n";
-    _socket.send(boost::asio::buffer(message));
-
     std::string resp = getInformations();
+
     if (resp != "WELCOME\n")
         return false;
-
+    _socket.send(boost::asio::buffer(message));
     resp = getInformations();
     parseOutput(resp);
     return true;

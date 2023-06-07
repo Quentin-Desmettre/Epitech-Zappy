@@ -19,7 +19,7 @@ void ServerInformations::setMapSize(int x, int y)
 void ServerInformations::setTile(int x, int y, std::vector<int> values)
 {
     for (size_t i = 0; i < values.size(); i++)
-        map[y][x + i] = values[i];
+        map[y][x][i] = values[i];
 }
 
 void ServerInformations::addTeam(std::string team)
