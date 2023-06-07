@@ -123,8 +123,7 @@ def get_regexes(cmd: CommandNames) -> list[regex.Pattern]:
 class ElevationException(Exception):
     """Exception raised to catch elevation message."""
 
-    def __init__(self, cmd_type: CommandNames, msg: str) -> None:
-        self.cmd_type = cmd_type
+    def __init__(self, msg: str) -> None:
         self.msg = msg
 
 

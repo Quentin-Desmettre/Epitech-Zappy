@@ -68,7 +68,7 @@ def main():
     while True:
         try:
             if exception is not None:
-                ai.elevate(False, exception.cmd_type, exception.msg)
+                ai.elevate(False, exception.msg)
                 exception = None
             ai.make_decision()
         except ElevationException as e:
@@ -81,6 +81,6 @@ if __name__ == "__main__":
     except Exception as e:
         print_error(e)
     except KeyboardInterrupt:
-        my_print("Interrupted by user")
+        my_print("Interrupted")
     except SystemExit:
         my_print("Exiting...")

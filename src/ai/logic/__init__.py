@@ -32,7 +32,7 @@ class Ai:
     from ._finding import loot_object, go_to_object
     from ._broadcast import parse_message
     from ._movement import move_randomly, go_to_direction
-    from ._evolve import get_needed_stones, can_evolve, elevate, drop_elevation_stones, get_items_on_ground
+    from ._evolve import get_needed_stones, can_evolve, elevate, drop_elevation_stones, check_requirements, get_items_on_ground
 
     def take_food(self, inventory: dict[str, int], tiles = None):
         """Takes food from the map until the player has 20 food."""
@@ -60,11 +60,14 @@ class Ai:
         if stone.value not in inventory:
             inventory[stone.value] = 0
         inventory[stone.value] += 1
-        if not self.can_evolve(inventory, tiles):
+        if self.can_evolve(inventory, tiles):
+            inventory[stone.value] -= 1
+            self.drop_elevation_stones(inventory)
+        else:
             self.send(CommandNames.BROADCAST, "looted:" + self.team + ":" + stone.value)
             time.sleep(self.delta * 2)
 
-    def handle_broadcast(self, msg: tuple[str, int], inventory: dict[str, int]):
+    def handle_broadcast(self, msg, inventory: dict[str, int]):
         if msg[0].count("incantation") == 0\
         or (msg[1] > self.last_movement and msg[0].count(str(self.level + 1)) > 0):
             my_print("Analyzing broadcast %s" % msg[0])
@@ -77,11 +80,13 @@ class Ai:
         if self.reader.broadcast_contains("incantation"):
             return
         my_print("Trying to evolve to level %d" % (self.level + 1))
-        if self.drop_elevation_stones(True, inventory, tiles):
+        if self.check_requirements(inventory, tiles):
+            self.drop_elevation_stones()
             self.elevate()
         elif self.can_send:
             # if not cmd.read_before_write(self.server, self.broadcast_queue):
             self.send(CommandNames.BROADCAST, "incantation:" + self.team + ":" + str(self.level + 1))
+            time.sleep(self.delta * 7)
             self.can_send = False
         else:
             my_print("Cannot send broadcast (cooldown)")

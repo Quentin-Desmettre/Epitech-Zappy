@@ -34,7 +34,7 @@ def parse_message(self, msg: str, inventory = None) -> None:
         self.can_send = True
     elif msg.startswith("incantation"):
         if direction == Directions.HERE:
-            self.drop_elevation_stones(False, inventory)
+            self.drop_elevation_stones(inventory)
         else:
             my_print("moving to other player")
             self.go_to_direction(direction)

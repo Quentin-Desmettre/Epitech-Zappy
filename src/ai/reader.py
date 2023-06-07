@@ -1,4 +1,4 @@
-import socket, queue, time, regex, threading
+import socket, queue, time, regex, threading, os, signal
 from src.ai.commands import Command, CommandNames, PossibleResponsesRegex, ElevationException, get_regexes
 from src.ai.utils import send_to_server, my_print
 
@@ -12,32 +12,39 @@ class Reader:
         self.broadcast_queue = queue.Queue()
         self.buffer = ""
         self.team = team
+        self.mtx = threading.Lock()
         self.thread = threading.Thread(target=self.launch, daemon=True)
         self.thread.start()
-        self.mtx = threading.Lock()
 
     def launch(self) -> None:
         """Starts the reading thread."""
-        while True:
-            data = self.sock.recv(4096).decode()
-            if not data or data == "":
-                break
-            self.buffer += data
-            while "\n" in self.buffer:
-                self.mtx.acquire()
-                self.parse_data()
-                self.mtx.release()
+        try:
+            while True:
+                data = self.sock.recv(4096).decode()
+                if not data or data == "":
+                    raise Exception("Server disconnected")
+                self.buffer += data
+                while "\n" in self.buffer:
+                    self.mtx.acquire()
+                    self.parse_data()
+                    self.mtx.release()
+        except Exception as e:
+            my_print(e)
+            os.kill(os.getpid(), signal.SIGINT)
+            exit(0)
 
     def parse_data(self) -> None:
         index = self.buffer.index("\n")
         msg = self.buffer[:index]
         my_print("Received: %s" % msg)
+        if msg == "dead":
+            raise Exception("You died")
         if regex.match(PossibleResponsesRegex.MESSAGE.value[0], msg):
             if msg.count(self.team) == 0:
                 return # à remplacer pour les renvoyer aux autres
             if msg.count("incantation") > 0:
                 self.clean_broadcast_queue()
-            self.broadcast_queue.put({msg, time.time()})
+            self.broadcast_queue.put([msg, time.time()])
         else:
             self.queue.put(msg)
         self.buffer = self.buffer[index + 1:]
@@ -47,7 +54,7 @@ class Reader:
         regexes = get_regexes(type)
         for reg in regexes:
             if regex.match(PossibleResponsesRegex.INCANTATION.value[1], msg):
-                raise ElevationException(type, msg)
+                raise ElevationException(msg)
             if regex.match(reg, msg):
                 return True
         return False
@@ -55,14 +62,8 @@ class Reader:
     def get_next_match(self, type: CommandNames) -> str:
         """Gets the next message that matches the regex."""
         msg = self.queue.get()
-        if msg == "dead":
-            my_print("You died")
-            exit(0)
         while not self.check_matches(msg, type):
             msg = self.queue.get()
-            if msg == "dead":
-                my_print("You died")
-                exit(0)
         return msg
 
     def send(self, type: CommandNames, arg: str | None = None):
@@ -105,7 +106,7 @@ class Reader:
         tmp_queue = queue.Queue()
         while not self.broadcast_queue.empty():
             msg = self.broadcast_queue.get()
-            if not msg[0].startswith("message incantation"):
+            if not msg[0].count("incantation") == 0:
                 tmp_queue.put(msg)
         while not tmp_queue.empty():
             self.broadcast_queue.put(tmp_queue.get())
