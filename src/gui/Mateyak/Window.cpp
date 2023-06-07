@@ -26,6 +26,11 @@ void Mateyak::Window::draw(const Triangle &triangle, Color color)
     DrawTriangle3D(triangle._a.getRayVec3(), triangle._b.getRayVec3(), triangle._c.getRayVec3(), color);
 }
 
+void Mateyak::Window::draw(const Model3D &model)
+{
+    DrawModel(model, model.getPos(), model.getScale(), model.getColor());
+}
+
 void Mateyak::Window::startDrawing(Color color)
 {
     BeginDrawing();

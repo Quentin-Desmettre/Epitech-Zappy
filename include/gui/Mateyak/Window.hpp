@@ -13,6 +13,7 @@
 #include "Triangle.hpp"
 #include "Camera.hpp"
 #include "Vector2.hpp"
+#include "Model3D.hpp"
 //
 //#ifndef RLIGHTS_IMPLEMENTATION
 //    #include "rlights.h"
@@ -37,6 +38,7 @@ namespace Mateyak
         void begin3D(const Mateyak::Camera &camera);
         static void draw(const Triangle &triangle);
         static void draw(const Triangle &triangle, Color color);
+        static void draw(const Model3D &model);
         void end3D();
         void endDrawing();
 

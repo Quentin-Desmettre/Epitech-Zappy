@@ -79,9 +79,9 @@ void Map::generateColor()
     tmp.a = 255;
     for (int i = 0; i < _size.x; i++)
         for (int j = 0; j < _size.y; j++) {
-            tmp.r = Map::randomClr(rng, i, j, 1) / 2;
+            tmp.r = Map::randomClr(rng, i, j, 1) / 3;
             tmp.g = Map::randomClr(rng2, i, j, 2) / 3;
-            tmp.b = Map::randomClr(rng3, i, j, 4) / 4;
+            tmp.b = Map::randomClr(rng3, i, j, 4) / 3;
             colors.push_back(tmp.value);
         }
     clr.setData(colors.data());

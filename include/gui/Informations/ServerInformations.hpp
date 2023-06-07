@@ -12,6 +12,7 @@
 #include <array>
 #include <mutex>
 #include "Mateyak/Vector2.hpp"
+#include <algorithm>
 #include "Informations/Player.hpp"
 
 class ServerInformations

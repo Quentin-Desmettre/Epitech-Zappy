@@ -68,3 +68,23 @@ std::vector<Mateyak::Triangle> Utils::connectPointsWithTriangles(std::vector<Mat
     }
     return connectedPoints;
 }
+
+float Utils::differenceAngle(Mateyak::Vec3f v1, Mateyak::Vec3f v2) {
+    float dotProduct = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+    float angle = std::acos(dotProduct) * (180.0f / M_PI);
+    return angle;
+}
+
+//bool isInFOV(Mateyak::Vec3f camPos, Mateyak::Vec3f camTar, float fov, Mateyak::Vec3f point)
+//{
+//    Mateyak::Vec3f camToPos = (point - camPos).Normalize();
+//    Mateyak::Vec3f camToTar = (camTar - camPos).Normalize();
+//    float dotProduct = camToPos.x * camToTar.x + camToPos.y * camToTar.y + camToPos.z * camToTar.z;
+//    float angle = std::acos(dotProduct) * (180.0f / M_PI);
+//
+//    if (angle <= fov / 2.0f) {
+//        return true;
+//    } else {
+//        return false;
+//    }
+//}

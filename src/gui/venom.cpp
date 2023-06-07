@@ -1,12 +1,11 @@
 #include <math.h>
 #include "venom.hpp"
-#define BALL_NB 30
+#define BALL_NB 6
 #define FLOAT_NB (float)BALL_NB
 #define DIS 3.f
 #define DIS2 2.5f
-#define PRECI 4
-#define LEG 5
-#include <cfloat>
+#define PRECI 3
+#define LEG 1
 #include "Utils3d.hpp"
 #include "Mateyak/Vector.hpp"
 #include "Perlin/Perlin.hpp"
@@ -23,13 +22,8 @@ Venom::Venom()
         ps.y = 0;
         pos_feet.push_back(ps);
     }
-    models = LoadModelFromMesh(mesh);
     pos = {2.5, 0.75, 2.5};
 
-    Image checked = GenImageChecked(2, 2, 1, 1, RED, BLUE);
-    texture = LoadTextureFromImage(checked);
-    UnloadImage(checked);
-    models.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
 }
 
 
@@ -41,6 +35,7 @@ Venom::~Venom()
 void Venom::Draw_leg(Mateyak::Vec3f leg, int seed)
 {
     Mateyak::Vec3f vec(pos.x - leg.x, 0, pos.z - leg.z);
+    float len = 80 - (c_pos - leg).len();
     vec = -vec;
     int nb = BALL_NB;
     std::vector<Mateyak::Vec3f> points;
@@ -76,7 +71,7 @@ void Venom::Draw_leg(Mateyak::Vec3f leg, int seed)
         for (int i = 0; i < PRECI; i++) {
             for (int j = 0; j < line; j++) {
                 Mateyak::Triangle tr = triangles[j * PRECI + i];
-                Mateyak::Window::draw(tr, Color{u_char(80 - (j * 80) / line), 0, 0, 255});
+                Mateyak::Window::draw(tr, Color{u_char(80 - (j * 80) / line), 0, 0, (unsigned char)(3.1875 * len)});
             }
         }
     }
@@ -109,11 +104,14 @@ void Venom::move_ven(Camera camera)
     }
 }
 
-void Venom::draw_ven(int seed)
+void Venom::draw_ven(int seed, const Mateyak::Camera& camera)
 {
+    c_pos = camera._position;
     for (int i = 0; i < 5000; i++) {
         time = GetTime();
-        if ((pos - pos_feet[i]).len() < DIS) {
+        if ((pos - pos_feet[i]).len() < DIS && (c_pos - pos_feet[i]).len() < 80) {
+            if (Utils::differenceAngle((c_pos - camera._target).Normalize(), (c_pos - pos_feet[i]).Normalize()) > 45)
+                continue;
             Draw_leg(pos_feet[i], seed + i * 1000);
         }
     }

@@ -8,6 +8,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <cstring>
 #include "Mateyak/Vector2.hpp"
 #include <array>
 

@@ -29,19 +29,24 @@ struct MaterialProperty {
 uniform vec3 lightsPos;
 uniform vec3 lightsColor;
 uniform int lightsEnabled;
-uniform vec4 ambient;
+// uniform vec4 ambient;
 uniform vec3 viewPos;
 uniform float fogDensity;
-
+uniform int shaderEnabled;
 
 void main()
 {
     // Texel color fetching from texture sampler
+    if (shaderEnabled == 0) {
+        gl_FragColor = texture2D(texture0, fragTexCoord) * colDiffuse;
+        return;
+    }
     vec4 texelColor = texture2D(texture0, fragTexCoord);
     vec3 lightDot = vec3(0.0);
     vec3 normal = normalize(fragNormal);
     vec3 viewD = normalize(viewPos - fragPosition);
     vec3 specular = vec3(0.0);
+    vec4 ambient = vec4(0.1, 0.1, 0.1, 1.0);
 
     // NOTE: Implement here your fragment shader code
 
@@ -57,31 +62,28 @@ void main()
         float specCo = 0.0;
         if (NdotL > 0.0) specCo = pow(max(0.0, dot(viewD, reflect(-(light), normal))), 16.0); // Shine: 16.0
         specular += specCo;
-        texelColor = vec4(0, 0, 0, 1);
     }
-
-//     lightDot += 0.1;
+    lightDot += 0.1;
     vec4 finalColor = (texelColor*((colDiffuse + vec4(specular,1))*vec4(lightDot, 1.0)));
-    finalColor = texelColor * colDiffuse;
-//     finalColor += texelColor * (ambient/10.0);
+    finalColor += texelColor * ambient;
 
-    // // Gamma correction
+    // Gamma correction
 //     finalColor = pow(finalColor, vec4(1.0/2.2));
 
     // Fog calculation
     float dist = length(viewPos - fragPosition);
 
     // these could be parameters...
-    const vec4 fogColor = vec4(0.0, 0.00, 0.00, 1.0);
+    const vec4 fogColor = vec4(0.0, 0.0, 0.0, 1.0);
     //const float fogDensity = 0.16;
 
     // Exponential fog
     float fogFactor = 1.0 / exp((dist * fogDensity) * (dist * fogDensity));
 
     // Linear fog (less nice)
-//     const float fogStart = 2.0;
-//     const float fogEnd = 10.0;
-//     float fogFactor = (fogEnd - dist)/(fogEnd - fogStart);
+    //const float fogStart = 2.0;
+    //const float fogEnd = 10.0;
+    //float fogFactor = (fogEnd - dist)/(fogEnd - fogStart);
 
     fogFactor = clamp(fogFactor, 0.0, 1.0);
 

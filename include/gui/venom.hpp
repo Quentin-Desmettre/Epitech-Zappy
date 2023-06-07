@@ -6,6 +6,7 @@
     #include <math.h>
     #include <vector>
     #include "Mateyak/Vector.hpp"
+    #include "Mateyak/Camera.hpp"
 class Venom
 {
 private:
@@ -13,6 +14,7 @@ private:
     Mesh mesh;
     Texture2D texture;
     Mateyak::Vec3f pos;
+    Mateyak::Vec3f c_pos;
 public:
     float time;
     std::vector<Mateyak::Vec3f> pos_feet;
@@ -20,7 +22,7 @@ public:
     ~Venom();
     void Draw_leg(Mateyak::Vec3f pos, int seed);
     void move_ven(Camera camera);
-    void draw_ven(int seed);
+    void draw_ven(int seed, const Mateyak::Camera& camera);
     Mateyak::Vec3f getPos() const;
 };
 
