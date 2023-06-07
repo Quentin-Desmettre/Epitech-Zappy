@@ -32,6 +32,8 @@ static void send_to_gui(server_t *server, char *msg)
     list_t *tmp = server->clients;
     client_t *cli;
 
+    if (!tmp)
+        return;
     do {
         cli = (client_t *)tmp->data;
         if (cli->state == GUI)

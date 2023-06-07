@@ -28,6 +28,8 @@
     #define MAX_CLIENTS 1000
     #define WELCOME_MESSAGE "WELCOME\n"
     #define UNUSED __attribute__((unused))
+    #define MAP_SPAWN_FREQ 20
+    #define FOOD_CONSUMPTION_FREQ 126
 
 enum gui_event {
     PLAYER_CONNECTION,
@@ -54,13 +56,21 @@ typedef struct {
 
 extern const gui_event_t GUI_EVENTS[];
 
-typedef struct server_init {
+typedef struct food_timeout {
+    struct timespec end;
+    void *cli;
+} food_timeout_t;
+
+typedef struct server {
     int fd;
     list_t *clients;
+    int client_count;
 
-    // Actions
-    action_t *actions[MAX_CLIENTS];
+    // Timeouts
+    action_t *actions[MAX_CLIENTS + 1];
     int action_count;
+    list_t *food_timeouts;
+    struct timespec next_spawn;
 
     trantor_t *trantor;
     args_t params;
@@ -160,5 +170,8 @@ void handle_actions(server_t *server);
 void put_action_in_waitlist(server_t *server, action_t *action);
 void notify_gui(server_t *server, enum gui_event event, ...);
 void log_ai(client_t *cli, server_t *server, const char *cmd, team_t *team);
+void check_food(server_t *server);
+void disconnect_client(server_t *server, client_t *cli);
+void update_next_spawn(server_t *server);
 
 #endif //EPITECH_ZAPPY_SERVER_H

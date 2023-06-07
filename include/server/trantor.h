@@ -149,5 +149,6 @@ ai_cmd_response_t ai_incantation_end_handler(action_t *action,
 
 bool is_action_finished(action_t *action, struct timespec *now);
 action_t *create_action(const char *cmd, void *client_t, int f);
+void spawn_resources(trantor_t *trantor);
 
 #endif //EPITECH_ZAPPY_TRANTOR_H

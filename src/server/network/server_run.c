@@ -11,20 +11,6 @@
 #include "utility/strings.h"
 #include <string.h>
 
-static void init_read_set(server_t *server)
-{
-    list_t *tmp = server->clients;
-
-    FD_ZERO(&server->read_fds);
-    FD_SET(server->fd, &server->read_fds);
-    if (!tmp)
-        return;
-    do {
-        FD_SET(((client_t *)tmp->data)->fd, &server->read_fds);
-        tmp = tmp->next;
-    } while (tmp != server->clients);
-}
-
 static void init_write_set(fd_set *write_fds)
 {
     list_t *tmp = *packet_waitlist();
@@ -40,17 +26,22 @@ static void init_write_set(fd_set *write_fds)
 
 static void fetch_timeout(server_t *server, struct timeval *timeout)
 {
-    action_t *action;
     struct timespec now;
+    struct timespec infinity = {INT64_MAX, 0};
+    struct timespec *ends[] = {
+        server->food_timeouts ?
+            &((food_timeout_t *)server->food_timeouts->data)->end : NULL,
+        server->actions[0] ? &server->actions[0]->end_time : NULL,
+        &server->next_spawn
+    };
+    const size_t possible_ends = sizeof(ends) / sizeof(ends[0]);
+    struct timespec *tmp = &infinity;
 
-    if (!server->action_count) {
-        *timeout = (struct timeval) {.tv_sec = INT64_MAX, .tv_usec = 0};
-        return;
-    }
-    action = server->actions[0];
+    for (size_t i = 0; i < possible_ends; i++)
+        if (ends[i] && is_timespec_less(ends[i], tmp))
+            tmp = ends[i];
     get_time(&now);
-    timeout->tv_sec = action->end_time.tv_sec - now.tv_sec;
-    timeout->tv_usec = action->end_time.tv_nsec / 1000 - now.tv_nsec / 1000;
+    *timeout = timespec_diff(*tmp, now);
 }
 
 static void accept_client(server_t *server)
@@ -66,6 +57,17 @@ static void accept_client(server_t *server)
     append_node(&server->clients, cli);
     safe_write(cli->fd, WELCOME_MESSAGE, strlen(WELCOME_MESSAGE));
     FD_SET(cli->fd, &server->read_fds);
+    server->client_count++;
+}
+
+static void check_resource_spawn(server_t *server)
+{
+    struct timespec now;
+
+    get_time(&now);
+    if (is_timespec_less(&now, &server->next_spawn))
+        return;
+    spawn_resources(server->trantor);
 }
 
 void run_server(server_t *server)
@@ -74,8 +76,6 @@ void run_server(server_t *server)
     fd_set writefds;
     struct timeval timeout = {0, 0};
     int select_rval;
-
-    init_read_set(server);
     while (server->run) {
         init_write_set(&writefds);
         fetch_timeout(server, &timeout);
@@ -83,6 +83,8 @@ void run_server(server_t *server)
         select_rval = try_select(FD_SETSIZE, &readfds, &writefds, &timeout);
         if (select_rval == 0) {
             handle_actions(server);
+            check_food(server);
+            check_resource_spawn(server);
             continue;
         }
         if (FD_ISSET(server->fd, &readfds))

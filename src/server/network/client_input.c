@@ -28,9 +28,10 @@ void destroy_client(server_t *server, void *data)
     my_free(cli);
 }
 
-static void disconnect_client(server_t *server, client_t *cli)
+void disconnect_client(server_t *server, client_t *cli)
 {
     FD_CLR(cli->fd, &server->read_fds);
+    server->client_count--;
     destroy_client(server, cli);
     remove_if(&server->clients, cli, NULL, NULL);
 }

@@ -34,5 +34,7 @@ int try_select(int fd_max, fd_set *read_fds,
                 fd_set *write_fds, struct timeval *timeout);
 bool is_timespec_less(struct timespec *t1, struct timespec *t2);
 bool is_timespec_equal(struct timespec *t1, struct timespec *t2);
+struct timespec get_end_time(int ticks, int freq, struct timespec now);
+struct timeval timespec_diff(struct timespec a, struct timespec b);
 
 #endif //EPITECH_ZAPPY_STRINGS_H

@@ -34,6 +34,28 @@ static bool init_server_network(server_t *server, char **err)
     return true;
 }
 
+static void init_read_set(server_t *server)
+{
+    list_t *tmp = server->clients;
+
+    FD_ZERO(&server->read_fds);
+    FD_SET(server->fd, &server->read_fds);
+    if (!tmp)
+        return;
+    do {
+        FD_SET(((client_t *)tmp->data)->fd, &server->read_fds);
+        tmp = tmp->next;
+    } while (tmp != server->clients);
+}
+
+void update_next_spawn(server_t *server)
+{
+    struct timespec now;
+
+    get_time(&now);
+    server->next_spawn = get_end_time(20, server->params.freq, now);
+}
+
 server_t *init_server(int ac, char **av, char **err)
 {
     args_t args = {0};
@@ -49,18 +71,15 @@ server_t *init_server(int ac, char **av, char **err)
         destroy_server(server);
         return NULL;
     }
+    init_read_set(server);
+    update_next_spawn(server);
     return server;
-}
-
-static void destroy_clients(list_t **clients)
-{
-    free_list(clients, NULL);
 }
 
 void destroy_server(server_t *server)
 {
     close(server->fd);
-    destroy_clients(&server->clients);
+    free_list(&server->clients, NULL);
     destroy_trantor(server->trantor);
     free_str_array(server->params.names);
     my_free(server);

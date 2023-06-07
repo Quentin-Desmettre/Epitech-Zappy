@@ -11,15 +11,12 @@
 #include <sys/ioctl.h>
 #include <stdbool.h>
 
-int bytes_available(int fd)
+struct timespec get_end_time(int ticks, int freq, struct timespec now)
 {
-    int bytes_available = 0;
-
-    if (ioctl(fd, FIONREAD, &bytes_available) == -1) {
-        perror("ioctl");
-        exit(84);
-    }
-    return (bytes_available);
+    return (struct timespec) {
+            now.tv_sec + ticks / freq,
+            now.tv_nsec + (ticks % freq) * 1000000000L / freq
+    };
 }
 
 void get_time(struct timespec *timeout)
