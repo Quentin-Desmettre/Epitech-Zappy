@@ -49,9 +49,12 @@ class Ai:
         stone = None
         sucess = False
         needed = self.get_needed_stones(inventory)
+        loot_food = False
+        if Objects.FOOD.value in inventory and inventory[Objects.FOOD.value] < 20:
+            loot_food = True
         while len(needed) > 0:
             stone = needed.pop()
-            if self.loot_object(stone, False, tiles):
+            if self.loot_object(stone, False, tiles, loot_food):
                 sucess = True
                 break
         if not sucess:

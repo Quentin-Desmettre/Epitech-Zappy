@@ -1,6 +1,6 @@
-import math, socket, queue, time
+import math, time
 from src.ai.utils import add_to_dict, my_print
-from src.ai.commands import Objects, Directions, Command, CommandNames
+from src.ai.commands import Objects, Directions, CommandNames
 
 
 def generate_heat_map(object: Objects, tiles: list[list[str]]) -> dict[int, list]:
@@ -40,6 +40,27 @@ def get_path_from_index(index: int) -> list[Directions]:
     return path
 
 
+def get_index_from_path(path: list[Directions]) -> int:
+    """Returns the index of the given path."""
+    row = 0
+    column = 0
+    has_turned = False
+    orientation = 1
+    for direction in path:
+        if direction == Directions.FORWARD and not has_turned:
+            row += 1
+        if direction == Directions.FORWARD and has_turned:
+            column += orientation
+        elif direction == Directions.LEFT:
+            has_turned = True
+            orientation = -1
+        elif direction == Directions.RIGHT:
+            has_turned = True
+            orientation = 1
+    row_center = row ** 2 + row
+    return row_center + column
+
+
 def get_object_path(object: Objects, tiles: list[list[str]]) -> list[Directions]:
     """Returns the path from the player to the closest given object."""
     heat_map = generate_heat_map(object, tiles)
@@ -49,32 +70,46 @@ def get_object_path(object: Objects, tiles: list[list[str]]) -> list[Directions]
     return get_path_from_index(closest_index)
 
 
-def go_to_object(self, desired: Objects, tiles: list[list[str]] | None) -> bool:
+def is_food_on_tile(tiles: list[list[str]] | None, directions: list[Directions]) -> bool:
+    """Returns True if there is food on the given tile."""
+    if len(directions) > 0 and directions[len(directions) - 1] != Directions.FORWARD:
+        return False
+    index = get_index_from_path(directions)
+    return Objects.FOOD.value in tiles[index]
+
+
+def go_to_object(self, desired: Objects, tiles: list[list[str]] | None, loot_food = False) -> bool:
     """Take the shortest path to the desired object and loot it if possible."""
     if tiles is None:
         tiles = self.send(CommandNames.LOOK)
     if tiles is None:
         return False
     directions = get_object_path(desired, tiles)
+    moved = []
+    if loot_food and desired is not Objects.FOOD and is_food_on_tile(tiles, moved):
+        self.send(CommandNames.TAKE, Objects.FOOD.value)
     for direction in directions:
+        moved.append(direction)
         if self.send(direction) is None:
-            break
+            return False
+        elif loot_food and desired is not Objects.FOOD and is_food_on_tile(tiles, moved):
+            self.send(CommandNames.TAKE, Objects.FOOD.value)
     if len(directions) != 0 and desired != Objects.PLAYER:
         self.send(CommandNames.TAKE, desired.value)
     return len(directions) != 0
 
 
-def loot_object(self, object: Objects, can_move_randomly: bool = True, tiles = None) -> bool:
+def loot_object(self, object: Objects, can_move_randomly: bool = True, tiles = None, loot_food = False) -> bool:
     """Loots the object from the map if there is any, otherwise moves randomly."""
     if tiles is None:
         self.send(CommandNames.LOOK)
     if tiles is None:
         return False
-    if object.value in tiles[0] and (tiles[0].count(Objects.PLAYER.value) <= 1 or object is Objects.FOOD):
+    if object.value in tiles[0]:
         if self.send(CommandNames.TAKE, object.value) == "ko":
             my_print("Error: could not loot %s" % object.name)
             return False
-    elif self.go_to_object(object, tiles) == False:
+    elif self.go_to_object(object, tiles, loot_food) == False:
         if can_move_randomly:
             self.move_randomly()
         self.last_movement = time.time()
