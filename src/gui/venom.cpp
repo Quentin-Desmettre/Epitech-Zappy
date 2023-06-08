@@ -25,7 +25,6 @@ Venom::Venom()
 
 }
 
-
 Venom::~Venom()
 {
     UnloadTexture(this->texture);
@@ -117,6 +116,11 @@ void Venom::draw_ven(int seed, const Mateyak::Camera& camera)
 }
 
 Mateyak::Vec3f Venom::getPos() const
+{
+    return pos;
+}
+
+Mateyak::Vec3f &Venom::getPosition()
 {
     return pos;
 }

@@ -109,3 +109,14 @@ void GuiClient::PlayerInventory(std::vector<std::string> parameters)
         res.push_back(std::stoi(parameters[i]));
     _serverInformations.setPlayerInventory(name, res);
 }
+
+void GuiClient::PlayerDeath(std::vector<std::string> parameters)
+{
+    if (parameters.size() != 1) {
+        std::cerr << "PlayerDeath: invalid number of parameters" << std::endl;
+        return;
+    }
+
+    std::string name = parameters[0];
+    _serverInformations.setPlayerDead(name);
+}

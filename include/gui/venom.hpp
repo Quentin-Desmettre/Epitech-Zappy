@@ -24,6 +24,7 @@ public:
     void move_ven(Camera camera);
     void draw_ven(int seed, const Mateyak::Camera& camera);
     Mateyak::Vec3f getPos() const;
+    Mateyak::Vec3f &getPosition();
 };
 
 #endif

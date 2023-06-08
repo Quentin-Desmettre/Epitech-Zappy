@@ -6,6 +6,18 @@
 */
 
 #include "Informations/ServerInformations.hpp"
+#include <iostream>
+
+void ServerInformations::updatePlayer(std::unique_ptr<Player> &player)
+{
+    Player::STATE state = player->getState();
+    if (state == Player::STATE::NONE)
+        return;
+    if (state == Player::STATE::DEAD)
+        player->ven.getPosition().y += 0.01;
+    if (player->ven.getPos().y > 3)
+        removePlayer(player->getName());
+}
 
 void ServerInformations::setMapSize(int x, int y)
 {
@@ -30,16 +42,16 @@ void ServerInformations::addTeam(std::string team)
 
 void ServerInformations::addPlayer(std::string name, int x, int y, Player::ORIENTATION orientation, int level, std::string team)
 {
-    Player player(name, x, y, orientation, level, team);
-    players.push_back(player);
+    std::unique_ptr<Player> player = std::make_unique<Player>(name, x, y, orientation, level, team);
+    players.push_back(std::move(player));
 }
 
 void ServerInformations::movePlayer(std::string name, int x, int y, Player::ORIENTATION orientation)
 {
     for (size_t i = 0; i < players.size(); i++) {
-        if (players[i].getName() == name) {
-            players[i].setPos(x, y);
-            players[i].setOrientation(orientation);
+        if (players[i]->getName() == name) {
+            players[i]->setPos(x, y);
+            players[i]->setOrientation(orientation);
             return;
         }
     }
@@ -48,8 +60,8 @@ void ServerInformations::movePlayer(std::string name, int x, int y, Player::ORIE
 void ServerInformations::setPlayerState(std::string name, Player::STATE state)
 {
     for (size_t i = 0; i < players.size(); i++) {
-        if (players[i].getName() == name) {
-            players[i].setState(state);
+        if (players[i]->getName() == name) {
+            players[i]->setState(state);
             return;
         }
     }
@@ -58,8 +70,8 @@ void ServerInformations::setPlayerState(std::string name, Player::STATE state)
 void ServerInformations::setPlayerLevel(std::string name, int level)
 {
     for (size_t i = 0; i < players.size(); i++) {
-        if (players[i].getName() == name) {
-            players[i].setLevel(level);
+        if (players[i]->getName() == name) {
+            players[i]->setLevel(level);
             return;
         }
     }
@@ -69,12 +81,33 @@ void ServerInformations::setPlayerInventory(std::string name,
     std::vector<int> inventory)
 {
     for (size_t i = 0; i < players.size(); i++) {
-        if (players[i].getName() == name) {
-            players[i].setInventory(inventory);
+        if (players[i]->getName() == name) {
+            players[i]->setInventory(inventory);
             return;
         }
     }
 }
+
+void ServerInformations::removePlayer(std::string name)
+{
+    for (size_t i = 0; i < players.size(); i++) {
+        if (players[i]->getName() == name) {
+            players[i]->setState(Player::STATE::DEAD);
+            return;
+        }
+    }
+}
+
+void ServerInformations::setPlayerDead(std::string name)
+{
+    for (size_t i = 0; i < players.size(); i++) {
+        if (players[i]->getName() == name) {
+            players[i]->setState(Player::STATE::DEAD);
+            return;
+        }
+    }
+}
+
 
 Mateyak::Vec2f ServerInformations::getMapSize() const
 {
@@ -88,7 +121,7 @@ std::vector<std::string> ServerInformations::getTeams() const
 {
     return teams;
 }
-std::vector<Player> ServerInformations::getPlayers() const
+std::vector<std::unique_ptr<Player>> &ServerInformations::getPlayers()
 {
     return players;
 }

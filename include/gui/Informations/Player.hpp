@@ -27,10 +27,13 @@ class Player
         void setState(STATE state);
         void setLevel(int level);
         void setInventory(std::vector<int> inventory);
+
+        STATE getState() const;
+
         Venom ven;
+        Mateyak::Vec2f _position;
 
     private:
-        Mateyak::Vec2f _position;
         Mateyak::Vec2f _nextPosition;
         int _level;
         std::array<int, 7> _inventory;

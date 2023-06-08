@@ -52,3 +52,8 @@ void Player::setInventory(std::vector<int> inventory)
     for (size_t i = 0; i < inventory.size(); i++)
         _inventory[i] = inventory[i];
 }
+
+Player::STATE Player::getState() const
+{
+    return _state;
+}

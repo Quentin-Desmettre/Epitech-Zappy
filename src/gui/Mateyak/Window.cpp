@@ -31,6 +31,11 @@ void Mateyak::Window::draw(const Model3D &model)
     DrawModel(model, model.getPos(), model.getScale(), model.getColor());
 }
 
+void Mateyak::Window::draw(const std::string &text, int x, int y, int fontSize, Color color)
+{
+    DrawText(text.c_str(), x, y, fontSize, color);
+}
+
 void Mateyak::Window::startDrawing(Color color)
 {
     BeginDrawing();

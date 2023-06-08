@@ -16,6 +16,23 @@ void GuiClient::parseOutput(std::string re) {
             {"ppo", &GuiClient::MovePlayer},
             {"plv", &GuiClient::PlayerLevel},
             {"pin", &GuiClient::PlayerInventory},
+            {"pdi", &GuiClient::PlayerDeath},
+            /*{"pex", &GuiClient::PlayerExpulse},
+            {"pbc", &GuiClient::PlayerBroadcast},
+            {"pic", &GuiClient::PlayerIncantation},
+            {"pie", &GuiClient::PlayerIncantationEnd},
+            {"pfk", &GuiClient::PlayerFork},
+            {"pdr", &GuiClient::PlayerDropRessource},
+            {"pgt", &GuiClient::PlayerTakeRessource},
+            {"enw", &GuiClient::EggLaying},
+            {"eht", &GuiClient::EggHatching},
+            {"ebo", &GuiClient::EggConnection},
+            {"edi", &GuiClient::EggDeath},
+            {"sgt", &GuiClient::ServerTimeUnit},
+            {"seg", &GuiClient::ServerEndGame},
+            {"smg", &GuiClient::ServerMessage},
+            {"suc", &GuiClient::ServerUnknownCommand},
+            {"sbp", &GuiClient::ServerBadParameter},*/
     };
     std::vector<std::string> res = splitStrings(re, "\n");
 
@@ -34,6 +51,7 @@ void GuiClient::parseOutput(std::string re) {
         while (ss >> token)
             parameters.push_back(token);
         if (commands.find(command) != commands.end()) {
+            std::cout << "command: " << command << std::endl;
             try {
                 std::invoke(commands[command], this, parameters);
             } catch (std::exception &e) {}
@@ -55,7 +73,6 @@ void GuiClient::compute()
     while (_loop) {
         if (_socket.available() > 0) {
             resp = getInformations();
-            std::cout << "server send: " << resp << std::endl;
             parseOutput(resp);
         }
     }

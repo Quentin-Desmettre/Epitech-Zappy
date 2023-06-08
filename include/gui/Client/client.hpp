@@ -33,7 +33,8 @@ class GuiClient
         void MovePlayer(std::vector<std::string> parameters);
         void PlayerLevel(std::vector<std::string> parameters);
         void PlayerInventory(std::vector<std::string> parameters);
-private:
+        void PlayerDeath(std::vector<std::string> parameters);
+    private:
         boost::asio::io_context _io_context;
         boost::asio::ip::tcp::resolver _resolver;
         boost::asio::ip::tcp::resolver::results_type _endpoints;
