@@ -34,7 +34,6 @@ void ServerInformations::addPlayer(std::string name, int x, int y, Player::ORIEN
     players.push_back(player);
 }
 
-
 void ServerInformations::movePlayer(std::string name, int x, int y, Player::ORIENTATION orientation)
 {
     for (size_t i = 0; i < players.size(); i++) {
@@ -75,6 +74,23 @@ void ServerInformations::setPlayerInventory(std::string name,
             return;
         }
     }
+}
+
+Mateyak::Vec2f ServerInformations::getMapSize() const
+{
+    return mapSize;
+}
+std::vector<std::vector<std::array<int, 7>>> ServerInformations::getMap() const
+{
+    return map;
+}
+std::vector<std::string> ServerInformations::getTeams() const
+{
+    return teams;
+}
+std::vector<Player> ServerInformations::getPlayers() const
+{
+    return players;
 }
 
 void ServerInformations::startComputing()

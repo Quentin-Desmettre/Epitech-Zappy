@@ -20,6 +20,7 @@ class ServerInformations
     public:
         ServerInformations() = default;
         ~ServerInformations() = default;
+
         void startComputing();
         void endComputing();
 
@@ -32,6 +33,10 @@ class ServerInformations
         void setPlayerLevel(std::string name, int level);
         void setPlayerInventory(std::string name, std::vector<int> inventory);
 
+        Mateyak::Vec2f getMapSize() const;
+        std::vector<std::vector<std::array<int, 7>>> getMap() const;
+        std::vector<std::string> getTeams() const;
+        std::vector<Player> getPlayers() const;
 
     private:
         Mateyak::Vec2f mapSize;

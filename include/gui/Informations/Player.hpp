@@ -10,6 +10,7 @@
 #include <vector>
 #include <cstring>
 #include "Mateyak/Vector2.hpp"
+#include "venom.hpp"
 #include <array>
 
 class Player
@@ -26,6 +27,7 @@ class Player
         void setState(STATE state);
         void setLevel(int level);
         void setInventory(std::vector<int> inventory);
+        Venom ven;
 
     private:
         Mateyak::Vec2f _position;

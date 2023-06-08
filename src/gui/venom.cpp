@@ -9,7 +9,6 @@
 #include "Utils3d.hpp"
 #include "Mateyak/Vector.hpp"
 #include "Perlin/Perlin.hpp"
-#include "Map.hpp"
 
 Venom::Venom()
 {

@@ -8,14 +8,14 @@
 #include "Client/client.hpp"
 #include "Mateyak/Vector2.hpp"
 #include "Mateyak/Model3D.hpp"
+#include "Graphic.hpp"
 
-void graph()
+void Graphic::loop(Mateyak::Vec2f mapSize)
 {
-    Mateyak::Window win(1920 / 2, 1080 / 2, "Zappy", 500);
+    Mateyak::Window win(1920, 1080, "Zappy", 500);
     int seed = rand();
     Mateyak::Camera cam({5.0f, 5.0f, 5.0f}, {0.0f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, 45.0f);
     Mateyak::Model3D sky(GenMeshSphere(200, 8, 8), Mateyak::Vec3f{0, 0, 0}, 1.0f, BLACK);
-
     Map map({400, 400}, 0.5);
     Mateyak::Sprite mapMdl = map.getMap();
     Mateyak::Sprite color = map.getColor();
@@ -23,9 +23,10 @@ void graph()
     Mesh mesh = GenMeshHeightmap(mapMdl, (Vector3){100, 1, 100});
     Mateyak::Model3D model(mesh, Mateyak::Vec3f{-50, -0.5, -50});
     Mateyak::Model3D rock("assets/rock.obj", Mateyak::Vec3f{0, 0, 0}, 0.5f, RED);
-    model.setTexture(color);
     Mateyak::Model3D flat(GenMeshPoly(10, 10000.0f), Mateyak::Vec3f{-500, -1, -500}, 1.0f, BLACK);
     Mateyak::Shaders shader("src/gui/shader/base_lighting.vs", "src/gui/shader/test.fs");
+
+    model.setTexture(color);
     shader.setUniform("fogDensity", 0.02f);
     shader.setUniform("lightsPos", {0.0f, 20.0f, 0.0f});
     shader.setUniform("lightsColor", {0.5f, 0.5f, 0.5f});
@@ -37,6 +38,11 @@ void graph()
     bool shaderEnabled = true;
     shader.setUniform("shaderEnabled", shaderEnabled);
     while (!WindowShouldClose()) {
+        _serverInformations.startComputing();
+        for (auto &it : _serverInformations.getPlayers())
+            it.ven.draw_ven(seed, cam);
+        _serverInformations.endComputing();
+
         if (IsKeyPressed(KEY_F1)) {
             shaderEnabled = !shaderEnabled;
             shader.setUniform("shaderEnabled", shaderEnabled);
@@ -54,7 +60,7 @@ void graph()
         Mateyak::Window::draw(rock);
         EndShaderMode();
         ven.draw_ven(seed, cam);
-        //DrawGrid(30, 10/3.f);
+        DrawGrid(10, 10);
         win.end3D();
         DrawFPS(10, 10);
         win.endDrawing();
@@ -126,20 +132,21 @@ std::string ErrorHandling::getIp() const
 
 int main(int ac, char **av)
 {
-//    ServerInformations serverInformations;
+    Graphic graphic;
 
     try {
         ErrorHandling errorHandling(ac, av);
         errorHandling.parse();
-//        GuiClient client(serverInformations, errorHandling.getIp(), errorHandling.getPort());
-//
-//        if (!client.CheckValidServer())
-//            return 84;
-//
-//        std::thread t(&GuiClient::compute, &client);
-        graph();
-//        client.stop();
-//        t.join();
+        GuiClient client(graphic.getServerInformations(), errorHandling.getIp(), errorHandling.getPort());
+
+        if (!client.CheckValidServer())
+            return 84;
+        Mateyak::Vec2f mapSize = graphic.getServerInformations().getMapSize();
+
+       std::thread t(&GuiClient::compute, &client);
+        graphic.loop(mapSize);
+        client.stop();
+        t.join();
 
     } catch (const std::exception& ex) {
         std::cerr << "Exception: " << ex.what() << std::endl;
