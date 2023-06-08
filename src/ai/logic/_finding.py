@@ -67,7 +67,10 @@ def get_object_path(object: Objects, tiles: list[list[str]]) -> list[Directions]
     if len(heat_map) == 0:
         return []
     closest_index = heat_map[min(heat_map.keys())][0]
-    return get_path_from_index(closest_index)
+    path = get_path_from_index(closest_index)
+    if len(path) > 0:
+        tiles[closest_index].remove(object.value)
+    return path
 
 
 def is_food_on_tile(tiles: list[list[str]] | None, directions: list[Directions]) -> bool:
@@ -75,7 +78,10 @@ def is_food_on_tile(tiles: list[list[str]] | None, directions: list[Directions])
     if len(directions) > 0 and directions[len(directions) - 1] != Directions.FORWARD:
         return False
     index = get_index_from_path(directions)
-    return Objects.FOOD.value in tiles[index]
+    found = Objects.FOOD.value in tiles[index]
+    if found:
+        tiles[index].remove(Objects.FOOD.value)
+    return found
 
 
 def go_to_object(self, desired: Objects, tiles: list[list[str]] | None, loot_food = False) -> bool:
@@ -109,6 +115,8 @@ def loot_object(self, object: Objects, can_move_randomly: bool = True, tiles = N
         if self.send(CommandNames.TAKE, object.value) == "ko":
             my_print("Error: could not loot %s" % object.name)
             return False
+        else:
+            tiles[0].remove(object.value)
     elif self.go_to_object(object, tiles, loot_food) == False:
         if can_move_randomly:
             self.move_randomly()

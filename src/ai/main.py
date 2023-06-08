@@ -81,7 +81,6 @@ if __name__ == "__main__":
     except Exception as e:
         set_color(Colors.FAIL)
         my_print(e)
-        print_error(e.__traceback__)
     except KeyboardInterrupt:
         my_print("Interrupted")
     except SystemExit:

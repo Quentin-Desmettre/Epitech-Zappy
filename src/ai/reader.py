@@ -36,7 +36,6 @@ class Reader:
     def parse_data(self) -> None:
         index = self.buffer.index("\n")
         msg = self.buffer[:index]
-        my_print("Received: %s" % msg)
         if msg == "dead":
             raise Exception("You died")
         if regex.match(PossibleResponsesRegex.MESSAGE.value[0], msg):
@@ -46,6 +45,7 @@ class Reader:
                 self.clean_broadcast_queue()
             self.broadcast_queue.put([msg, time.time()])
         else:
+            my_print("Received: %s" % msg)
             self.queue.put(msg)
         self.buffer = self.buffer[index + 1:]
 
