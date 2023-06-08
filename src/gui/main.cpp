@@ -9,6 +9,7 @@
 #include "Mateyak/Vector2.hpp"
 #include "Mateyak/Model3D.hpp"
 #include "Graphic.hpp"
+#include "Utils3d.hpp"
 
 void Graphic::loop(Mateyak::Vec2f mapSize)
 {
@@ -16,12 +17,12 @@ void Graphic::loop(Mateyak::Vec2f mapSize)
     int seed = rand();
     Mateyak::Camera cam({5.0f, 5.0f, 5.0f}, {0.0f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, 45.0f);
     Mateyak::Model3D sky(GenMeshSphere(200, 8, 8), Mateyak::Vec3f{0, 0, 0}, 1.0f, BLACK);
-    Map map({400, 400}, 0.5);
+    Map map(mapSize * 10, 0.5);
     Mateyak::Sprite mapMdl = map.getMap();
     Mateyak::Sprite color = map.getColor();
-    Venom ven;
-    Mesh mesh = GenMeshHeightmap(mapMdl, (Vector3){100, 1, 100});
-    Mateyak::Model3D model(mesh, Mateyak::Vec3f{-50, -0.5, -50});
+    Venom ven({0, 0});
+    Mesh mesh = GenMeshHeightmap(mapMdl, (Vector3){mapSize.x * 10 / 3, 1, mapSize.y * 10 / 3});
+    Mateyak::Model3D model(mesh, Mateyak::Vec3f{0, -0.5, 0});
     Mateyak::Model3D rock("assets/rock.obj", Mateyak::Vec3f{0, 0, 0}, 0.5f, RED);
     Mateyak::Model3D flat(GenMeshPoly(10, 10000.0f), Mateyak::Vec3f{-500, -1, -500}, 1.0f, BLACK);
     Mateyak::Shaders shader("src/gui/shader/base_lighting.vs", "src/gui/shader/test.fs");
@@ -41,11 +42,15 @@ void Graphic::loop(Mateyak::Vec2f mapSize)
     flat.setShader(shader);
     rock.setShader(shader);
     bool shaderEnabled = true;
+    bool drawGrid = false;
     shader.setUniform("shaderEnabled", shaderEnabled);
     while (!WindowShouldClose()) {
         if (IsKeyPressed(KEY_F1)) {
             shaderEnabled = !shaderEnabled;
             shader.setUniform("shaderEnabled", shaderEnabled);
+        }
+        if (IsKeyPressed(KEY_F2)) {
+            drawGrid = !drawGrid;
         }
         shader.setUniform(viewPos, cam._position);
         ven.move_ven(cam.getRayCam());
@@ -67,7 +72,8 @@ void Graphic::loop(Mateyak::Vec2f mapSize)
         }
         _serverInformations.endComputing();
 
-        DrawGrid(10, 10);
+        if (drawGrid)
+            Utils::drawGrid(mapSize, 10/3.f, {0, 0, 0});
         win.end3D();
         DrawFPS(10, 10);
         win.endDrawing();
