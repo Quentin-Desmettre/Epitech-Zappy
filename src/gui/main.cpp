@@ -13,7 +13,7 @@
 
 void Graphic::loop(Mateyak::Vec2f mapSize)
 {
-    Mateyak::Window win(1920 / 2, 1080 / 2, "Zappy", 500);
+    Mateyak::Window win(1920 / 2, 1080 / 2, "Zappy", 30);
     int seed = rand();
     Mateyak::Camera cam({5.0f, 5.0f, 5.0f}, {0.0f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, 45.0f);
     Mateyak::Model3D sky(GenMeshSphere(200, 8, 8), Mateyak::Vec3f{0, 0, 0}, 1.0f, BLACK);
@@ -26,11 +26,6 @@ void Graphic::loop(Mateyak::Vec2f mapSize)
     Mateyak::Model3D rock("assets/rock.obj", Mateyak::Vec3f{0, 0, 0}, 0.5f, RED);
     Mateyak::Model3D flat(GenMeshPoly(10, 10000.0f), Mateyak::Vec3f{-500, -1, -500}, 1.0f, BLACK);
     Mateyak::Shaders shader("src/gui/shader/base_lighting.vs", "src/gui/shader/test.fs");
-    Font font = LoadFont("assets/arial.ttf");
-    if (!font.texture.id) {
-        std::cerr << "Error loading font" << std::endl;
-        font = GetFontDefault();
-    }
 
     model.setTexture(color);
     shader.setUniform("fogDensity", 0.02f);
@@ -76,9 +71,9 @@ void Graphic::loop(Mateyak::Vec2f mapSize)
             Utils::drawGrid(mapSize, 10/3.f, {0, 0, 0});
         win.end3D();
         DrawFPS(10, 10);
+        Mateyak::Window::draw("sale pute");
         win.endDrawing();
     }
-    UnloadFont(font);
 }
 
 class ErrorHandling {
