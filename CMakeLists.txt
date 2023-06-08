@@ -124,6 +124,6 @@ add_executable(server_tests
         tests/server/test_syscalls.c
         tests/server/test_safe_write.c
         tests/server/test_utility.c
-        tests/server/test_actions.c tests/server/test_handle_actions.c tests/server/test_server_init.c src/server/network/ai_log_handler.c tests/server/test_ai_log.c src/server/trantor/map.c)
+        tests/server/test_actions.c tests/server/test_handle_actions.c tests/server/test_server_init.c src/server/network/ai_log_handler.c tests/server/test_ai_log.c src/server/trantor/map.c src/server/utility/linked_list/multi_dimensional_linked_list/liked_list.c src/server/utility/linked_list/multi_dimensional_linked_list/remove_if.c)
 target_link_libraries(server_tests --coverage -lcriterion -g)
 set_target_properties(zappy_server PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
