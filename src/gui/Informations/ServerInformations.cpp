@@ -26,17 +26,40 @@ void ServerInformations::setMapSize(int x, int y)
     map.resize(y);
     for (int i = 0; i < y; i++) {
         map[i].resize(x);
-        for (int j = 0; j < x; j++) {
-            for (int k = 0; k < 7; k++)
-                map[i][j][k] = 0;
-        }
     }
 }
 
 void ServerInformations::setTile(int x, int y, std::vector<int> values)
 {
-    for (size_t i = 0; i < values.size(); i++)
-        map[y][x][i] = values[i];
+    int number_in_tile;
+    int number_to_erase;
+    int number_to_add;
+
+    for (int i = 0; i < static_cast<int>(values.size()); i++) {
+        number_in_tile = 0;
+        number_to_erase = 0;
+        number_to_add = 0;
+        for (auto &it : map[y][x])
+            if (it.type == i)
+                number_in_tile++;
+        if (number_in_tile == values[i])
+            continue;
+        if (number_in_tile < values[i]) {
+            number_to_add = values[i] - number_in_tile;
+            for (int j = 0; j < number_to_add; j++) {
+                Mateyak::Vec2f pos = {static_cast<float>(x), static_cast<float>(y)};
+                map[y][x].emplace_back(pos, i);
+            }
+        }
+        else {
+            number_to_erase = number_in_tile - values[i];
+            for (size_t j = 0; j < map[y][x].size(); j++)
+                if (map[y][x][j].type == i && number_to_erase > 0) {
+                    number_to_erase--;
+                    map[y][x].erase(map[y][x].begin() + j);
+                }
+        }
+    }
 }
 
 void ServerInformations::addTeam(std::string team)
@@ -118,7 +141,7 @@ Mateyak::Vec2f ServerInformations::getMapSize() const
 {
     return mapSize;
 }
-std::vector<std::vector<std::array<int, 7>>> ServerInformations::getMap() const
+ZappyMap ServerInformations::getMap() const
 {
     return map;
 }
