@@ -1,9 +1,10 @@
-import enum, regex
+from enum import Enum
+from regex import Pattern, compile, match
 from src.ai.utils import on, create_command_parsers
 
 command_parsers = {}
 
-class Objects(enum.Enum):
+class Objects(Enum):
     """Enum representing all the possible objects."""
     FOOD = "food"
     LINEMATE = "linemate"
@@ -69,7 +70,7 @@ def get_elevation_needs(current_level: int) -> dict[Objects, int]:
     return tab[current_level - 1]
 
 
-class Directions(enum.Enum):
+class Directions(Enum):
     """Enum representing all the possible directions."""
     HERE = 0
     FORWARD = 1
@@ -82,7 +83,7 @@ class Directions(enum.Enum):
     TOP_RIGHT = 8
 
 
-class CommandNames(enum.Enum):
+class CommandNames(Enum):
     """Enum representing all the possible commands."""
     FORWARD = "Forward"
     RIGHT = "Right"
@@ -98,7 +99,7 @@ class CommandNames(enum.Enum):
     INCANTATION = "Incantation"
 
 
-class PossibleResponsesRegex(enum.Enum):
+class PossibleResponsesRegex(Enum):
     """Enum representing all the possible responses from the server."""
     FORWARD = [r"^ok$", r"^ko$"]
     RIGHT = [r"^ok$", r"^ko$"]
@@ -115,9 +116,9 @@ class PossibleResponsesRegex(enum.Enum):
     MESSAGE = [r"^message [0-9]+, .+$"]
 
 
-def get_regexes(cmd: CommandNames) -> list[regex.Pattern]:
+def get_regexes(cmd: CommandNames) -> list[Pattern]:
     """Returns the regexes corresponding to the given command."""
-    return [regex.compile(regex_str) for regex_str in PossibleResponsesRegex[cmd.name].value]
+    return [compile(regex_str) for regex_str in PossibleResponsesRegex[cmd.name].value]
 
 
 class ElevationException(Exception):
@@ -154,21 +155,21 @@ class Command:
     @on(CommandNames.FORWARD)
     def parse_forward(self, result: str):
         for reg in PossibleResponsesRegex.FORWARD.value:
-            if regex.match(reg, result):
+            if match(reg, result):
                 return result
         raise ValueError("Invalid response %s for command %s" % (result, self.type))
 
     @on(CommandNames.RIGHT)
     def parse_right(self, result: str):
         for reg in PossibleResponsesRegex.RIGHT.value:
-            if regex.match(reg, result):
+            if match(reg, result):
                 return result
         raise ValueError("Invalid response %s for command %s" % (result, self.type))
 
     @on(CommandNames.LEFT)
     def parse_left(self, result: str):
         for reg in PossibleResponsesRegex.LEFT.value:
-            if regex.match(reg, result):
+            if match(reg, result):
                 return result
         raise ValueError("Invalid response %s for command %s" % (result, self.type))
 
@@ -176,7 +177,7 @@ class Command:
     def parse_look(self, result: str) -> list[list[str]]:
         matched = False
         for reg in PossibleResponsesRegex.LOOK.value:
-            if regex.match(reg, result):
+            if match(reg, result):
                 matched = True
         if not matched:
             raise ValueError("Invalid response %s for command %s" % (result, self.type))
@@ -191,7 +192,7 @@ class Command:
     def parse_inventory(self, result: str) -> dict[str, int]:
         matched = False
         for reg in PossibleResponsesRegex.INVENTORY.value:
-            if regex.match(reg, result):
+            if match(reg, result):
                 matched = True
         if not matched:
             raise ValueError("Invalid response %s for command %s" % (result, self.type))
@@ -203,49 +204,49 @@ class Command:
     @on(CommandNames.BROADCAST)
     def parse_broadcast(self, result: str):
         for reg in PossibleResponsesRegex.BROADCAST.value:
-            if regex.match(reg, result):
+            if match(reg, result):
                 return result
         raise ValueError("Invalid response %s for command %s" % (result, self.type))
 
     @on(CommandNames.CONNECT_NBR)
     def parse_connect_nbr(self, result: str):
         for reg in PossibleResponsesRegex.CONNECT_NBR.value:
-            if regex.match(reg, result):
+            if match(reg, result):
                 return result
         raise ValueError("Invalid response %s for command %s" % (result, self.type))
 
     @on(CommandNames.FORK)
     def parse_fork(self, result: str):
         for reg in PossibleResponsesRegex.FORK.value:
-            if regex.match(reg, result):
+            if match(reg, result):
                 return result
         raise ValueError("Invalid response %s for command %s" % (result, self.type))
 
     @on(CommandNames.EJECT)
     def parse_eject(self, result: str):
         for reg in PossibleResponsesRegex.EJECT.value:
-            if regex.match(reg, result):
+            if match(reg, result):
                 return result
         raise ValueError("Invalid response %s for command %s" % (result, self.type))
 
     @on(CommandNames.TAKE)
     def parse_take(self, result: str):
         for reg in PossibleResponsesRegex.TAKE.value:
-            if regex.match(reg, result):
+            if match(reg, result):
                 return result
         raise ValueError("Invalid response %s for command %s" % (result, self.type))
 
     @on(CommandNames.SET)
     def parse_set(self, result: str):
         for reg in PossibleResponsesRegex.SET.value:
-            if regex.match(reg, result):
+            if match(reg, result):
                 return result
         raise ValueError("Invalid response %s for command %s" % (result, self.type))
 
     @on(CommandNames.INCANTATION)
     def parse_incantation(self, result: str):
         for reg in PossibleResponsesRegex.INCANTATION.value:
-            if regex.match(reg, result):
+            if match(reg, result):
                 return result
         raise ValueError("Invalid response %s for command %s" % (result, self.type))
 

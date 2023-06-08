@@ -1,6 +1,7 @@
 #!/bin/env python3
 
-import sys, socket
+from socket import AF_INET, SOCK_STREAM, socket
+from sys import argv
 from src.ai.utils import send_to_server, recv_from_server, my_print, set_color, Colors
 from src.ai.commands import ElevationException
 from src.ai.logic import Ai
@@ -25,19 +26,19 @@ def arg_handling():
     port = -1
     name = ""
     machine = "localhost"
-    if len(sys.argv) == 2 and sys.argv[1] == "-help":
+    if len(argv) == 2 and argv[1] == "-help":
         print_usage(0)
-    elif len(sys.argv) != 7 and len(sys.argv) != 5:
+    elif len(argv) != 7 and len(argv) != 5:
         print_usage()
-    elif sys.argv.count("-p") != 1 or sys.argv.count("-n") != 1:
+    elif argv.count("-p") != 1 or argv.count("-n") != 1:
         print_usage()
-    for i in range(1, len(sys.argv), 2):
-        if sys.argv[i] == "-p" and sys.argv[i + 1].isdigit():
-            port = int(sys.argv[i + 1])
-        elif sys.argv[i] == "-n" and sys.argv[i + 1] != "":
-            name = sys.argv[i + 1]
-        elif sys.argv[i] == "-h" and sys.argv[i + 1] != "":
-            machine = sys.argv[i + 1]
+    for i in range(1, len(argv), 2):
+        if argv[i] == "-p" and argv[i + 1].isdigit():
+            port = int(argv[i + 1])
+        elif argv[i] == "-n" and argv[i + 1] != "":
+            name = argv[i + 1]
+        elif argv[i] == "-h" and argv[i + 1] != "":
+            machine = argv[i + 1]
         else:
             print_usage()
     if port == -1 or name == "":
@@ -47,7 +48,7 @@ def arg_handling():
 
 def main():
     port, name, machine = arg_handling()
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server = socket(AF_INET, SOCK_STREAM)
     server.connect((machine, port))
 
     recv_from_server(server)
@@ -81,7 +82,6 @@ if __name__ == "__main__":
     except Exception as e:
         set_color(Colors.FAIL)
         my_print(e)
-        print_error(e.__traceback__)
     except KeyboardInterrupt:
         my_print("Interrupted")
     except SystemExit:
