@@ -7,11 +7,21 @@
 
 #include "trantor.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include "utility/garbage_collector.h"
 
-static map_t *init_map(int width, int height)
+static dim_list_t *init_map(int width, int height)
 {
-    map_t *map = my_calloc(1, sizeof(map_t));
+    dim_list_t *map = NULL;
+    dim_list_t *sub_list = NULL;
+
+    for (int i = 0; i < height; i++) {
+        sub_list = NULL;
+        for (int j = 0; j < width; j++)
+            dim_append_node(&sub_list, init_tile(j, i));
+        dim_append_node(&map, sub_list);
+    }
+    link_layers(map);
     return map;
 }
 
@@ -28,7 +38,7 @@ static void destroy_teams(list_t **teams)
     free_list(teams, NULL);
 }
 
-static void destroy_map(map_t *map)
+static void destroy_map(dim_list_t *map)
 {
     my_free(map);
 }

@@ -47,12 +47,20 @@ typedef enum direction {
     WEST
 } direction_t;
 
+typedef struct map_tile {
+    list_t *resources;
+    list_t *players;
+    list_t *eggs;
+    int x;
+    int y;
+} map_tile_t;
+
 typedef struct map {
 } map_t;
 
 typedef struct trantor {
     list_t *teams;
-    map_t *map;
+    dim_list_t *map;
 } trantor_t;
 
 trantor_t *init_trantor(int width, int height);
@@ -150,5 +158,8 @@ ai_cmd_response_t ai_incantation_end_handler(action_t *action,
 bool is_action_finished(action_t *action, struct timespec *now);
 action_t *create_action(const char *cmd, void *client_t, int f);
 void spawn_resources(trantor_t *trantor);
+
+map_tile_t *init_tile(int x, int y);
+void link_layers(dim_list_t *map);
 
 #endif //EPITECH_ZAPPY_TRANTOR_H
