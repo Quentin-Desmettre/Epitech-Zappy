@@ -8,6 +8,7 @@
 #ifndef EPITECH_ZAPPY_TRANTOR_H
     #define EPITECH_ZAPPY_TRANTOR_H
     #include "utility/linked_list.h"
+    #include <stdlib.h>
 
 //////////////////////////////////////////////////////////////////////////////
 // TRANTOR
@@ -161,5 +162,6 @@ void spawn_resources(trantor_t *trantor);
 
 map_tile_t *init_tile(int x, int y);
 void link_layers(dim_list_t *map);
+map_tile_t *get_tile_by_pos(dim_list_t *map, int x, int y);
 
 #endif //EPITECH_ZAPPY_TRANTOR_H

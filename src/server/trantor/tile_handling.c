@@ -50,3 +50,15 @@ void link_layers(dim_list_t *map)
         sub_list1 = sub_list1->next;
     }
 }
+
+map_tile_t *get_tile_by_pos(dim_list_t *map, int x, int y)
+{
+    dim_list_t *sub_list = map;
+
+    for (int i = 0; i < y; i++)
+        sub_list = sub_list->next;
+    sub_list = sub_list->data;
+    for (int i = 0; i < x; i++)
+        sub_list = sub_list->next;
+    return sub_list->data;
+}

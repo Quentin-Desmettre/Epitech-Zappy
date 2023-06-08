@@ -6,10 +6,25 @@
 */
 
 #include "trantor.h"
+#include "server.h"
 
-ai_cmd_response_t ai_forward_handler(action_t *action,
-                                    trantor_t *trantor, player_t *player)
+ai_cmd_reponse_t ai_forward_handler(action_t *action UNUSED,
+    trantor_t *trantor, player_t *player)
 {
+    map_tile_t *tile = get_tile_by_pos(trantor->map, player->x, player->y);
+
+    remove_if(&tile->players, player, NULL, NULL);
+    if (player->dir == NORTH)
+        player->y = (player->y - 1) % dim_list_size(trantor->map, VERTICAL);
+    else if (player->dir == SOUTH)
+        player->y = (player->y + 1) % dim_list_size(trantor->map, VERTICAL);
+    else if (player->dir == EAST)
+        player->x = (player->x + 1) % dim_list_size(trantor->map, HORIZONTAL);
+    else if (player->dir == WEST)
+        player->x = (player->x - 1) % dim_list_size(trantor->map, HORIZONTAL);
+    tile = get_tile_by_pos(trantor->map, player->x, player->y);
+    append_node(&tile->players, player);
+    return AI_CMD_RESPONSE_OK;
 }
 
 ai_cmd_response_t ai_right_handler(action_t *action,
