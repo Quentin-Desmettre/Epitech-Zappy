@@ -29,13 +29,13 @@ void Map::generate()
     mpp.clear();
     int rng = rand();
     unsigned char noise = 0;
-    for (int i = 0; i < _size.x; i++)
-        for (int j = 0; j < _size.y; j++) {
+    for (int j = 0; j < _size.y; j++) {
+        for (int i = 0; i < _size.x; i++) {
             noise = ((Perlin::Noise2D(rng, i / _zoom, j / _zoom, 5)) + 1) * 127;
             noise = noise / 255.0 * 127;
             pixels.push_back(noise);
         }
-
+    }
     int max = 0;
     int min = 255;
     for (int i = 0; i < _size.x; i++)
@@ -47,7 +47,7 @@ void Map::generate()
         }
     for (int i = 0; i < _size.x; i++)
         for (int j = 0; j < _size.y; j++) {
-            pixels[i * 400 + j] = (pixels[i * _size.y + j] - min) / float(max - min) * 255;
+            pixels[i * _size.y + j] = (pixels[i * _size.y + j] - min) / float(max - min) * 255;
             color_u tmp;
             tmp.r = (255 - pixels[i * _size.y + j]);
             tmp.g = (255 - pixels[i * _size.y + j]);

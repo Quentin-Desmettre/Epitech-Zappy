@@ -13,12 +13,12 @@ private:
     Model models;
     Mesh mesh;
     Texture2D texture;
-    Mateyak::Vec3f pos;
+    Mateyak::Vec3f _pos;
     Mateyak::Vec3f c_pos;
 public:
     float time;
     std::vector<Mateyak::Vec3f> pos_feet;
-    Venom();
+    Venom(Mateyak::Vec2f pos = {0, 0});
     ~Venom();
     void Draw_leg(Mateyak::Vec3f pos, int seed);
     void move_ven(Camera camera);
