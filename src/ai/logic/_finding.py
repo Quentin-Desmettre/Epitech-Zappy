@@ -1,4 +1,5 @@
-import math, time
+from time import time
+from math import sqrt, floor
 from src.ai.utils import add_to_dict, my_print
 from src.ai.commands import Objects, Directions, CommandNames
 
@@ -26,7 +27,7 @@ def generate_heat_map(object: Objects, tiles: list[list[str]]) -> dict[int, list
 def get_path_from_index(index: int) -> list[Directions]:
     """Returns the path from the player to the given index."""
     path = []
-    row = math.floor(math.sqrt(index))
+    row = floor(sqrt(index))
     row_center = row ** 2 + row
     column = index - row_center
     for _ in range(row):
@@ -120,6 +121,6 @@ def loot_object(self, object: Objects, can_move_randomly: bool = True, tiles = N
     elif self.go_to_object(object, tiles, loot_food) == False:
         if can_move_randomly:
             self.move_randomly()
-        self.last_movement = time.time()
+        self.last_movement = time()
         return False
     return True

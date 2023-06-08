@@ -1,4 +1,11 @@
-import socket, queue, time, regex, threading, os, signal
+from regex import match
+from threading import Lock, Thread
+from signal import SIGINT
+from random import randint
+from os import kill, getpid
+from time import time
+from queue import Queue
+from socket import socket
 from src.ai.commands import Command, CommandNames, PossibleResponsesRegex, ElevationException, get_regexes
 from src.ai.utils import send_to_server, my_print
 
@@ -6,14 +13,14 @@ from src.ai.utils import send_to_server, my_print
 class Reader:
     """In a dedicated thread, reads from the server all the time and stores the commands in a queue."""
 
-    def __init__(self, sock: socket.socket, team: str) -> None:
+    def __init__(self, sock: socket, team: str) -> None:
         self.sock = sock
-        self.queue = queue.Queue()
-        self.broadcast_queue = queue.Queue()
+        self.queue = Queue()
+        self.broadcast_queue = Queue()
         self.buffer = ""
         self.team = team
-        self.mtx = threading.Lock()
-        self.thread = threading.Thread(target=self.launch, daemon=True)
+        self.mtx = Lock()
+        self.thread = Thread(target=self.launch, daemon=True)
         self.thread.start()
 
     def launch(self) -> None:
@@ -30,7 +37,7 @@ class Reader:
                     self.mtx.release()
         except Exception as e:
             my_print(e)
-            os.kill(os.getpid(), signal.SIGINT)
+            kill(getpid(), SIGINT)
             exit(0)
 
     def parse_data(self) -> None:
@@ -38,12 +45,12 @@ class Reader:
         msg = self.buffer[:index]
         if msg == "dead":
             raise Exception("You died")
-        if regex.match(PossibleResponsesRegex.MESSAGE.value[0], msg):
-            if msg.count(self.team) == 0:
+        if match(PossibleResponsesRegex.MESSAGE.value[0], msg):
+            if msg.count(self.team) == 0 and randint(0, 3) != 0:
                 return # à remplacer pour les renvoyer aux autres
             if msg.count("incantation") > 0:
                 self.clean_broadcast_queue()
-            self.broadcast_queue.put([msg, time.time()])
+            self.broadcast_queue.put([msg, time()])
         else:
             my_print("Received: %s" % msg)
             self.queue.put(msg)
@@ -53,9 +60,9 @@ class Reader:
         """Checks if the message matches the regex."""
         regexes = get_regexes(type)
         for reg in regexes:
-            if regex.match(PossibleResponsesRegex.INCANTATION.value[1], msg):
+            if match(PossibleResponsesRegex.INCANTATION.value[1], msg):
                 raise ElevationException(msg)
-            if regex.match(reg, msg):
+            if match(reg, msg):
                 return True
         return False
 
@@ -71,7 +78,7 @@ class Reader:
         cmd = Command(type, arg)
         send_to_server(self.sock, str(cmd))
         msg = self.get_next_match(type)
-        if regex.match(PossibleResponsesRegex.INCANTATION.value[0], msg):
+        if match(PossibleResponsesRegex.INCANTATION.value[0], msg):
             msg = self.get_next_match(type)
         if msg == "ko":
             my_print("Command %s failed" % type.value)
@@ -88,7 +95,7 @@ class Reader:
 
     def broadcast_contains(self, msg: str) -> bool:
         """Checks if the broadcast queue contains a message."""
-        tmp_queue = queue.Queue()
+        tmp_queue = Queue()
         found = False
         self.mtx.acquire()
         while not self.broadcast_queue.empty():
@@ -103,7 +110,7 @@ class Reader:
 
     def clean_broadcast_queue(self):
         """Cleans broadcast queue from all messages stating with 'incantation'."""
-        tmp_queue = queue.Queue()
+        tmp_queue = Queue()
         while not self.broadcast_queue.empty():
             msg = self.broadcast_queue.get()
             if not msg[0].count("incantation") == 0:

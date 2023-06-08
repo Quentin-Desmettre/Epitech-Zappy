@@ -1,4 +1,4 @@
-import time
+from time import sleep
 from src.ai.commands import Objects, CommandNames, get_elevation_needs
 from src.ai.utils import my_print, merge_dicts
 
@@ -68,7 +68,7 @@ def drop_elevation_stones(self, inventory = None):
             if self.send(CommandNames.SET, stone) != None:
                 self.send(CommandNames.BROADCAST, "dropped:" + self.team + ":" + stone)
                 inventory[stone] -= 1
-                time.sleep(self.delta * 7)
+                sleep(self.delta * 7)
     my_print("Dropped all stones needed to evolve.")
 
 
