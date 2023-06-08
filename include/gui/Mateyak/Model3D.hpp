@@ -22,6 +22,7 @@ namespace Mateyak {
         Model3D();
         ~Model3D();
 
+        void operator=(Mesh mesh);
         void setTexture(const Sprite &texture);
         void setShader(const Shaders &shader);
         void setScale(float scale);

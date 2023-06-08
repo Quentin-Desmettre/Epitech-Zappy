@@ -14,6 +14,7 @@
 #include "Mateyak/Vector2.hpp"
 #include <algorithm>
 #include "Informations/Player.hpp"
+#include <memory>
 
 class ServerInformations
 {

@@ -10,17 +10,23 @@
 //
 
 #include "Map.hpp"
-
+#include "Mateyak/Window.hpp"
 
 Map::Map(Mateyak::Vec2f size, float zoom):
     _size(size),
     map(size),
     clr(size),
-    _zoom(zoom)
+    _zoom(zoom),
+    _ground(),
+    _rock("assets/rock.obj", Mateyak::Vec3f{0, 0, 0}, 0.3f, WHITE)
 {
     srand(time(NULL));
     generate();
     generateColor();
+
+    _ground = GenMeshHeightmap(map, (Vector3){_size.x / 3, 1, _size.y / 3});
+    _ground.setPos({0, -0.5, 0});
+    _ground.setTexture(clr);
 }
 
 void Map::generate()
@@ -56,6 +62,7 @@ void Map::generate()
             mpp.push_back(tmp.value);
         }
     map.setData(mpp.data());
+
 }
 
 unsigned char Map::randomClr(int rand, int i, int j, int prop)
@@ -101,47 +108,18 @@ Mateyak::Sprite Map::getColor() const
 {
     return clr;
 }
-//void set_map(Image &image, Image &color, int rng)
-//{
-//    char *pixels = new char[400 * 400];
-//    int *pixels_clr = new int[400 * 400];
-//    unsigned char noise = 0;
-//    image.format = PIXELFORMAT_UNCOMPRESSED_GRAYSCALE;
-//    image.mipmaps = true;
-//    color.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
-//    color.mipmaps = true;
-//    float zoom = 1.0;
-//    for (int i = 0; i < 400; i++)
-//        for (int j = 0; j < 400; j++) {
-//            noise = ((Perlin::Noise2D(rng, i / zoom, j / zoom, 5)) + 1) * 127;
-//            noise = noise / 255.0 * 127;
-//            pixels[i * 400 + j] = noise;
-//        }
-//    int max = 0;
-//    int min = 255;
-//    for (int i = 0; i < 400; i++)
-//        for (int j = 0; j < 400; j++) {
-//            if (pixels[i * 400 + j] > max)
-//                max = pixels[i * 400 + j];
-//            if (pixels[i * 400 + j] < min)
-//                min = pixels[i * 400 + j];
-//        }
-//    for (int i = 0; i < 400; i++)
-//        for (int j = 0; j < 400; j++) {
-//            pixels[i * 400 + j] = (pixels[i * 400 + j] - min) / float(max - min) * 255;
-//            noise = pixels[i * 400 + j];
-//            color_u tmp;
-//            tmp.value = 0;//rgba(121,4,235,255)
-//            tmp.r = 0;
-//            tmp.g = (255 - noise) / 255.0 * 255;
-//            tmp.b = (255 - noise) / 255.0 * 255;
-//            tmp.a = 255;
-//            pixels_clr[i * 400 + j] = (255) << 24 | tmp.value;
-//        }
-//    image.data = pixels;
-//    image.height = 400;
-//    image.width = 400;
-//    color.data = pixels_clr;
-//    color.height = 400;
-//    color.width = 400;
-//}
+
+const Mateyak::Model3D &Map::getGround() const
+{
+    return _ground;
+}
+
+void Map::setShader(const Mateyak::Shaders &shader) {
+    _ground.setShader(shader);
+    _rock.setShader(shader);
+}
+
+void Map::update(const ServerInformations &infos) {
+    std::cout << "update" << std::endl;
+    std::cout << "end update" << std::endl;
+}
