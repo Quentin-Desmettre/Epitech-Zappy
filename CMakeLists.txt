@@ -39,6 +39,7 @@ add_executable(zappy_gui
         src/gui/Mateyak/Sprite.cpp
         src/gui/Mateyak/Triangle.cpp
         src/gui/Mateyak/Window.cpp
+        src/gui/Mateyak/Model3D.cpp
         src/gui/Perlin/Perlin.cpp
         src/gui/main.cpp
         src/gui/Map.cpp
