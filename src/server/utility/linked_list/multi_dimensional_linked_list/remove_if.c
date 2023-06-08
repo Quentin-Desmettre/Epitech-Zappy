@@ -36,21 +36,20 @@ void dim_remove_if(dim_list_t **list, void *data, bool (*eq_cmp)(void *, void *)
     void (*free_data)(void *))
 {
     dim_list_t *s = *list;
+    bool cont = true;
 
     if (!s)
         return;
-    label:
-    do {
-        if (!((!eq_cmp && data == s->data) ||
-            (eq_cmp && eq_cmp(s->data, data)))) {
-            s = s->next;
+    while (cont) {
+        if (((!eq_cmp && data == s->data) ||
+            (eq_cmp && eq_cmp(data, s->data)))) {
+            cont = dim_remove_if_remove_node(list, &s, free_data);
             continue;
         }
-        if (!dim_remove_if_remove_node(list, &s, free_data))
-            return;
+        s = s->next;
         if (s == *list)
-            go_to label;
-    } while (s != *list);
+            return;
+    }
 }
 
 void dim_append_list(dim_list_t **list, dim_list_t *to_append,

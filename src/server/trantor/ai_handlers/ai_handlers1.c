@@ -8,7 +8,7 @@
 #include "trantor.h"
 #include "server.h"
 
-ai_cmd_reponse_t ai_forward_handler(action_t *action UNUSED,
+ai_cmd_response_t ai_forward_handler(action_t *action UNUSED,
     trantor_t *trantor, player_t *player)
 {
     map_tile_t *tile = get_tile_by_pos(trantor->map, player->x, player->y);
@@ -27,14 +27,14 @@ ai_cmd_reponse_t ai_forward_handler(action_t *action UNUSED,
     return AI_CMD_RESPONSE_OK;
 }
 
-ai_cmd_reponse_t ai_right_handler(action_t *action UNUSED,
+ai_cmd_response_t ai_right_handler(action_t *action UNUSED,
     trantor_t *trantor UNUSED, player_t *player)
 {
     player->dir = (player->dir + 1) % 4;
     return AI_CMD_RESPONSE_OK;
 }
 
-ai_cmd_reponse_t ai_left_handler(action_t *action,
+ai_cmd_response_t ai_left_handler(action_t *action,
     trantor_t *trantor, player_t *player)
 {
     player->dir = (player->dir - 1) % 4;

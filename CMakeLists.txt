@@ -16,44 +16,9 @@ include_directories(include/gui)
 include_directories(include/server)
 include_directories(/usr/local/include)
 
-find_package(Boost QUIET)
-include_directories(${Boost_INCLUDE_DIR})
 
 find_package(raylib QUIET)
 include_directories(${RAYLIB_INCLUDE_DIRS})
-
-if (NOT Boost_FOUND)
-    message(FATAL_ERROR "Please install boost!\nOn Ubuntu: sudo apt install libboost-all-dev\nOn Mac OS X: brew install boost\nOn Windows: https://www.boost.org/doc/libs/1_75_0/more/getting_started/windows.html")
-endif ()
-
-if (NOT raylib_FOUND)
-    message(FATAL_ERROR "Please install raylib!\nOn Ubuntu: sudo apt install libraylib-dev\nOn Mac OS X: brew install raylib\nOn Windows:")
-endif ()
-
-add_executable(zappy_gui
-        src/gui/Client/client.cpp
-        src/gui/Client/client_loop.cpp
-        src/gui/Client/receive.cpp
-        src/gui/Client/send.cpp
-        src/gui/Mateyak/Camera.cpp
-        src/gui/Mateyak/Matrix.cpp
-        src/gui/Mateyak/Shaders.cpp
-        src/gui/Mateyak/Sprite.cpp
-        src/gui/Mateyak/Triangle.cpp
-        src/gui/Mateyak/Window.cpp
-        src/gui/Perlin/Perlin.cpp
-        src/gui/main.cpp
-        src/gui/Map.cpp
-        src/gui/Utils3d.cpp
-        src/gui/venom.cpp
-)
-
-target_link_libraries(zappy_gui ${raylib_LIBRARY} ${Boost_LIBRARY})
-set_target_properties(zappy_gui PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
-
-add_custom_command(TARGET zappy_gui POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/${PAULIIINNN} ${CMAKE_SOURCE_DIR}/zappy_ai
-)
 
 add_executable(zappy_server
         src/server/network/notify_gui.c
@@ -85,7 +50,11 @@ add_executable(zappy_server
         src/server/utility/strings.c
         src/server/utility/str_array_2.c
         src/server/trantor/map.c
-        src/server/network/ai_log_handler.c)
+        src/server/network/ai_log_handler.c
+        src/server/trantor/map.c
+        src/server/utility/linked_list/multi_dimensional_linked_list/liked_list.c
+        src/server/utility/linked_list/multi_dimensional_linked_list/remove_if.c
+        src/server/trantor/tile_handling.c)
 
 set_target_properties(zappy_server PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
@@ -124,6 +93,6 @@ add_executable(server_tests
         tests/server/test_syscalls.c
         tests/server/test_safe_write.c
         tests/server/test_utility.c
-        tests/server/test_actions.c tests/server/test_handle_actions.c tests/server/test_server_init.c src/server/network/ai_log_handler.c tests/server/test_ai_log.c src/server/trantor/map.c src/server/utility/linked_list/multi_dimensional_linked_list/liked_list.c src/server/utility/linked_list/multi_dimensional_linked_list/remove_if.c src/server/trantor/tile_handling.c)
+        tests/server/test_actions.c tests/server/test_handle_actions.c tests/server/test_server_init.c src/server/network/ai_log_handler.c tests/server/test_ai_log.c )
 target_link_libraries(server_tests --coverage -lcriterion -g)
 set_target_properties(zappy_server PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
