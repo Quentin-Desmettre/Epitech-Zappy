@@ -56,3 +56,8 @@ void Mateyak::Window::end3D()
 {
     EndMode3D();
 }
+
+void Mateyak::Window::draw(const Map &map)
+{
+    draw(map.getGround());
+}

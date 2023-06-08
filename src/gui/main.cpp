@@ -21,9 +21,8 @@ void Graphic::loop(Mateyak::Vec2f mapSize)
     Mateyak::Sprite mapMdl = map.getMap();
     Mateyak::Sprite color = map.getColor();
     Venom ven({0, 0});
-    Mesh mesh = GenMeshHeightmap(mapMdl, (Vector3){mapSize.x * 10 / 3, 1, mapSize.y * 10 / 3});
-    Mateyak::Model3D model(mesh, Mateyak::Vec3f{0, -0.5, 0});
-    Mateyak::Model3D rock("assets/rock.obj", Mateyak::Vec3f{0, 0, 0}, 0.5f, RED);
+//    Mesh mesh = GenMeshHeightmap(mapMdl, (Vector3){mapSize.x * 10 / 3, 1, mapSize.y * 10 / 3});
+//    Mateyak::Model3D model(mesh, Mateyak::Vec3f{0, -0.5, 0});
     Mateyak::Model3D flat(GenMeshPoly(10, 10000.0f), Mateyak::Vec3f{-500, -1, -500}, 1.0f, BLACK);
     Mateyak::Shaders shader("src/gui/shader/base_lighting.vs", "src/gui/shader/test.fs");
     Font font = LoadFont("assets/arial.ttf");
@@ -32,15 +31,15 @@ void Graphic::loop(Mateyak::Vec2f mapSize)
         font = GetFontDefault();
     }
 
-    model.setTexture(color);
+//    model.setTexture(color);
     shader.setUniform("fogDensity", 0.02f);
     shader.setUniform("lightsPos", {0.0f, 20.0f, 0.0f});
     shader.setUniform("lightsColor", {0.5f, 0.5f, 0.5f});
     shader.setUniform("lightsEnabled", 1);
     int viewPos = shader.getUniformLocation("viewPos");
-    model.setShader(shader);
+//    model.setShader(shader);
+    map.setShader(shader);
     flat.setShader(shader);
-    rock.setShader(shader);
     bool shaderEnabled = true;
     bool drawGrid = false;
     shader.setUniform("shaderEnabled", shaderEnabled);
@@ -59,10 +58,10 @@ void Graphic::loop(Mateyak::Vec2f mapSize)
         ClearBackground(Color{255 / 10, 255 / 20, 255 / 20, 255});
         win.begin3D(cam);
         BeginShaderMode(shader);
-        Mateyak::Window::draw(model);
+        Mateyak::Window::draw(map);
         Mateyak::Window::draw(sky);
         Mateyak::Window::draw(flat);
-        Mateyak::Window::draw(rock);
+        map.update(_serverInformations);
         EndShaderMode();
         ven.draw_ven(seed, cam);
         _serverInformations.startComputing();

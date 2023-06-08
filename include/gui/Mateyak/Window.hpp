@@ -14,6 +14,7 @@
 #include "Camera.hpp"
 #include "Vector2.hpp"
 #include "Model3D.hpp"
+#include "Map.hpp"
 //
 //#ifndef RLIGHTS_IMPLEMENTATION
 //    #include "rlights.h"
@@ -40,6 +41,7 @@ namespace Mateyak
         static void draw(const Triangle &triangle, Color color);
         static void draw(const Model3D &model);
         void draw(const std::string &text, int x = 0, int y = 0, int fontSize = 15, Color color = DARKGRAY);
+        static void draw(const Map &map);
         void end3D();
         void endDrawing();
 

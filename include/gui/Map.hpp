@@ -15,6 +15,8 @@
 #include <vector>
 #include "Perlin/Perlin.hpp"
 #include "Mateyak/Sprite.hpp"
+#include "Informations/ServerInformations.hpp"
+#include "Mateyak/Model3D.hpp"
 
 union color_u {
     struct {
@@ -31,6 +33,9 @@ class Map {
         ~Map();
         Mateyak::Sprite getMap() const;
         Mateyak::Sprite getColor() const;
+        void update(const ServerInformations &infos);
+        void setShader(const Mateyak::Shaders &shader);
+        const Mateyak::Model3D &getGround() const;
     private:
         unsigned char randomClr(int rand, int i, int j, int prop = 10);
         std::vector<int> mpp;
@@ -38,5 +43,7 @@ class Map {
         Mateyak::Vec2f _size;
         Mateyak::Sprite map;
         Mateyak::Sprite clr;
+        Mateyak::Model3D _rock;
+        Mateyak::Model3D _ground;
         float _zoom;
 };

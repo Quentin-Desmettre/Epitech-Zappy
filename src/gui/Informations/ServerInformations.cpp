@@ -24,8 +24,13 @@ void ServerInformations::setMapSize(int x, int y)
     mapSize.x = x;
     mapSize.y = y;
     map.resize(y);
-    for (int i = 0; i < y; i++)
+    for (int i = 0; i < y; i++) {
         map[i].resize(x);
+        for (int j = 0; j < x; j++) {
+            for (int k = 0; k < 7; k++)
+                map[i][j][k] = 0;
+        }
+    }
 }
 
 void ServerInformations::setTile(int x, int y, std::vector<int> values)

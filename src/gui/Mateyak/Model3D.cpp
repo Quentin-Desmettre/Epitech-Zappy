@@ -17,14 +17,20 @@ Mateyak::Model3D::Model3D(Mesh mesh, Vec3f pos, float scale, Color color)
     _model = LoadModelFromMesh(mesh);
 }
 
+void Mateyak::Model3D::operator=(Mesh mesh)
+{
+    _model = LoadModelFromMesh(mesh);
+}
+
 Mateyak::Model3D::Model3D(const std::string &path, Vec3f pos, float scale, Color color)
     : _pos(pos), _scale(scale), _color(color)
 {
     _model = LoadModel(path.c_str());
 }
 
-Mateyak::Model3D::Model3D()
+Mateyak::Model3D::Model3D(): _scale(1), _color(WHITE)
 {
+    _pos = {0, 0, 0};
     _model = LoadModelFromMesh(GenMeshCube(1, 1, 1));
 }
 
