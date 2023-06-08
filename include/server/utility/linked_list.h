@@ -16,6 +16,14 @@ typedef struct list {
     struct list *prev;
 } list_t;
 
+typedef struct dim_list {
+    void *data;
+    struct dim_list *next;
+    struct dim_list *prev;
+    struct dim_list *over;
+    struct dim_list *under;
+} dim_list_t;
+
 void append_node(list_t **list, void *data);
 void remove_node(list_t **list, int index, void (*free_data)(void *));
 void free_list(list_t **list, void (*free_data)(void *));
