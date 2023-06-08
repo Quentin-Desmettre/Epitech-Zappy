@@ -34,9 +34,11 @@ ai_cmd_reponse_t ai_right_handler(action_t *action UNUSED,
     return AI_CMD_RESPONSE_OK;
 }
 
-ai_cmd_response_t ai_left_handler(action_t *action,
-                                    trantor_t *trantor, player_t *player)
+ai_cmd_reponse_t ai_left_handler(action_t *action,
+    trantor_t *trantor, player_t *player)
 {
+    player->dir = (player->dir - 1) % 4;
+    return AI_CMD_RESPONSE_OK;
 }
 
 ai_cmd_response_t ai_look_handler(action_t *action,
