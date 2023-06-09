@@ -9,6 +9,8 @@
     #define EPITECH_ZAPPY_TRANTOR_H
     #include "utility/linked_list.h"
     #include <stdlib.h>
+    #include <stdio.h>
+    #include <string.h>
 
 //////////////////////////////////////////////////////////////////////////////
 // TRANTOR
@@ -24,6 +26,16 @@ typedef enum resource {
     THYSTAME,
     NB_RESOURCE
 } resource_t;
+
+static char *ressources_names[NB_RESOURCE] = {
+    "food",
+    "linemate",
+    "deraumere",
+    "sibur",
+    "mendiane",
+    "phiras",
+    "thystame"
+};
 
 static const float resource_freq[NB_RESOURCE] = {
         0.5,
@@ -163,5 +175,11 @@ void spawn_resources(trantor_t *trantor);
 map_tile_t *init_tile(int x, int y);
 void link_layers(dim_list_t *map);
 map_tile_t *get_tile_by_pos(dim_list_t *map, int x, int y);
+map_tile_t *select_tile_for_look_command(trantor_t *trantor, player_t *player, int nb);
+int get_nb_tile(int level);
+char *get_tile_content(map_tile_t *tile);
+
+char *get_list_ressources(list_t *ressources);
+char *get_list_players(list_t *players);
 
 #endif //EPITECH_ZAPPY_TRANTOR_H
