@@ -10,7 +10,9 @@
     #include <stddef.h>
     #include <stdbool.h>
     #include <sys/select.h>
+    #include <string.h>
     #include "linked_list.h"
+    #include "garbage_collector.h"
 
 typedef struct {
     int fd;
@@ -66,5 +68,12 @@ void safe_write(int fd, void *data, size_t size);
  * @return list_t** The packet waitlist
  */
 list_t **packet_waitlist(void);
+
+static inline void safe_write_free(int fd, char *data)
+{
+    safe_write(fd, data, strlen(data));
+    my_free(data);
+}
+
 
 #endif //EPITECH_ZAPPY_SAFE_WRITE_H

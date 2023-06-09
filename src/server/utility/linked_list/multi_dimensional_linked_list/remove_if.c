@@ -32,8 +32,8 @@ bool dim_remove_if_remove_node(dim_list_t **begin,
     return true;
 }
 
-void dim_remove_if(dim_list_t **list, void *data, bool (*eq_cmp)(void *, void *),
-    void (*free_data)(void *))
+void dim_remove_if(dim_list_t **list, void *data,
+        bool (*eq_cmp)(void *, void *), void (*free_data)(void *))
 {
     dim_list_t *s = *list;
     bool cont = true;

@@ -48,8 +48,8 @@ int dim_list_size(dim_list_t *list, enum dimension dim);
 void dim_push_to_front(dim_list_t **begin, void *data);
 void dim_remove_if(dim_list_t **list, void *data, bool (*cmp)(void *, void *),
     void (*free_data)(void *));
-void dim_append_list(dim_list_t **list, dim_list_t *to_append, bool free_to_append,
-    void (*free_data)(void *));
+void dim_append_list(dim_list_t **list, dim_list_t *to_append,
+    bool free_to_append, void (*free_data)(void *));
 bool dim_remove_if_remove_node(dim_list_t **list,
     dim_list_t **s, void (*free_data)(void *));
 

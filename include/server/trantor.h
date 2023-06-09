@@ -37,8 +37,10 @@ static const float resource_freq[NB_RESOURCE] = {
 
 typedef struct team {
     int available_slots;
+    int eggs;
     char *name;
     list_t *players;
+    list_t *egg_numbers;
 } team_t;
 
 typedef enum direction {
@@ -64,7 +66,8 @@ typedef struct trantor {
     dim_list_t *map;
 } trantor_t;
 
-trantor_t *init_trantor(int width, int height);
+trantor_t *init_trantor(int width, int height,
+    char **team_names, int max_players);
 void destroy_trantor(trantor_t *trantor);
 
 //////////////////////////////////////////////////////////////////////////////
@@ -121,10 +124,13 @@ typedef struct player {
 
     action_t *current_action;
     list_t *buffered_actions;
+    team_t *team;
     const char *team_name;
+    bool is_from_egg;
 } player_t;
 
-player_t *create_player(trantor_t *trantor, const char *team_name);
+player_t *create_player(trantor_t *trantor, team_t *team,
+                        const char *team_name);
 void destroy_player(trantor_t *trantor, player_t *player);
 
 // Ai request handling
@@ -163,5 +169,6 @@ void spawn_resources(trantor_t *trantor);
 map_tile_t *init_tile(int x, int y);
 void link_layers(dim_list_t *map);
 map_tile_t *get_tile_by_pos(dim_list_t *map, int x, int y);
+team_t *create_team(const char *name, int max_players);
 
 #endif //EPITECH_ZAPPY_TRANTOR_H

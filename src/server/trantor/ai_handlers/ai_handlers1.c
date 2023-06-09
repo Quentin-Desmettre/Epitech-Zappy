@@ -16,11 +16,11 @@ ai_cmd_response_t ai_forward_handler(action_t *action UNUSED,
     remove_if(&tile->players, player, NULL, NULL);
     if (player->dir == NORTH)
         player->y = (player->y - 1) % dim_list_size(trantor->map, VERTICAL);
-    else if (player->dir == SOUTH)
+    if (player->dir == SOUTH)
         player->y = (player->y + 1) % dim_list_size(trantor->map, VERTICAL);
-    else if (player->dir == EAST)
+    if (player->dir == EAST)
         player->x = (player->x + 1) % dim_list_size(trantor->map, HORIZONTAL);
-    else if (player->dir == WEST)
+    if (player->dir == WEST)
         player->x = (player->x - 1) % dim_list_size(trantor->map, HORIZONTAL);
     tile = get_tile_by_pos(trantor->map, player->x, player->y);
     append_node(&tile->players, player);

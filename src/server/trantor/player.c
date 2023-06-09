@@ -6,12 +6,18 @@
 */
 
 #include "trantor.h"
-#include <stdlib.h>
 #include "utility/garbage_collector.h"
 
-player_t *create_player(trantor_t *trantor, const char *team_name)
+player_t *create_player(trantor_t *trantor, team_t *team,
+                        const char *team_name)
 {
-    return my_calloc(sizeof(player_t), 1);
+    static int player_id = 0;
+    player_t *p = my_calloc(sizeof(player_t), 1);
+
+    p->inventory[FOOD] = 10;
+    p->team = team;
+    p->id = player_id++;
+    return p;
 }
 
 void destroy_player(trantor_t *trantor, player_t *player)

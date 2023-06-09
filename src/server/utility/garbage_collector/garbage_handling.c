@@ -33,13 +33,14 @@ void remove_from_list(void *data, bool free_data)
     s_list_t *prev = NULL;
     s_list_t *head = *(malloc_stack());
 
-    free(data);
+    if (free_data)
+        free(data);
     while (head) {
         if (head->data == data) {
             prev ?
             (prev->next = head->next) :
             (*(malloc_stack()) = head->next);
-            free_data ? free(head->data) : 0;
+            free(head);
             return;
         }
         prev = head;

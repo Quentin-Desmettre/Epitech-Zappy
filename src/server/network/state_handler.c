@@ -42,9 +42,9 @@ static char *get_gui_connected_answer(server_t *server)
     return answer;
 }
 
-team_t *get_team_by_name(server_t *server, const char *team)
+team_t *get_team_by_name(trantor_t *trantor, const char *team)
 {
-    list_t *tmp = server->trantor->teams;
+    list_t *tmp = trantor->teams;
     team_t *tmp_team;
 
     do {
@@ -52,7 +52,7 @@ team_t *get_team_by_name(server_t *server, const char *team)
         if (strcmp(tmp_team->name, team) == 0)
             return tmp_team;
         tmp = tmp->next;
-    } while (tmp != server->trantor->teams);
+    } while (tmp != trantor->teams);
     return NULL;
 }
 
@@ -67,8 +67,8 @@ void handle_connected(server_t *server, client_t *cli, const char *cmd)
         safe_write(cli->fd, answer, strlen(answer));
         return my_free(answer);
     }
-    team = get_team_by_name(server, cmd);
-    if (!team || team->available_slots == 0) {
+    team = get_team_by_name(server->trantor, cmd);
+    if (!team || (team->available_slots + team->eggs) == 0) {
         answer = team ? ERR_NO_SLOTS : ERR_NO_TEAM;
         return safe_write(cli->fd, answer, strlen(answer));
     }

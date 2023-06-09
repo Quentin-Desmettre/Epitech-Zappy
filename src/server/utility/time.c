@@ -13,10 +13,16 @@
 
 struct timespec get_end_time(int ticks, int freq, struct timespec now)
 {
-    return (struct timespec) {
+    struct timespec tmp = {
             now.tv_sec + ticks / freq,
             now.tv_nsec + (ticks % freq) * 1000000000L / freq
     };
+
+    if (tmp.tv_nsec >= 1000000000L) {
+        tmp.tv_sec++;
+        tmp.tv_nsec -= 1000000000L;
+    }
+    return tmp;
 }
 
 void get_time(struct timespec *timeout)

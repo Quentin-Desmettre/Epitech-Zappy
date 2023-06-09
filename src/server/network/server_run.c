@@ -68,6 +68,7 @@ static void check_resource_spawn(server_t *server)
     if (is_timespec_less(&now, &server->next_spawn))
         return;
     spawn_resources(server->trantor);
+    update_next_spawn(server);
 }
 
 void run_server(server_t *server)

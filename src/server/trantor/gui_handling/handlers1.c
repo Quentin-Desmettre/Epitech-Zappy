@@ -17,6 +17,7 @@ char *gui_tile_content_handler(server_t *server, char **args)
 
 char *gui_tiles_content_handler(server_t *server, char **args)
 {
+    return my_strdup("ok\n");
 }
 
 char *gui_team_names_handler(server_t *server, char **args)
