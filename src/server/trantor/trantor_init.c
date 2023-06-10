@@ -38,11 +38,6 @@ trantor_t *init_trantor(int width, int height,
     return trantor;
 }
 
-static void destroy_teams(list_t **teams)
-{
-    free_list(teams, NULL);
-}
-
 static void destroy_map(dim_list_t *map)
 {
     my_free(map);
@@ -50,7 +45,7 @@ static void destroy_map(dim_list_t *map)
 
 void destroy_trantor(trantor_t *trantor)
 {
-    destroy_teams(&trantor->teams);
+    free_list(&trantor->teams, destroy_team);
     destroy_map(trantor->map);
     my_free(trantor);
 }

@@ -16,3 +16,13 @@ team_t *create_team(const char *name, int max_players)
     team->available_slots = max_players;
     return team;
 }
+
+void destroy_team(void *t)
+{
+    team_t *team = t;
+
+    my_free(team->name);
+    free_list(&team->players, NULL);
+    free_list(&team->egg_numbers, NULL);
+    my_free(team);
+}

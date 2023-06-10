@@ -10,10 +10,7 @@
     #include "utility/linked_list.h"
     #include <stdlib.h>
     #define ERROR_CODE my_strdup("sbp")
-
-    #define ASSERT_ARGS_NB(args, nb) \
-    if (str_array_len(args) != nb)\
-    return ERROR_CODE
+    #define BASE_FOOD 9
 
 //////////////////////////////////////////////////////////////////////////////
 // TRANTOR
@@ -52,7 +49,8 @@ typedef enum direction {
     NORTH,
     EAST,
     SOUTH,
-    WEST
+    WEST,
+    NB_DIR
 } direction_t;
 
 typedef struct map_tile {
@@ -132,7 +130,7 @@ typedef struct player {
     action_t *current_action;
     list_t *buffered_actions;
     team_t *team;
-    const char *team_name;
+    char *team_name;
     bool is_from_egg;
 } player_t;
 
@@ -177,5 +175,6 @@ map_tile_t *init_tile(int x, int y);
 void link_layers(dim_list_t *map);
 map_tile_t *get_tile_by_pos(dim_list_t *map, int x, int y);
 team_t *create_team(const char *name, int max_players);
+void destroy_team(void *team);
 
 #endif //EPITECH_ZAPPY_TRANTOR_H
