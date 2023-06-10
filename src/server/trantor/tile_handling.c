@@ -14,7 +14,6 @@ map_tile_t *init_tile(int x, int y)
     map_tile_t *tile = my_calloc(sizeof(map_tile_t), 1);
 
     tile->players = NULL;
-    tile->resources = NULL;
     tile->eggs = NULL;
     tile->x = x;
     tile->y = y;

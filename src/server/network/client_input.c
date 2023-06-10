@@ -40,7 +40,6 @@ static void handle_client_input(server_t *server, client_t *cli)
 {
     char **args;
     int nb_args;
-
     if (!fetch_client_data(cli))
         return disconnect_client(server, cli, true);
     if (strchr(cli->buffer, '\n') == NULL)
@@ -57,7 +56,8 @@ static void handle_client_input(server_t *server, client_t *cli)
         cli->buffer_size = 0;
     }
     for (int i = 0; args[i]; i++)
-        STATE_HANDLER[cli->state](server, cli, args[i]);
+        if (strlen(args[i]))
+            STATE_HANDLER[cli->state](server, cli, args[i]);
 }
 
 void handle_clients(server_t *server, fd_set *read_fds)

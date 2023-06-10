@@ -25,19 +25,22 @@ static char *get_gui_connected_answer(server_t *server)
 {
     size_t len;
     char *answer =
-            str_concat_free(&len, 4,
-                gui_map_size_handler(server, NULL),
-                gui_time_request_handler(server, NULL),
-                gui_tiles_content_handler(server, NULL),
-                gui_team_names_handler(server, NULL)
-    );
+    str_concat_free(&len, 6, gui_map_size_handler(server, "msz"),
+    my_strdup("\n"), gui_time_request_handler(server, "sgt"), my_strdup("\n"),
+    gui_tiles_content_handler(server, "mct"), my_strdup("\n"),
+    gui_team_names_handler(server, "tna"));
     list_t *start = server->clients;
     client_t *cli;
+    player_t *player;
 
     do {
         cli = start->data;
+        player = cli->data;
         if (cli->state == AI)
-            str_append_free(&answer, &len, gui_pnw_response(cli->data));
+            str_append_free(&answer, &len, get_gui_message(PLAYER_CONNECTION,
+                player->id, player->x, player->y, player->dir,
+                player->level, player->team_name));
+        start = start->next;
     } while (start != server->clients);
     return answer;
 }
@@ -77,17 +80,15 @@ void handle_connected(server_t *server, client_t *cli, const char *cmd)
 
 void handle_gui(server_t *server, UNUSED client_t *cli, const char *cmd)
 {
-    char **args = str_to_word_array(cmd, " ", NULL);
     char *output;
     size_t len;
 
     for (int i = 0; GUI_HANDLERS[i].cmd; i++) {
-        if (strcmp(GUI_HANDLERS[i].cmd, args[0]) != 0)
+        if (strncmp(GUI_HANDLERS[i].cmd, cmd, 3) != 0)
             continue;
         output = str_concat_free(&len, 2,
-                    GUI_HANDLERS[i].handler(server, args), "\n");
-        safe_write(cli->fd, output, len);
-        break;
+                    GUI_HANDLERS[i].handler(server, cmd), my_strdup("\n"));
+        return safe_write(cli->fd, output, len);
     }
-    free_str_array(args);
+    safe_write(cli->fd, "suc\n", 4);
 }

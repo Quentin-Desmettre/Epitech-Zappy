@@ -295,14 +295,6 @@ const arg_test_t tests[] = {
         }
 };
 
-int str_array_len(char **array)
-{
-    int i = 0;
-
-    for (; array[i] != NULL; i++);
-    return i;
-}
-
 bool is_args_eq(args_t *args, const args_t_raw *test)
 {
     if (args->port != test->port) {

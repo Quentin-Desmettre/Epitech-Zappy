@@ -24,16 +24,12 @@ static char *get_ai_connected_answer(team_t *team, int map_x, int map_y)
 
 static char *gui_mess_ai_connected(server_t *server, player_t *player)
 {
-    printf("Player: %p\n", player);
-    printf("Team: %p\n", player->team);
-    printf("Team name: %s\n", player->team->name);
     char *msg = get_gui_message(PLAYER_CONNECTION,
         player->id, player->x, player->y, player->dir, player->level,
         player->team->name);
     size_t msg_len = strlen(msg);
 
-    str_append_free(&msg, &msg_len, my_strdup("\n"));
-    str_append_free(&msg, &msg_len, gui_tiles_content_handler(server, NULL));
+    str_append_free(&msg, &msg_len, gui_tiles_content_handler(server, "mct"));
     str_append_free(&msg, &msg_len, my_strdup("\n"));
     return msg;
 }

@@ -66,7 +66,6 @@ add_executable(zappy_server
         src/server/trantor/ai_handlers/ai_handlers3.c
         src/server/trantor/gui_handling/handlers2.c
         src/server/trantor/gui_handling/handlers1.c
-        src/server/trantor/gui_handling/responses1.c
         src/server/trantor/team.c
         src/server/parse_args.c
         src/server/utility/str_array.c
@@ -81,7 +80,9 @@ add_executable(zappy_server
         src/server/utility/safe_write/my_write.c
         src/server/utility/garbage_collector/garbage_handling.c
         src/server/utility/garbage_collector/my_malloc.c
-        src/server/utility/strings.c)
+        src/server/utility/strings.c src/server/utility/strings2.c
+        src/server/trantor/gui_handling/handlers3.c
+)
 
 set_target_properties(zappy_server PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
@@ -116,7 +117,6 @@ add_executable(server_tests
         ./src/server/trantor/ai_handlers/ai_handlers3.c
         ./src/server/trantor/gui_handling/handlers2.c
         ./src/server/trantor/gui_handling/handlers1.c
-        ./src/server/trantor/gui_handling/responses1.c
         ./src/server/parse_args.c
         ./src/server/utility/str_array.c
         ./src/server/utility/time.c
@@ -131,5 +131,5 @@ add_executable(server_tests
         ./src/server/utility/garbage_collector/garbage_handling.c
         ./src/server/utility/garbage_collector/my_malloc.c
         ./src/server/utility/strings.c
-        src/server/trantor/team.c src/server/network/client.c)
+        src/server/trantor/team.c src/server/network/client.c src/server/utility/strings2.c src/server/trantor/gui_handling/handlers3.c)
 target_link_libraries(server_tests criterion)

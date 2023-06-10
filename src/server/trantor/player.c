@@ -16,6 +16,7 @@ player_t *create_player(trantor_t *trantor, team_t *team,
 
     p->inventory[FOOD] = 10;
     p->team = team;
+    p->team_name = my_strdup(team_name);
     p->id = player_id++;
     return p;
 }

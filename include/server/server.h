@@ -31,6 +31,8 @@
     #define MAP_SPAWN_FREQ 20
     #define FOOD_CONSUMPTION_FREQ 126
 
+UNUSED static char *NO_ARGS[2] = {"", NULL};
+
 enum gui_event {
     PLAYER_CONNECTION,
     EXPULSION,
@@ -95,21 +97,21 @@ typedef struct client {
 } client_t;
 
 // GUI request handling
-typedef char *(*gui_cmd_handler_t)(server_t *server, char **args);
+typedef char *(*gui_cmd_handler_t)(server_t *server, const char *cmd);
 typedef struct {
     const char *cmd;
     gui_cmd_handler_t handler;
 } gui_cmd_t;
 
-char *gui_map_size_handler(server_t *server, char **args);
-char *gui_tile_content_handler(server_t *server, char **args);
-char *gui_tiles_content_handler(server_t *server, char **args);
-char *gui_team_names_handler(server_t *server, char **args);
-char *gui_player_position_handler(server_t *server, char **args);
-char *gui_player_level_handler(server_t *server, char **args);
-char *gui_player_inventory_handler(server_t *server, char **args);
-char *gui_time_request_handler(server_t *server, char **args);
-char *gui_time_change_handler(server_t *server, char **args);
+char *gui_map_size_handler(server_t *server, const char *cmd);
+char *gui_tile_content_handler(server_t *server, const char *cmd);
+char *gui_tiles_content_handler(server_t *server, const char *cmd);
+char *gui_team_names_handler(server_t *server, const char *cmd);
+char *gui_player_position_handler(server_t *server, const char *cmd);
+char *gui_player_level_handler(server_t *server, const char *cmd);
+char *gui_player_inventory_handler(server_t *server, const char *cmd);
+char *gui_time_request_handler(server_t *server, const char *cmd);
+char *gui_time_change_handler(server_t *server, const char *cmd);
 char *gui_pnw_response(player_t *player);
 
 extern const gui_cmd_t GUI_HANDLERS[];
@@ -176,5 +178,6 @@ void update_next_spawn(server_t *server);
 void send_to_gui(server_t *server, char *msg, bool free_msg);
 char *get_gui_message(enum gui_event event, ...);
 food_timeout_t *create_food_timeout(int freq, client_t *cli);
+client_t *get_client_by_id(server_t *server, int id);
 
 #endif //EPITECH_ZAPPY_SERVER_H

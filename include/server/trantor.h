@@ -9,6 +9,11 @@
     #define EPITECH_ZAPPY_TRANTOR_H
     #include "utility/linked_list.h"
     #include <stdlib.h>
+    #define ERROR_CODE my_strdup("sbp")
+
+    #define ASSERT_ARGS_NB(args, nb) \
+    if (str_array_len(args) != nb)\
+    return ERROR_CODE
 
 //////////////////////////////////////////////////////////////////////////////
 // TRANTOR
@@ -25,7 +30,7 @@ typedef enum resource {
     NB_RESOURCE
 } resource_t;
 
-static const float resource_freq[NB_RESOURCE] = {
+static const float RESOURCE_FREQ[NB_RESOURCE] = {
         0.5,
         0.3,
         0.15,
@@ -51,7 +56,7 @@ typedef enum direction {
 } direction_t;
 
 typedef struct map_tile {
-    list_t *resources;
+    int resources[NB_RESOURCE];
     list_t *players;
     list_t *eggs;
     int x;
@@ -64,6 +69,8 @@ typedef struct map {
 typedef struct trantor {
     list_t *teams;
     dim_list_t *map;
+    int width;
+    int height;
 } trantor_t;
 
 trantor_t *init_trantor(int width, int height,
