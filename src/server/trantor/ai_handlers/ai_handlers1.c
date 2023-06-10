@@ -62,11 +62,27 @@ ai_cmd_response_t ai_look_handler(action_t *action UNUSED,
     }
     response = my_realloc(response, strlen(response) + 2);
     sprintf(response, "%s]", response);
-    printf("%s\n", response);
     return AI_CMD_RESPONSE_TEXT(response);
 }
 
-ai_cmd_response_t ai_inventory_handler(action_t *action,
-                                    trantor_t *trantor, player_t *player)
+ai_cmd_response_t ai_inventory_handler(action_t *action UNUSED,
+                                    trantor_t *trantor UNUSED, player_t *player)
 {
+    char *response = malloc(2);
+    char *tmp = malloc(8);
+
+    memset(response, 0, 2);
+    sprintf(response, "[");
+    for (int i = 0; i < NB_RESOURCE; i++) {
+        sprintf(tmp, "%d", player->inventory[i]);
+        response = realloc(response, strlen(response) + strlen(ressources_names[i]) + strlen(tmp) + 4);
+        sprintf(response, "%s %s %s", response, ressources_names[i], tmp);
+        if (i != NB_RESOURCE - 1) {
+            response = realloc(response, strlen(response) + 3);
+            sprintf(response, "%s,", response);
+        }
+    }
+    response = realloc(response, strlen(response) + 2);
+    sprintf(response, "%s]", response);
+    return AI_CMD_RESPONSE_TEXT(response);
 }
