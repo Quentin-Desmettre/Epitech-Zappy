@@ -51,12 +51,16 @@ void *my_calloc(size_t nmemb, size_t size)
 
 void *my_realloc(void *ptr, size_t size)
 {
-    void *r = my_malloc(size);
+    void *r = realloc(ptr, size);
 
-    if (!ptr)
-        return r;
-    memcpy(r, ptr, size);
-    my_free(ptr);
+    if (!r) {
+        perror("realloc");
+        exit(84);
+    }
+    if (r != ptr) {
+        remove_from_list(ptr, false);
+        push_to_stack(malloc_stack(), r);
+    }
     return r;
 }
 
