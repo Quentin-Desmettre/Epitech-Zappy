@@ -3,7 +3,7 @@
 #define BALL_NB 30
 #define FLOAT_NB (float)BALL_NB
 #define DIS 3.f
-#define DIS2 2.5f
+#define DIS2 0.5f
 #define PRECI 4
 #define LEG 5
 #include "Utils3d.hpp"
@@ -21,7 +21,8 @@ Venom::Venom(Mateyak::Vec2f pos)
         ps.y = 0;
         pos_feet.push_back(ps);
     }
-    _pos = {pos.x + 5/3.f, 0.75, pos.y + 5/3.f};
+    _pos = {(pos.x * 10 + 5) / 3.F, 0.75, (pos.y * 10 + 5) / 3.F};
+    _nextPosition = _pos;
 }
 
 Venom::~Venom()
@@ -87,6 +88,7 @@ void Venom::move_ven(Camera camera)
 {
     float norm = 0;
     Vector3 vec;
+
     if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_RIGHT)) {
         vec = {camera.position.x - camera.target.x, 0, camera.position.z - camera.target.z};
         norm = sqrt(pow(vec.x, 2) + pow(vec.z, 2));
@@ -106,6 +108,26 @@ void Venom::move_ven(Camera camera)
     if (IsKeyDown(KEY_LEFT)) {
         _pos.x -= vec.z / norm / 20.0;
         _pos.z += vec.x / norm / 20.0;
+    }
+}
+
+void Venom::move_ven()
+{
+    float norm = 0;
+    Vector3 vec;
+
+    if (_pos == _nextPosition)
+        return;
+    std::cout << _pos.x << " " << _pos.z << std::endl;
+    std::cout << _nextPosition.x << " " << _nextPosition.z << std::endl;
+    vec = {_nextPosition.x - _pos.x, _pos.y, _nextPosition.z - _pos.z};
+    norm = sqrt(pow(vec.x, 2) + pow(vec.z, 2));
+
+    if (norm < 0.1) {
+        _pos = _nextPosition;
+    } else {
+        _pos.x += vec.x / norm / 20.0;
+        _pos.z += vec.z / norm / 20.0;
     }
 }
 
@@ -130,4 +152,9 @@ Mateyak::Vec3f Venom::getPos() const
 Mateyak::Vec3f &Venom::getPosition()
 {
     return _pos;
+}
+
+void Venom::setPos(const Mateyak::Vec3f &pos)
+{
+    _nextPosition = {(pos.x * 10 + 5) / 3.F, _pos.y, (pos.y * 10 + 5) / 3.F};
 }

@@ -13,7 +13,7 @@
 
 void Graphic::loop(Mateyak::Vec2f mapSize)
 {
-    Mateyak::Window win(1920 / 2, 1080 / 2, "Zappy", 30);
+    Mateyak::Window win(1920 / 1.2, 1080 / 1.2, "Zappy", 400);
     int seed = rand();
     Mateyak::Camera cam({5.0f, 5.0f, 5.0f}, {0.0f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, 45.0f);
     Mateyak::Model3D sky(GenMeshSphere(200, 8, 8), Mateyak::Vec3f{0, 0, 0}, 1.0f, BLACK);
@@ -38,6 +38,19 @@ void Graphic::loop(Mateyak::Vec2f mapSize)
     bool shaderEnabled = true;
     bool drawGrid = false;
     shader.setUniform("shaderEnabled", shaderEnabled);
+    int maxSize = 0;
+
+    _serverInformations.startComputing();
+    for (auto &it : _serverInformations.getTeams()) {
+        it.getName();
+        Vector2 size = MeasureTextEx(win._font, it.getName().c_str(), 15, 1);
+        it.width = size.x;
+        it.height = size.y;
+        if (size.x > maxSize)
+            maxSize = size.x;
+    }
+    _serverInformations.endComputing();
+
     while (!WindowShouldClose()) {
         if (IsKeyPressed(KEY_F1)) {
             shaderEnabled = !shaderEnabled;
@@ -61,16 +74,21 @@ void Graphic::loop(Mateyak::Vec2f mapSize)
         ven.draw_ven(seed, cam);
         _serverInformations.startComputing();
         for (auto &it : _serverInformations.getPlayers()) {
-            _serverInformations.updatePlayer(it);
             it->ven.draw_ven(seed, cam);
+            _serverInformations.updatePlayer(it);
         }
-        _serverInformations.endComputing();
-
-        if (drawGrid)
-            Utils::drawGrid(mapSize, 10/3.f, {0, 0, 0});
+        if (drawGrid) {
+            Utils::drawGrid(mapSize, 10 / 3.F, {0, 0, 0});
+        }
         win.end3D();
         DrawFPS(10, 10);
-        Mateyak::Window::draw("sale pute");
+        int x = win.width - maxSize - 10;
+        int y = 10;
+        for (auto &it : _serverInformations.getTeams()) {
+            Mateyak::Window::draw(it.getName(), x, y, 15, it.getColor());
+            y += 20;
+        }
+        _serverInformations.endComputing();
         win.endDrawing();
     }
 }

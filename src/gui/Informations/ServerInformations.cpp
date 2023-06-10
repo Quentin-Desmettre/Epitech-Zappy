@@ -6,17 +6,19 @@
 */
 
 #include "Informations/ServerInformations.hpp"
-#include <iostream>
 
 void ServerInformations::updatePlayer(std::unique_ptr<Player> &player)
 {
     Player::STATE state = player->getState();
-    if (state == Player::STATE::NONE)
+    if (state == Player::STATE::NONE) {
+        player->ven.move_ven();
         return;
+    }
     if (state == Player::STATE::DEAD)
         player->ven.getPosition().y += 0.01;
-    if (player->ven.getPos().y > 3)
+    if (player->ven.getPos().y > 3.0) {
         removePlayer(player->getName());
+    }
 }
 
 void ServerInformations::setMapSize(int x, int y)
@@ -64,8 +66,9 @@ void ServerInformations::setTile(int x, int y, std::vector<int> values)
 
 void ServerInformations::addTeam(std::string team)
 {
-    if (std::find(teams.begin(), teams.end(), team) == teams.end())
-        teams.push_back(team);
+    if (std::find(teams.begin(), teams.end(), team) == teams.end()) {
+        teams.emplace_back(team);
+    }
 }
 
 void ServerInformations::addPlayer(std::string name, int x, int y, Player::ORIENTATION orientation, int level, std::string team)
@@ -120,7 +123,7 @@ void ServerInformations::removePlayer(std::string name)
 {
     for (size_t i = 0; i < players.size(); i++) {
         if (players[i]->getName() == name) {
-            players[i]->setState(Player::STATE::DEAD);
+            players.erase(players.begin() + i);
             return;
         }
     }
@@ -145,7 +148,7 @@ ZappyMap ServerInformations::getMap() const
 {
     return map;
 }
-std::vector<std::string> ServerInformations::getTeams() const
+std::vector<Team> ServerInformations::getTeams() const
 {
     return teams;
 }

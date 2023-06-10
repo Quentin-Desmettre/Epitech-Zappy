@@ -120,6 +120,6 @@ void Map::setShader(const Mateyak::Shaders &shader) {
 }
 
 void Map::update(const ServerInformations &infos) {
-    std::cout << "update" << std::endl;
-    std::cout << "end update" << std::endl;
+    //std::cout << "update" << std::endl;
+    //std::cout << "end update" << std::endl;
 }

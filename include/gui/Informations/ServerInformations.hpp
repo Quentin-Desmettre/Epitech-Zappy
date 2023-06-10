@@ -14,6 +14,7 @@
 #include "Mateyak/Vector2.hpp"
 #include <algorithm>
 #include "Informations/Player.hpp"
+#include "Informations/Team.hpp"
 #include "Ressource.hpp"
 #include <memory>
 typedef std::vector<std::vector<std::vector<Ressource>>> ZappyMap;
@@ -42,13 +43,13 @@ class ServerInformations
 
         Mateyak::Vec2f getMapSize() const;
         ZappyMap getMap() const;
-        std::vector<std::string> getTeams() const;
+        std::vector<Team> getTeams() const;
         std::vector<std::unique_ptr<Player>> &getPlayers();
 
     private:
         Mateyak::Vec2f mapSize;
         ZappyMap map;
-        std::vector<std::string> teams;
+        std::vector<Team> teams;
         std::vector<std::unique_ptr<Player>> players;
         std::mutex mutex;
 };

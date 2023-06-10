@@ -40,11 +40,13 @@ namespace Mateyak
         static void draw(const Triangle &triangle);
         static void draw(const Triangle &triangle, Color color);
         static void draw(const Model3D &model);
-        static void draw(const std::string &text, int x = 0, int y = 0, int fontSize = 15, Color color = DARKGRAY);
+        static void draw(const std::string &text, float x = 0, float y = 0, int fontSize = 15, Color color = DARKGRAY);
         static void draw(const Map &map);
         void end3D();
         void endDrawing();
 
+        int width;
+        int height;
         static Font _font;
 
         Vec2f getMousePosition() const {

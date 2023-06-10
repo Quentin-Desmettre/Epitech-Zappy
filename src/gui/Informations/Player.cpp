@@ -6,11 +6,12 @@
 */
 
 #include "Informations/Player.hpp"
+#include <iostream>
 
-Player::Player(std::string name, int x, int y, Player::ORIENTATION orientation, int level, std::string team)
+Player::Player(std::string name, int x, int y, Player::ORIENTATION orientation, int level, std::string team) : ven({static_cast<float>(x), static_cast<float>(y)})
 {
-    _nextPosition.x = _position.x = x;
-    _nextPosition.y = _position.y = y;
+    _position.x = x;
+    _position.y = y;
     _level = level;
     _inventory.fill(0);
     _orientation = orientation;
@@ -28,8 +29,9 @@ std::string Player::getName() const
 
 void Player::setPos(int x, int y)
 {
-    _nextPosition.x = x;
-    _nextPosition.y = y;
+    Mateyak::Vec3f pos = {static_cast<float>(x), static_cast<float>(y), 0};
+
+    ven.setPos(pos);
 }
 
 void Player::setOrientation(Player::ORIENTATION orientation)

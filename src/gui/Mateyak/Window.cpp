@@ -10,6 +10,8 @@ Mateyak::Window::Window(int width, int height, std::string title, int fps)
     if (!_font.texture.id) {
         Mateyak::Window::_font = GetFontDefault();
     }
+    this->width = width;
+    this->height = height;
 }
 
 Mateyak::Window::~Window()
@@ -38,26 +40,24 @@ void Mateyak::Window::draw(const Model3D &model)
     DrawModel(model, model.getPos(), model.getScale(), model.getColor());
 }
 
-void Mateyak::Window::draw(const std::string &textss, int x, int y, int fontSize, Color color)
+void Mateyak::Window::draw(const std::string &texts, float x, float y, int fontSize, Color color)
 {
-    const char* text = "dôfjepaiuhfpuihafpuihaeuihdu";
+    const char* text = texts.c_str();
     Vector2 size = MeasureTextEx(_font, text, fontSize, 1);
     double textWidth = size.x;
     double textHeight = size.y;
 
-    float rectX = 600;
-    float rectY = 10;
+    float rectX = x;
+    float rectY = y;
     auto rectWidth = static_cast<float>(textWidth);
     auto rectHeight = static_cast<float>(textHeight);
 
-    Vector2 rectPosition = { rectX, rectY };
-    Vector2 rectSize = { rectWidth, rectHeight };
+    Vector2 rectPosition = { rectX - 5, rectY - 3 };
+    Vector2 rectSize = { rectWidth + 10, rectHeight + 6 };
     DrawRectangleV(rectPosition, rectSize, DARKGRAY);
 
     Vector2 textPosition = { rectX, rectY };
-    Color textColor = { 0xFF, 0x00, 0x00, 0xFF };
-    DrawTextEx(_font, text, textPosition, (float)fontSize, 1, textColor);
-    DrawText(textss.c_str(), x, y, fontSize, color);
+    DrawTextEx(_font, text, textPosition, (float)fontSize, 1, color);
 }
 
 void Mateyak::Window::startDrawing(Color color)

@@ -34,7 +34,6 @@ class Player
         Mateyak::Vec2f _position;
 
     private:
-        Mateyak::Vec2f _nextPosition;
         int _level;
         std::array<int, 7> _inventory;
         ORIENTATION _orientation;
