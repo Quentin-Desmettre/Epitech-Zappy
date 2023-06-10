@@ -11,6 +11,8 @@
     #include <stdlib.h>
     #define ERROR_CODE my_strdup("sbp")
     #define BASE_FOOD 9
+    #include <stdio.h>
+    #include <string.h>
 
 //////////////////////////////////////////////////////////////////////////////
 // TRANTOR
@@ -26,6 +28,16 @@ typedef enum resource {
     THYSTAME,
     NB_RESOURCE
 } resource_t;
+
+static char *ressources_names[NB_RESOURCE] = {
+    "food",
+    "linemate",
+    "deraumere",
+    "sibur",
+    "mendiane",
+    "phiras",
+    "thystame"
+};
 
 static const float RESOURCE_FREQ[NB_RESOURCE] = {
         0.5,
@@ -176,5 +188,11 @@ void link_layers(dim_list_t *map);
 map_tile_t *get_tile_by_pos(dim_list_t *map, int x, int y);
 team_t *create_team(const char *name, int max_players);
 void destroy_team(void *team);
+map_tile_t *select_tile_for_look_command(trantor_t *trantor, player_t *player, int nb);
+int get_nb_tile(int level);
+char *get_tile_content(map_tile_t *tile);
+
+char *get_list_ressources(list_t *ressources);
+char *get_list_players(list_t *players);
 
 #endif //EPITECH_ZAPPY_TRANTOR_H

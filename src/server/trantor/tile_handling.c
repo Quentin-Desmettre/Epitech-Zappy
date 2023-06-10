@@ -54,10 +54,41 @@ map_tile_t *get_tile_by_pos(dim_list_t *map, int x, int y)
 {
     dim_list_t *sub_list = map;
 
-    for (int i = 0; i < y; i++)
-        sub_list = sub_list->next;
+    if (y >= 0)
+        for (int i = 0; i < y; i++)
+            sub_list = sub_list->next;
+    else
+        for (int i = 0; i > y; i--)
+            sub_list = sub_list->prev;
     sub_list = sub_list->data;
-    for (int i = 0; i < x; i++)
-        sub_list = sub_list->next;
+    if (x >= 0)
+        for (int i = 0; i < x; i++)
+            sub_list = sub_list->next;
+    else
+        for (int i = 0; i > x; i--)
+            sub_list = sub_list->prev;
+    map_tile_t *tile = sub_list->data;
     return sub_list->data;
 }
+
+char *get_tile_content(map_tile_t *tile)
+{
+    char *content = NULL;
+    char *tmp = NULL;
+    list_t *tmp_list = tile->players;
+
+    printf("tile->x = %d, tile->y = %d\n", tile->x, tile->y);
+    tmp = get_list_players(tmp_list);
+    if (tmp != NULL) {
+        content = my_realloc(content, strlen(tmp) + 1);
+        sprintf(content, "%s", tmp);
+    }
+    tmp_list = tile->resources;
+    tmp = get_list_ressources(tmp_list);
+    if (tmp != NULL) {
+        content = my_realloc(content, strlen(content) + strlen(tmp) + 1);
+        sprintf(content, "%s%s", content, tmp);
+    }
+    return content;
+}
+
