@@ -51,10 +51,9 @@ add_executable(zappy_server
         src/server/utility/str_array_2.c
         src/server/trantor/map.c
         src/server/network/ai_log_handler.c
-        src/server/trantor/map.c
         src/server/utility/linked_list/multi_dimensional_linked_list/liked_list.c
         src/server/utility/linked_list/multi_dimensional_linked_list/remove_if.c
-        src/server/trantor/tile_handling.c)
+        src/server/trantor/tile_handling.c src/server/trantor/tile_handling2.c)
 
 set_target_properties(zappy_server PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 

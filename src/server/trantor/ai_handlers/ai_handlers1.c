@@ -44,7 +44,7 @@ ai_cmd_response_t ai_left_handler(action_t *action UNUSED,
 ai_cmd_response_t ai_look_handler(action_t *action UNUSED,
     trantor_t *trantor, player_t *player)
 {
-    char *response = malloc(2);
+    char *response = my_malloc(2);
     char *tmp = NULL;
 
     memset(response, 0, 2);
@@ -52,11 +52,11 @@ ai_cmd_response_t ai_look_handler(action_t *action UNUSED,
     for (int i = 0; i != get_nb_tile(player->level); i++) {
         tmp = get_tile_content(select_tile_for_look_command(trantor, player, i));
         if (tmp != NULL) {
-            response = realloc(response, strlen(response) + strlen(tmp) + 2);
+            response = my_realloc(response, strlen(response) + strlen(tmp) + 2);
             sprintf(response, "%s%s", response, tmp);
         }
         if (i != get_nb_tile(player->level) - 1) {
-            response = realloc(response, strlen(response) + 2);
+            response = my_realloc(response, strlen(response) + 2);
             sprintf(response, "%s,", response);
         }
     }
