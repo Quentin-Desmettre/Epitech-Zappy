@@ -7,42 +7,43 @@
 
 #include "trantor.h"
 #include "server.h"
+#include "utility/strings.h"
 
 ai_cmd_response_t ai_forward_handler(action_t *action UNUSED,
-    trantor_t *trantor, player_t *player)
+    server_t *server, player_t *player)
 {
-    map_tile_t *tile = get_tile_by_pos(trantor->map, player->x, player->y);
+    map_tile_t *tile = get_tile_by_pos(server->trantor->map, player->x, player->y);
 
     remove_if(&tile->players, player, NULL, NULL);
     if (player->dir == NORTH)
-        player->y = (player->y - 1) % dim_list_size(trantor->map, VERTICAL);
+        player->y = (player->y - 1) % dim_list_size(server->trantor->map, VERTICAL);
     if (player->dir == SOUTH)
-        player->y = (player->y + 1) % dim_list_size(trantor->map, VERTICAL);
+        player->y = (player->y + 1) % dim_list_size(server->trantor->map, VERTICAL);
     if (player->dir == EAST)
-        player->x = (player->x + 1) % dim_list_size(trantor->map, HORIZONTAL);
+        player->x = (player->x + 1) % dim_list_size(server->trantor->map, HORIZONTAL);
     if (player->dir == WEST)
-        player->x = (player->x - 1) % dim_list_size(trantor->map, HORIZONTAL);
-    tile = get_tile_by_pos(trantor->map, player->x, player->y);
+        player->x = (player->x - 1) % dim_list_size(server->trantor->map, HORIZONTAL);
+    tile = get_tile_by_pos(server->trantor->map, player->x, player->y);
     append_node(&tile->players, player);
     return AI_CMD_RESPONSE_OK;
 }
 
 ai_cmd_response_t ai_right_handler(action_t *action UNUSED,
-    trantor_t *trantor UNUSED, player_t *player)
+    server_t *server UNUSED, player_t *player)
 {
     player->dir = (player->dir + 1) % 4;
     return AI_CMD_RESPONSE_OK;
 }
 
 ai_cmd_response_t ai_left_handler(action_t *action UNUSED,
-    trantor_t *trantor UNUSED, player_t *player)
+    server_t *server UNUSED, player_t *player)
 {
     player->dir = (player->dir - 1) % 4;
     return AI_CMD_RESPONSE_OK;
 }
 
 ai_cmd_response_t ai_look_handler(action_t *action UNUSED,
-    trantor_t *trantor, player_t *player)
+    server_t *server, player_t *player)
 {
     char *response = my_malloc(2);
     char *tmp = NULL;
@@ -50,7 +51,7 @@ ai_cmd_response_t ai_look_handler(action_t *action UNUSED,
     memset(response, 0, 2);
     sprintf(response, "[");
     for (int i = 0; i != get_nb_tile(player->level); i++) {
-        tmp = get_tile_content(select_tile_for_look_command(trantor, player, i));
+        tmp = get_tile_content(select_tile_for_look_command(server->trantor, player, i));
         if (tmp != NULL) {
             response = my_realloc(response, strlen(response) + strlen(tmp) + 2);
             sprintf(response, "%s%s", response, tmp);
@@ -66,23 +67,11 @@ ai_cmd_response_t ai_look_handler(action_t *action UNUSED,
 }
 
 ai_cmd_response_t ai_inventory_handler(action_t *action UNUSED,
-                                    trantor_t *trantor UNUSED, player_t *player)
+    server_t *server UNUSED, player_t *player)
 {
-    char *response = malloc(2);
-    char *tmp = malloc(8);
-
-    memset(response, 0, 2);
-    sprintf(response, "[");
-    for (int i = 0; i < NB_RESOURCE; i++) {
-        sprintf(tmp, "%d", player->inventory[i]);
-        response = realloc(response, strlen(response) + strlen(ressources_names[i]) + strlen(tmp) + 4);
-        sprintf(response, "%s %s %s", response, ressources_names[i], tmp);
-        if (i != NB_RESOURCE - 1) {
-            response = realloc(response, strlen(response) + 3);
-            sprintf(response, "%s,", response);
-        }
-    }
-    response = realloc(response, strlen(response) + 2);
-    sprintf(response, "%s]", response);
+    char *response = my_asprintf("[food %d, linemate %d, deraumere %d, sibur %d, mendiane %d, phiras %d, thystame %d]",
+        player->inventory[FOOD], player->inventory[LINEMATE], player->inventory[DERAUMERE],
+        player->inventory[SIBUR], player->inventory[MENDIANE], player->inventory[PHIRAS],
+        player->inventory[THYSTAME]);
     return AI_CMD_RESPONSE_TEXT(response);
 }

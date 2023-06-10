@@ -84,7 +84,7 @@ add_executable(zappy_server
         src/server/utility/garbage_collector/garbage_handling.c
         src/server/utility/garbage_collector/my_malloc.c
         src/server/utility/strings.c
-)
+        )
 
 set_target_properties(zappy_server PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 

@@ -9,10 +9,10 @@
     #define EPITECH_ZAPPY_TRANTOR_H
     #include "utility/linked_list.h"
     #include <stdlib.h>
-    #define ERROR_CODE my_strdup("sbp")
-    #define BASE_FOOD 9
     #include <stdio.h>
     #include <string.h>
+    #define ERROR_CODE my_strdup("sbp")
+    #define BASE_FOOD 9
 
 //////////////////////////////////////////////////////////////////////////////
 // TRANTOR
@@ -152,32 +152,6 @@ void destroy_player(trantor_t *trantor, player_t *player);
 
 // Ai request handling
 extern const action_data_t AI_ACTIONS[];
-ai_cmd_response_t ai_forward_handler(action_t *action,
-                                    trantor_t *trantor, player_t *player);
-ai_cmd_response_t ai_right_handler(action_t *action,
-                                    trantor_t *trantor, player_t *player);
-ai_cmd_response_t ai_left_handler(action_t *action,
-                                    trantor_t *trantor, player_t *player);
-ai_cmd_response_t ai_look_handler(action_t *action,
-                                    trantor_t *trantor, player_t *player);
-ai_cmd_response_t ai_inventory_handler(action_t *action,
-                                    trantor_t *trantor, player_t *player);
-ai_cmd_response_t ai_broadcast_handler(action_t *action,
-                                    trantor_t *trantor, player_t *player);
-ai_cmd_response_t ai_connect_nbr_handler(action_t *action,
-                                    trantor_t *trantor, player_t *player);
-ai_cmd_response_t ai_fork_handler(action_t *action,
-                                    trantor_t *trantor, player_t *player);
-ai_cmd_response_t ai_eject_handler(action_t *action,
-                                    trantor_t *trantor, player_t *player);
-ai_cmd_response_t ai_take_handler(action_t *action,
-                                    trantor_t *trantor, player_t *player);
-ai_cmd_response_t ai_set_handler(action_t *action,
-                                    trantor_t *trantor, player_t *player);
-ai_cmd_response_t ai_incantation_start_handler(action_t *action,
-                                    trantor_t *trantor, player_t *player);
-ai_cmd_response_t ai_incantation_end_handler(action_t *action,
-                                    trantor_t *trantor, player_t *player);
 
 bool is_action_finished(action_t *action, struct timespec *now);
 action_t *create_action(const char *cmd, void *client_t, int f);
