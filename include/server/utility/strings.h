@@ -19,6 +19,7 @@ void free_str_array(char **array);
 char **dupstrarray(const char **arr);
 char **split_on(char *str, char *delim, int *len);
 bool has_duplicates(char **arr);
+int str_array_len(char **array);
 
 // Strings
 void *memdup(const void *src, size_t size);
@@ -36,5 +37,6 @@ bool is_timespec_less(struct timespec *t1, struct timespec *t2);
 bool is_timespec_equal(struct timespec *t1, struct timespec *t2);
 struct timespec get_end_time(int ticks, int freq, struct timespec now);
 struct timeval timespec_diff(struct timespec a, struct timespec b);
+char *my_asprintf(const char *format, ...);
 
 #endif //EPITECH_ZAPPY_STRINGS_H

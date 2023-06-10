@@ -25,17 +25,17 @@ static dim_list_t *init_map(int width, int height)
     return map;
 }
 
-trantor_t *init_trantor(int width, int height)
+trantor_t *init_trantor(int width, int height,
+    char **team_names, int max_players)
 {
     trantor_t *trantor = my_calloc(sizeof(trantor_t), 1);
 
     trantor->map = init_map(width, height);
+    trantor->width = width;
+    trantor->height = height;
+    for (int i = 0; team_names[i]; i++)
+        append_node(&trantor->teams, create_team(team_names[i], max_players));
     return trantor;
-}
-
-static void destroy_teams(list_t **teams)
-{
-    free_list(teams, NULL);
 }
 
 static void destroy_map(dim_list_t *map)
@@ -45,7 +45,7 @@ static void destroy_map(dim_list_t *map)
 
 void destroy_trantor(trantor_t *trantor)
 {
-    destroy_teams(&trantor->teams);
+    free_list(&trantor->teams, destroy_team);
     destroy_map(trantor->map);
     my_free(trantor);
 }

@@ -19,6 +19,8 @@
     #define DEFAULT_SLOTS 3
     #define ARGS_STR "p:x:y:n:c:f:"
     #define SIZE_T_MAX ((size_t)-1)
+    #define IS_FREQ_VALID(freq) ((freq) >= 2 && (freq) <= 10000)
+
 
 extern const char *DEFAULT_TEAMS[];
 

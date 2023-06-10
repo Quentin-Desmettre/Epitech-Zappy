@@ -17,25 +17,6 @@ const state_handler_t STATE_HANDLER[] = {
         handle_ai
 };
 
-void destroy_client(server_t *server, void *data)
-{
-    client_t *cli = (client_t *)data;
-
-    close(cli->fd);
-    if (cli->state == AI)
-        destroy_player(server->trantor, cli->data);
-    my_free(cli->buffer);
-    my_free(cli);
-}
-
-void disconnect_client(server_t *server, client_t *cli)
-{
-    FD_CLR(cli->fd, &server->read_fds);
-    server->client_count--;
-    destroy_client(server, cli);
-    remove_if(&server->clients, cli, NULL, NULL);
-}
-
 static bool fetch_client_data(client_t *cli)
 {
     int bytes = bytes_available(cli->fd);
@@ -59,35 +40,39 @@ static void handle_client_input(server_t *server, client_t *cli)
 {
     char **args;
     int nb_args;
-
     if (!fetch_client_data(cli))
-        return disconnect_client(server, cli);
+        return disconnect_client(server, cli, true);
     if (strchr(cli->buffer, '\n') == NULL)
         return;
     args = split_on(cli->buffer, "\n", &nb_args);
     if (!str_ends_with(cli->buffer, "\n")) {
-        free(cli->buffer);
+        my_free(cli->buffer);
         cli->buffer = args[nb_args - 1];
         args[nb_args - 1] = NULL;
         cli->buffer_size = strlen(cli->buffer);
     } else {
-        free(cli->buffer);
+        my_free(cli->buffer);
         cli->buffer = NULL;
         cli->buffer_size = 0;
     }
     for (int i = 0; args[i]; i++)
-        STATE_HANDLER[cli->state](server, cli, args[i]);
+        if (strlen(args[i]))
+            STATE_HANDLER[cli->state](server, cli, args[i]);
 }
 
 void handle_clients(server_t *server, fd_set *read_fds)
 {
     list_t *tmp = server->clients;
+    list_t *next;
     client_t *cli;
+    int nb_to_handle = server->client_count;
 
-    do {
-        cli = tmp->data;
+    while (nb_to_handle > 0) {
+        cli = (client_t *)tmp->data;
+        next = tmp->next;
         if (FD_ISSET(cli->fd, read_fds))
             handle_client_input(server, cli);
-        tmp = tmp->next;
-    } while (tmp != server->clients);
+        tmp = next;
+        nb_to_handle--;
+    }
 }

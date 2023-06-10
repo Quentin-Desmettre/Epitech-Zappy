@@ -66,7 +66,8 @@ server_t *init_server(int ac, char **av, char **err)
     server = my_calloc(1, sizeof(server_t));
     server->params = args;
     server->run = true;
-    server->trantor = init_trantor(args.width, args.height);
+    server->trantor = init_trantor(args.width,
+        args.height, args.names, args.slots);
     if (!init_server_network(server, err)) {
         destroy_server(server);
         return NULL;

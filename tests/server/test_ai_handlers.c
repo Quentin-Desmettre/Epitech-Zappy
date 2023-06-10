@@ -32,15 +32,6 @@ Test(ai_handlers, inventory)
     cr_assert_str_eq(resp.data, expected);
 }
 
-static team_t *__create_team(char *name, int available_slots)
-{
-    team_t *team = malloc(sizeof(team_t));
-    team->name = name;
-    team->available_slots = available_slots;
-    team->players = NULL;
-    return team;
-}
-
 Test(ai_handlers, connect_nbr_only_one_team)
 {
     srand(time(NULL));
@@ -49,7 +40,7 @@ Test(ai_handlers, connect_nbr_only_one_team)
     asprintf(&nb_slots_str, "%d", nb_slots);
     player_t player = {.team_name = "team1"};
     trantor_t trantor = {0};
-    append_node(&trantor.teams, __create_team("team1", nb_slots));
+    append_node(&trantor.teams, create_team("team1", nb_slots));
     ai_cmd_response_t resp = ai_connect_nbr_handler(NULL, &trantor, &player);
 
     cr_assert(resp.type == TEXT);
@@ -76,7 +67,7 @@ Test(ai_handlers, connect_nbr_multiple_teams)
     };
     trantor_t trantor = {0};
     for (int i = 0; i < 3; i++)
-        append_node(&trantor.teams, __create_team(players[i].team_name, nb_slots[i]));
+        append_node(&trantor.teams, create_team(players[i].team_name, nb_slots[i]));
 
     for (int i = 0; i < 3; i++) {
         ai_cmd_response_t resp = ai_connect_nbr_handler(NULL, &trantor, &players[i]);

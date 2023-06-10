@@ -56,3 +56,11 @@ struct timeval timespec_diff(struct timespec a, struct timespec b)
     }
     return res;
 }
+
+bool is_numeric(const char *str)
+{
+    for (int i = 0; str[i]; i++)
+        if (str[i] < '0' || str[i] > '9')
+            return false;
+    return true;
+}

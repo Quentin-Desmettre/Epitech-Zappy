@@ -71,7 +71,7 @@ void str_append_free(char **str, size_t *len, char *append)
 {
     size_t append_len = strlen(append);
 
-    *str = my_realloc(*str, *len + 1);
+    *str = my_realloc(*str, *len + append_len + 1);
     memcpy(*str + *len, append, append_len + 1);
     *len += append_len;
     my_free(append);

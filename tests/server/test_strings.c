@@ -182,7 +182,6 @@ Test(split_on, split_on)
     cr_assert_str_eq(arr[1], "");
     cr_assert_str_eq(arr[2], "Hello");
     cr_assert_str_eq(arr[3], "");
-    cr_assert_str_eq(arr[4], "");
     cr_assert_eq(arr[5], NULL);
     free_str_array(arr);
 

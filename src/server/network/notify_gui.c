@@ -27,7 +27,7 @@ const gui_event_t GUI_EVENTS[] = {
         {NUM_GUI_EVENTS, NULL}
 };
 
-static void send_to_gui(server_t *server, char *msg)
+void send_to_gui(server_t *server, char *msg, bool free_msg)
 {
     list_t *tmp = server->clients;
     client_t *cli;
@@ -40,9 +40,11 @@ static void send_to_gui(server_t *server, char *msg)
             safe_write(cli->fd, msg, strlen(msg));
         tmp = tmp->next;
     } while (tmp != server->clients);
+    if (free_msg)
+        my_free(msg);
 }
 
-static char *fetch_gui_message(enum gui_event event, va_list args)
+char *va_get_gui_message(enum gui_event event, va_list args)
 {
     const char *format_str = GUI_EVENTS[event].format_str;
     char *msg;
@@ -53,15 +55,26 @@ static char *fetch_gui_message(enum gui_event event, va_list args)
     return msg;
 }
 
+char *get_gui_message(enum gui_event event, ...)
+{
+    va_list args;
+    char *msg;
+
+    va_start(args, event);
+    msg = va_get_gui_message(event, args);
+    va_end(args);
+    return msg;
+}
+
 void notify_gui(server_t *server, enum gui_event event, ...)
 {
     va_list args;
     char *msg;
 
     va_start(args, event);
-    msg = fetch_gui_message(event, args);
+    msg = va_get_gui_message(event, args);
     va_end(args);
     if (!msg)
         return;
-    send_to_gui(server, msg);
+    send_to_gui(server, msg, true);
 }

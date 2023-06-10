@@ -11,6 +11,8 @@
     #include <stdlib.h>
     #include <stdio.h>
     #include <string.h>
+    #define ERROR_CODE my_strdup("sbp")
+    #define BASE_FOOD 9
 
 //////////////////////////////////////////////////////////////////////////////
 // TRANTOR
@@ -37,7 +39,7 @@ static char *ressources_names[NB_RESOURCE] = {
     "thystame"
 };
 
-static const float resource_freq[NB_RESOURCE] = {
+static const float RESOURCE_FREQ[NB_RESOURCE] = {
         0.5,
         0.3,
         0.15,
@@ -49,19 +51,22 @@ static const float resource_freq[NB_RESOURCE] = {
 
 typedef struct team {
     int available_slots;
+    int eggs;
     char *name;
     list_t *players;
+    list_t *egg_numbers;
 } team_t;
 
 typedef enum direction {
     NORTH,
     EAST,
     SOUTH,
-    WEST
+    WEST,
+    NB_DIR
 } direction_t;
 
 typedef struct map_tile {
-    list_t *resources;
+    int resources[NB_RESOURCE];
     list_t *players;
     list_t *eggs;
     int x;
@@ -74,9 +79,12 @@ typedef struct map {
 typedef struct trantor {
     list_t *teams;
     dim_list_t *map;
+    int width;
+    int height;
 } trantor_t;
 
-trantor_t *init_trantor(int width, int height);
+trantor_t *init_trantor(int width, int height,
+    char **team_names, int max_players);
 void destroy_trantor(trantor_t *trantor);
 
 //////////////////////////////////////////////////////////////////////////////
@@ -133,10 +141,13 @@ typedef struct player {
 
     action_t *current_action;
     list_t *buffered_actions;
-    const char *team_name;
+    team_t *team;
+    char *team_name;
+    bool is_from_egg;
 } player_t;
 
-player_t *create_player(trantor_t *trantor, const char *team_name);
+player_t *create_player(trantor_t *trantor, team_t *team,
+                        const char *team_name);
 void destroy_player(trantor_t *trantor, player_t *player);
 
 // Ai request handling
@@ -175,6 +186,8 @@ void spawn_resources(trantor_t *trantor);
 map_tile_t *init_tile(int x, int y);
 void link_layers(dim_list_t *map);
 map_tile_t *get_tile_by_pos(dim_list_t *map, int x, int y);
+team_t *create_team(const char *name, int max_players);
+void destroy_team(void *team);
 map_tile_t *select_tile_for_look_command(trantor_t *trantor, player_t *player, int nb);
 int get_nb_tile(int level);
 char *get_tile_content(map_tile_t *tile);

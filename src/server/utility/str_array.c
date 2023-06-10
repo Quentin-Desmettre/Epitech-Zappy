@@ -69,6 +69,7 @@ char **split_on(char *str, char *delim, int *len)
         str = occ + 1;
         INCREMENT_IF_NOT_NULL(len);
     }
-    append_str_array(&array, my_strdup(str));
+    if (strlen(str))
+        append_str_array(&array, my_strdup(str));
     return array;
 }

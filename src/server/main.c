@@ -35,6 +35,7 @@ int main(int ac, char **av)
         safe_write(2, "\n", 1);
         return 84;
     }
+    srandom(time(NULL));
     handle_all_sigs();
     run_server(server);
     destroy_server(server);

@@ -31,6 +31,8 @@
     #define MAP_SPAWN_FREQ 20
     #define FOOD_CONSUMPTION_FREQ 126
 
+UNUSED static char *NO_ARGS[2] = {"", NULL};
+
 enum gui_event {
     PLAYER_CONNECTION,
     EXPULSION,
@@ -95,21 +97,21 @@ typedef struct client {
 } client_t;
 
 // GUI request handling
-typedef char *(*gui_cmd_handler_t)(server_t *server, char **args);
+typedef char *(*gui_cmd_handler_t)(server_t *server, const char *cmd);
 typedef struct {
     const char *cmd;
     gui_cmd_handler_t handler;
 } gui_cmd_t;
 
-char *gui_map_size_handler(server_t *server, char **args);
-char *gui_tile_content_handler(server_t *server, char **args);
-char *gui_tiles_content_handler(server_t *server, char **args);
-char *gui_team_names_handler(server_t *server, char **args);
-char *gui_player_position_handler(server_t *server, char **args);
-char *gui_player_level_handler(server_t *server, char **args);
-char *gui_player_inventory_handler(server_t *server, char **args);
-char *gui_time_request_handler(server_t *server, char **args);
-char *gui_time_change_handler(server_t *server, char **args);
+char *gui_map_size_handler(server_t *server, const char *cmd);
+char *gui_tile_content_handler(server_t *server, const char *cmd);
+char *gui_tiles_content_handler(server_t *server, const char *cmd);
+char *gui_team_names_handler(server_t *server, const char *cmd);
+char *gui_player_position_handler(server_t *server, const char *cmd);
+char *gui_player_level_handler(server_t *server, const char *cmd);
+char *gui_player_inventory_handler(server_t *server, const char *cmd);
+char *gui_time_request_handler(server_t *server, const char *cmd);
+char *gui_time_change_handler(server_t *server, const char *cmd);
 char *gui_pnw_response(player_t *player);
 
 extern const gui_cmd_t GUI_HANDLERS[];
@@ -134,7 +136,7 @@ server_t *init_server(int ac, char **av, char **err);
 void destroy_server(server_t *server);
 void run_server(server_t *server);
 void handle_clients(server_t *server, fd_set *read_fds);
-team_t *get_team_by_name(server_t *server, const char *team);
+team_t *get_team_by_name(trantor_t *trantor, const char *team);
 
 // State handling
 typedef void (*state_handler_t)(server_t *, client_t *, const char *cmd);
@@ -171,7 +173,11 @@ void put_action_in_waitlist(server_t *server, action_t *action);
 void notify_gui(server_t *server, enum gui_event event, ...);
 void log_ai(client_t *cli, server_t *server, const char *cmd, team_t *team);
 void check_food(server_t *server);
-void disconnect_client(server_t *server, client_t *cli);
+void disconnect_client(server_t *server, client_t *cli, bool has_disconnect);
 void update_next_spawn(server_t *server);
+void send_to_gui(server_t *server, char *msg, bool free_msg);
+char *get_gui_message(enum gui_event event, ...);
+food_timeout_t *create_food_timeout(int freq, client_t *cli);
+client_t *get_client_by_id(server_t *server, int id);
 
 #endif //EPITECH_ZAPPY_SERVER_H
