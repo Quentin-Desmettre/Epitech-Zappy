@@ -10,7 +10,7 @@
 #include "utility/strings.h"
 
 ai_cmd_response_t ai_broadcast_handler(action_t *action,
-    server_t *server, player_t *player) //me
+    server_t *server, player_t *player)
 {
     int direction;
     client_t *client;
@@ -29,9 +29,12 @@ ai_cmd_response_t ai_broadcast_handler(action_t *action,
     return AI_CMD_RESPONSE_OK;
 }
 
-ai_cmd_response_t ai_connect_nbr_handler(action_t *action,
-    server_t *server, player_t *player) //me
+ai_cmd_response_t ai_connect_nbr_handler(action_t *action UNUSED,
+    server_t *server UNUSED, player_t *player)
 {
+    char *msg = my_asprintf("%d\n", player->team->available_slots);
+
+    return AI_CMD_RESPONSE_TEXT(msg);
 }
 
 ai_cmd_response_t ai_fork_handler(action_t *action,
