@@ -59,7 +59,7 @@ ai_cmd_response_t ai_set_handler(action_t *action,
 }
 
 // TODO: notify EXPULSION
-ai_cmd_response_t ai_eject_handler(action_t *action,
+ai_cmd_response_t ai_eject_handler(action_t *action UNUSED,
     server_t *server, player_t *player)
 {
     int save_direct;
