@@ -21,10 +21,8 @@ void delete_ai_from_server(server_t *server, client_t *cli,
         safe_write(cli->fd, "dead\n", 5);
     player->team->available_slots += (player->is_from_egg ? 0 : 1);
     for (int i = 0; i < server->action_count; i++) {
-        printf("here: %p vs %p\n", server->actions[i]->cli, cli);
         if (server->actions[i]->cli != cli)
             continue;
-        printf("Deleting an action...\n");
         memmove(&server->actions[i], &server->actions[i + 1],
                 sizeof(action_t *) * (server->action_count - i - 1));
         server->action_count--;

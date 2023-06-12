@@ -38,8 +38,7 @@ map_tile_t *select_tile_for_look_command(trantor_t *trantor, player_t *player, i
         return get_tile_by_pos(trantor->map, player->x - nb_on_line, player->y + line);
     if (player->dir == EAST)
         return get_tile_by_pos(trantor->map, player->x + line, player->y + nb_on_line);
-    if (player->dir == WEST)
-        return get_tile_by_pos(trantor->map, player->x - line, player->y - nb_on_line);
+    return get_tile_by_pos(trantor->map, player->x - line, player->y - nb_on_line);
 }
 
 char *get_list_players(list_t *players)
@@ -79,7 +78,6 @@ int find_direction(player_t *from, player_t *to, trantor_t *trantor)
     double angle;
     int dir[4] = {0, 90, 180, 270};
 
-    printf("%p, %p\n", from, to);
     vect[0] = (abs(from->x - to->x) > (trantor->width / 2)) ? ((from->x - to->x) - trantor->width) : (from->x - to->x);
     vect[1] = (abs(from->y - to->y) > (trantor->height / 2)) ? ((from->y - to->y) - trantor->height) : (from->y - to->y);
     angle = atan2(vect[1], vect[0]) * (180 / M_PI);

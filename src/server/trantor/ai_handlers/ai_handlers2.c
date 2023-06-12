@@ -20,10 +20,12 @@ ai_cmd_response_t ai_broadcast_handler(action_t *action,
 
     do {
         client = list_client->data;
-        player_dest = client->data;
-        direction = find_direction(player, player_dest, server->trantor);
-        msg = my_asprintf("message %d, %s\n", direction, action->arg);
-        safe_write(client->fd, msg, strlen(msg));
+        if (client->state == AI) {
+            player_dest = client->data;
+            direction = find_direction(player, player_dest, server->trantor);
+            msg = my_asprintf("message %d, %s\n", direction, action->arg);
+            safe_write(client->fd, msg, strlen(msg));
+        }
         list_client = list_client->next;
     } while (list_client != server->clients);
     notify_gui(server, BROADCAST, player->id, action->arg);
@@ -38,7 +40,6 @@ ai_cmd_response_t ai_connect_nbr_handler(action_t *action UNUSED,
     return AI_CMD_RESPONSE_TEXT(msg);
 }
 
-// TODO: notify RESOURCE_COLLECT / PLAYER_INVENTORY
 ai_cmd_response_t ai_set_handler(action_t *action,
     server_t *server, player_t *player)
 {
@@ -53,12 +54,12 @@ ai_cmd_response_t ai_set_handler(action_t *action,
             break;
     if (player->inventory[i] <= 0)
         return AI_CMD_RESPONSE_KO;
+    notify_gui(server, RESOURCE_DROP, player->id, i);
     player->inventory[i]--;
     tile->resources[i]++;
     return AI_CMD_RESPONSE_OK;
 }
 
-// TODO: notify EXPULSION
 ai_cmd_response_t ai_eject_handler(action_t *action UNUSED,
     server_t *server, player_t *player)
 {
@@ -79,10 +80,10 @@ ai_cmd_response_t ai_eject_handler(action_t *action UNUSED,
         } else
             players = players->next;
     }
+    notify_gui(server, EXPULSION, player->id);
     return AI_CMD_RESPONSE_OK;
 }
 
-// TODO: notify RESOURCE_DROP / PLAYER_INVENTORY
 ai_cmd_response_t ai_take_handler(action_t *action,
     server_t *server, player_t *player)
 {
@@ -99,5 +100,6 @@ ai_cmd_response_t ai_take_handler(action_t *action,
         return AI_CMD_RESPONSE_KO;
     player->inventory[i]++;
     tile->resources[i]--;
+    notify_gui(server, RESOURCE_COLLECT, player->id, i);
     return AI_CMD_RESPONSE_OK;
 }

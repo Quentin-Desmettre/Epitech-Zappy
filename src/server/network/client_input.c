@@ -57,7 +57,6 @@ static void handle_client_input(server_t *server, client_t *cli)
     }
     for (int i = 0; args[i]; i++) {
         if (strlen(args[i])) {
-            printf("Running command %s...\n", args[i]);
             STATE_HANDLER[cli->state](server, cli, args[i]);
         }
     }

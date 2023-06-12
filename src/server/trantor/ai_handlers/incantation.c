@@ -30,10 +30,9 @@ static bool can_level_up(player_t *player, map_tile_t *tile)
 
     if (requirements_for_level[player->level][0] < nb_same_level)
         return false;
-    for (int i = 0; i < NB_RESOURCE; i++) {
-        if (tile->resources[i] < requirements_for_level[player->level][i + 1])
+    for (int i = 1; i < NB_RESOURCE; i++)
+        if (tile->resources[i] < requirements_for_level[player->level][i])
             return false;
-    }
     return true;
 }
 
@@ -76,8 +75,8 @@ static void do_level_up(map_tile_t *tile, player_t *player, server_t *server)
     int base_level = player->level;
     player_t *pl;
 
-    for (int i = 0; i < NB_RESOURCE; i++)
-        tile->resources[i] -= requirements_for_level[player->level][i + 1];
+    for (int i = 1; i < NB_RESOURCE; i++)
+        tile->resources[i] -= requirements_for_level[player->level][i];
     notify_gui(server, TILE_CONTENT, tile->x, tile->y, tile->resources[FOOD],
     tile->resources[LINEMATE], tile->resources[DERAUMERE],
     tile->resources[SIBUR], tile->resources[MENDIANE],
