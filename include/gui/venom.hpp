@@ -16,10 +16,16 @@ private:
     Mateyak::Vec3f _pos;
     Mateyak::Vec3f _nextPosition;
     Mateyak::Vec3f c_pos;
+    Mateyak::Vec2f mapSize;
+
 public:
+    static int nbLegs;
+    static int circlePerLeg;
+    static int pointPerCircle;
+    static void fpsHandler();
     float time;
     std::vector<Mateyak::Vec3f> pos_feet;
-    Venom(Mateyak::Vec2f pos = {0, 0});
+    Venom(Mateyak::Vec2f pos = {0, 0}, Mateyak::Vec2f mapSize = {10, 10});
     ~Venom();
     void Draw_leg(Mateyak::Vec3f pos, int seed);
     void move_ven(Camera camera);

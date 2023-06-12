@@ -73,7 +73,7 @@ void ServerInformations::addTeam(std::string team)
 
 void ServerInformations::addPlayer(std::string name, int x, int y, Player::ORIENTATION orientation, int level, std::string team)
 {
-    std::unique_ptr<Player> player = std::make_unique<Player>(name, x, y, orientation, level, team);
+    std::unique_ptr<Player> player = std::make_unique<Player>(name, x, y, orientation, level, team, mapSize);
     players.push_back(std::move(player));
 }
 

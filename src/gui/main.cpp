@@ -86,6 +86,7 @@ void Graphic::loop(Mateyak::Vec2f mapSize)
         Mateyak::Window::draw(map);
         Mateyak::Window::draw(flat);
         ven.draw_ven(seed, cam);
+        Venom::fpsHandler();
         _serverInformations.startComputing();
         map.update(_serverInformations);
         for (auto &it : _serverInformations.getPlayers()) {

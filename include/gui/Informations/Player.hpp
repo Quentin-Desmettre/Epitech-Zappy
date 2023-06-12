@@ -18,7 +18,7 @@ class Player
     public:
         enum STATE {INCANTING, DEAD, EGG, BROADCASTING, DROPING, TAKING, NONE};
         enum ORIENTATION {NORTH, EAST, SOUTH, WEST};
-        Player(std::string name, int x, int y, Player::ORIENTATION orientation, int level, std::string team);
+        Player(std::string name, int x, int y, Player::ORIENTATION orientation, int level, std::string team, Mateyak::Vec2f mapSize);
         ~Player() = default;
 
         std::string getName() const;

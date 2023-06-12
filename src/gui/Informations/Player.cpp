@@ -8,7 +8,7 @@
 #include "Informations/Player.hpp"
 #include <iostream>
 
-Player::Player(std::string name, int x, int y, Player::ORIENTATION orientation, int level, std::string team) : ven({static_cast<float>(x), static_cast<float>(y)})
+Player::Player(std::string name, int x, int y, Player::ORIENTATION orientation, int level, std::string team, Mateyak::Vec2f mapSize) : ven({static_cast<float>(x), static_cast<float>(y)}, mapSize)
 {
     _position.x = x;
     _position.y = y;

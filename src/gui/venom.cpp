@@ -1,16 +1,17 @@
 #include <math.h>
 #include "venom.hpp"
-#define BALL_NB 30
-#define FLOAT_NB (float)BALL_NB
+#define FLOAT_NB (float)circlePerLeg
 #define DIS 3.f
 #define DIS2 2.5f
-#define PRECI 4
-#define LEG 5
 #include "Utils3d.hpp"
 #include "Mateyak/Vector.hpp"
 #include "Perlin/Perlin.hpp"
 
-Venom::Venom(Mateyak::Vec2f pos)
+int Venom::nbLegs = 5;
+int Venom::circlePerLeg = 30;
+int Venom::pointPerCircle = 4;
+
+Venom::Venom(Mateyak::Vec2f pos, Mateyak::Vec2f mapSize): mapSize(mapSize)
 {
     for (int i = 0; i < 5000; i++) {
         Mateyak::Vec3f ps;
@@ -35,7 +36,7 @@ void Venom::Draw_leg(Mateyak::Vec3f leg, int seed)
     Mateyak::Vec3f vec(_pos.x - leg.x, 0, _pos.z - leg.z);
     float len = 100 - (c_pos - leg).len();
     vec = -vec;
-    int nb = BALL_NB;
+    int nb = circlePerLeg;
     std::vector<Mateyak::Vec3f> center;
     std::vector<Mateyak::Vec3f> angles;
     center.reserve(nb + 1);
@@ -44,7 +45,7 @@ void Venom::Draw_leg(Mateyak::Vec3f leg, int seed)
     vec.x /= FLOAT_NB;
     vec.z /= FLOAT_NB;
     if (dis > DIS2)
-        nb = BALL_NB * (1 - (dis - DIS2) / (DIS - DIS2));
+        nb = circlePerLeg * (1 - (dis - DIS2) / (DIS - DIS2));
     Mateyak::Vec3f last = _pos;
     last.y = sinf((-1 / FLOAT_NB * PI * 4 + PI) / 5.0);
     Mateyak::Vec3f tmp = _pos;
@@ -57,22 +58,22 @@ void Venom::Draw_leg(Mateyak::Vec3f leg, int seed)
         last = tmp;
     }
 
-    if (center.size() <= PRECI)
+    if (center.size() <= static_cast<size_t>(pointPerCircle))
         return;
 
     std::vector<Mateyak::Vec3f> points;
-    points.reserve(PRECI * center.size());
+    points.reserve(pointPerCircle * center.size());
 
-    for (int h = 0; h < LEG; h++) {
+    for (int h = 0; h < nbLegs; h++) {
         points.clear();
         Mateyak::Vec3f noise = {0, 0, 0};
 
         for (size_t i = 0; i < center.size(); i++) {
             noise.x = Perlin::Noise2D(seed * h, i / (FLOAT_NB / 12.5), seed, 1) * ((i / FLOAT_NB + 0.5) / 2.0) / 2;
             noise.z = Perlin::Noise2D(seed * h * 2, i / (FLOAT_NB / 12.5), seed, 1) * ((i / FLOAT_NB + 0.5) / 2.0) / 2;
-            Utils::generateCirclePoints(center[i] + noise, angles[i], ((nb - i) / FLOAT_NB) / ((h - 1) * 3), PRECI, points);
+            Utils::generateCirclePoints(center[i] + noise, angles[i], ((nb - i) / FLOAT_NB) / ((h - 1) * 3), pointPerCircle, points);
         }
-        std::vector<Mateyak::Triangle> triangles = Utils::connectPointsWithTriangles(points, PRECI);
+        std::vector<Mateyak::Triangle> triangles = Utils::connectPointsWithTriangles(points, pointPerCircle);
         if (triangles.empty())
             return;
         for (size_t i = 0; i < triangles.size(); i++) {
@@ -115,16 +116,32 @@ void Venom::move_ven()
     float norm = 0;
     Vector3 vec;
 
-    if (_pos == _nextPosition)
+    if (_pos == _nextPosition) {
         return;
+    }
     vec = {_nextPosition.x - _pos.x, _pos.y, _nextPosition.z - _pos.z};
+    if (std::abs(vec.x) > 3.334 || std::abs(vec.z) > 3.334) {
+        vec = {-vec.x, vec.y, -vec.z};
+    }
     norm = sqrt(pow(vec.x, 2) + pow(vec.z, 2));
 
     if (norm < 0.1) {
         _pos = _nextPosition;
     } else {
-        _pos.x += vec.x / norm / 20.0;
-        _pos.z += vec.z / norm / 20.0;
+        _pos.x += vec.x / norm / 20.f;
+        _pos.z += vec.z / norm / 20.f;
+    }
+    if (_pos.x > mapSize.x * 10 / 3) {
+        _pos.x -= mapSize.x * 10 / 3;
+    }
+    if (_pos.x < 0) {
+        _pos.x += mapSize.x * 10 / 3;
+    }
+    if (_pos.z > mapSize.y * 10 / 3) {
+        _pos.z -= mapSize.y * 10 / 3;
+    }
+    if (_pos.z < 0) {
+        _pos.z += mapSize.y * 10 / 3;
     }
 }
 
@@ -154,4 +171,30 @@ Mateyak::Vec3f &Venom::getPosition()
 void Venom::setPos(const Mateyak::Vec3f &pos)
 {
     _nextPosition = {(pos.x * 10 + 5) / 3.F, _pos.y, (pos.y * 10 + 5) / 3.F};
+}
+
+void Venom::fpsHandler() {
+    int fps = GetFPS();
+    if (fps < 60) {
+        if (nbLegs > 1) {
+            nbLegs--;
+        } else if (pointPerCircle > 3) {
+            pointPerCircle--;
+        } else if (circlePerLeg > 6) {
+            circlePerLeg--;
+        }
+    }
+    if (fps > 60) {
+        if (circlePerLeg < 15) {
+            circlePerLeg++;
+        } else if (nbLegs < 3) {
+            nbLegs++;
+        } else if (pointPerCircle < 4) {
+            pointPerCircle++;
+        } else if (circlePerLeg < 30) {
+            circlePerLeg++;
+        } if (nbLegs < 5) {
+            nbLegs++;
+        }
+    }
 }
