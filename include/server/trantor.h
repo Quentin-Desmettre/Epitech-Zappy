@@ -13,6 +13,7 @@
     #include <string.h>
     #define ERROR_CODE my_strdup("sbp")
     #define BASE_FOOD 9
+    #define UNUSED __attribute__((unused))
 
 //////////////////////////////////////////////////////////////////////////////
 // TRANTOR
@@ -29,7 +30,7 @@ typedef enum resource {
     NB_RESOURCE
 } resource_t;
 
-static char *ressources_names[NB_RESOURCE] = {
+UNUSED static char *ressources_names[NB_RESOURCE] = {
     "food",
     "linemate",
     "deraumere",
@@ -39,7 +40,7 @@ static char *ressources_names[NB_RESOURCE] = {
     "thystame"
 };
 
-static const float RESOURCE_FREQ[NB_RESOURCE] = {
+UNUSED static const float RESOURCE_FREQ[NB_RESOURCE] = {
         0.5,
         0.3,
         0.15,
@@ -107,7 +108,7 @@ typedef struct ai_cmd_response {
     #define AI_CMD_RESPONSE_TEXT(text) (ai_cmd_response_t){TEXT, text}
 
 typedef ai_cmd_response_t
-        (*ai_cmd_handler_t)(void *action, trantor_t *, void *player);
+        (*ai_cmd_handler_t)(void *action, void *, void *player);
 typedef struct action_data {
     int ticks;
     bool has_arg;
@@ -144,6 +145,8 @@ typedef struct player {
     team_t *team;
     char *team_name;
     bool is_from_egg;
+    bool is_freezed;
+    struct timeval time_left;
 } player_t;
 
 player_t *create_player(trantor_t *trantor, team_t *team,

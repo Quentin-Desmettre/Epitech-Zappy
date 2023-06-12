@@ -40,3 +40,14 @@ void check_food(server_t *server)
             create_food_timeout(server->params.freq, cli));
     }
 }
+
+void check_resource_spawn(server_t *server)
+{
+    struct timespec now;
+
+    get_time(&now);
+    if (is_timespec_less(&now, &server->next_spawn))
+        return;
+    spawn_resources(server->trantor);
+    update_next_spawn(server);
+}
