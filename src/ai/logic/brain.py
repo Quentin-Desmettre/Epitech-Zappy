@@ -2,13 +2,16 @@ import socket, random, queue, time
 from src.ai.commands import Command, CommandNames, Objects, Directions, go_to_direction
 from src.ai.logic.finding import go_to_object
 from src.ai.logic.evolve import has_stones, get_needed_stones, get_items_on_ground, get_elevation_needs
+from src.ai.neural_network.layer import Layer
+from src.ai.neural_network.network import NeuralNetwork, NeuralNetworkException
 from src.ai.utils import merge_dicts, queue_contains, my_print, set_color, Colors
 
 
 class Ai:
     """Artificial intelligence class."""
 
-    def __init__(self, server: socket.socket, team: str) -> None:
+    def __init__(self, server: socket.socket, team: str, model: NeuralNetwork = None) -> None:
+        self.X = None
         self.server = server
         self.team = team
         self.shared_inventory = {}
@@ -18,6 +21,16 @@ class Ai:
         self.delta = 0
         self.can_send = True
         self.calibrate()
+
+        if model is None:
+            self.neural_network = NeuralNetwork()
+            self.neural_network.add_layer(Layer(7, 10), is_input=True)
+            self.neural_network.add_layer(Layer(10, 10))
+            self.neural_network.add_layer(Layer(10, 2), is_output=True)
+        else:
+            self.neural_network = model
+        self.score = 0
+
 
     def calibrate(self):
         current_time = time.time()
@@ -198,3 +211,73 @@ class Ai:
             set_color(Colors.OKGREEN)
             my_print("Looting stones")
             self.take_stones(inventory)
+
+    def convert_data(self, inventory: dict[str, int]):
+    #    * / Look / Item needed to evolve
+
+        item_codes = {
+            'food': 1,
+            'linemate': 2,
+            'deraumere': 3,
+            'sibur': 4,
+            'mendiane': 5,
+            'phiras': 6,
+            'thystame': 7
+        }
+
+        X = []
+
+        numeric_inventory = {}
+        for item in inventory:
+            multiplicator = len(str(inventory[item]))
+
+            numeric_code = (item_codes[item] * (10 ** multiplicator) + inventory[item])
+            numeric_inventory[item] = numeric_code
+
+        maxValue = max(numeric_inventory.values())
+        for item in numeric_inventory:
+            numeric_inventory[item] = numeric_inventory[item] / maxValue
+            X.append(numeric_inventory[item])
+
+        self.X = X
+
+    def compute_decision(self):
+        try:
+            inventory = Command(CommandNames.INVENTORY).send(self.server, self.broadcast_queue)
+            if inventory is None:
+                return
+
+            self.convert_data(inventory)
+            self.neural_network.run(self.X)
+
+            decision = self.neural_network.output[0]
+
+            if decision[0] > decision[1]:
+                if "food" not in inventory or inventory["food"] < 5:
+                    self.score += 2
+                else:
+                    self.score -= 1
+
+                set_color(Colors.WARNING)
+                # my_print("Looting food", self.score)
+                self.take_food(inventory)
+                self.can_send = True
+            else:
+                if "food" not in inventory or inventory["food"] < 5:
+                    self.score -= 1
+                else:
+                    self.score += 2
+
+                set_color(Colors.OKGREEN)
+                # my_print("Looting stones", self.score)
+                self.take_stones(inventory)
+
+            if self.score <= -100:
+                print("DEAD")
+                raise NeuralNetworkException("dead", self.score)
+
+        except NeuralNetworkException as e:
+            raise e
+        except Exception as e:
+            if e.__str__() == "dead":
+                raise NeuralNetworkException("dead", self.score)

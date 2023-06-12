@@ -70,7 +70,7 @@ def create_command_parsers(obj) -> dict[str, callable]:
 def send_to_server(server: socket.socket, msg: str) -> None:
     """Sends a message to the server."""
     server.send((msg + "\n").encode())
-    my_print("sending: " + msg)
+    # my_print("sending: " + msg)
 
 
 def recv_from_server(server: socket.socket) -> str:
@@ -80,8 +80,8 @@ def recv_from_server(server: socket.socket) -> str:
         msg += server.recv(1).decode()
     if msg == "dead\n":
         my_print("You died")
-        exit(0)
-    my_print("received: " + msg, end="")
+        raise Exception("dead")
+    # my_print("received: " + msg, end="")
     msg = msg[:-1]
     return msg
 

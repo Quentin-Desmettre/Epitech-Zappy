@@ -19,16 +19,5 @@ class Layer:
             self.output = None
 
     def save_layer(self):
-        layer = []
-
-        if self.neuronsNumber == 0 or self.inputNumber == 0:
-            return layer
-
-        for index in range(self.neuronsNumber - 1):
-            layer.append(
-                {
-                    "weights": self.weights[index],
-                    "biases": self.bias[index]
-                }
-            )
+        layer = {"weights": self.weights, "biases": self.bias}
         return layer
