@@ -88,8 +88,12 @@ add_executable(zappy_server
         src/server/network/ai_log_handler.c
         src/server/utility/linked_list/multi_dimensional_linked_list/liked_list.c
         src/server/utility/linked_list/multi_dimensional_linked_list/remove_if.c
-        src/server/trantor/tile_handling.c src/server/trantor/tile_handling2.c)
+        src/server/trantor/tile_handling.c src/server/trantor/tile_handling2.c src/server/trantor/tile_handling3.c)
 
+find_library(MATH_LIBRARY m)
+if(MATH_LIBRARY)
+    target_link_libraries(zappy_server PUBLIC ${MATH_LIBRARY})
+endif()
 set_target_properties(zappy_server PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 add_executable(server_tests

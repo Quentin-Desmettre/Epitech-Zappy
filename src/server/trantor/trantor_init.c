@@ -6,6 +6,7 @@
 */
 
 #include "trantor.h"
+#include "server.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include "utility/garbage_collector.h"
@@ -32,7 +33,10 @@ trantor_t *init_trantor(int width, int height,
 
     trantor->map = init_map(width, height);
     trantor->width = width;
-    trantor->height = height;
+    trantor->height = height + 1;
+    server_t *server = malloc(sizeof(server_t));
+    server->trantor = trantor;
+    ai_broadcast_handler(NULL, server, NULL);
     for (int i = 0; team_names[i]; i++)
         append_node(&trantor->teams, create_team(team_names[i], max_players));
     return trantor;

@@ -8,6 +8,7 @@
 #include "trantor.h"
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "utility/garbage_collector.h"
 
 int get_nb_tile(int level)
@@ -78,4 +79,20 @@ char *get_list_ressources(list_t *ressources)
         tmp_list = tmp_list->next;
     }
     return response;
+}
+
+int find_direction(player_t *from, player_t *to, trantor_t *trantor)
+{
+    int vect[2];
+    double angle;
+    int dir[4] = {0, 90, 180, 270};
+
+    vect[0] = (abs(from->x - to->x) > (trantor->width / 2)) ? ((from->x - to->x) - trantor->width) : (from->x - to->x);
+    vect[1] = (abs(from->y - to->y) > (trantor->height / 2)) ? ((from->y - to->y) - trantor->height) : (from->y - to->y);
+    angle = atan2(vect[1], vect[0]) * (180 / M_PI);
+    angle += 90;
+    if (angle < 0)
+        angle += 360;
+    angle -= dir[to->dir];
+    return get_direct_from_angle(angle);
 }

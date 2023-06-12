@@ -169,4 +169,7 @@ char *get_tile_content(map_tile_t *tile);
 char *get_list_ressources(list_t *ressources);
 char *get_list_players(list_t *players);
 
+int find_direction(player_t *from, player_t *to, trantor_t *trantor);
+int get_direct_from_angle(double angle);
+
 #endif //EPITECH_ZAPPY_TRANTOR_H
