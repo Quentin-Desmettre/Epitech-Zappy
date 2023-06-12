@@ -34,29 +34,25 @@ map_tile_t *select_tile_for_look_command(trantor_t *trantor, player_t *player, i
         nb_on_line--;
     if (player->dir == NORTH)
         return get_tile_by_pos(trantor->map, player->x + nb_on_line, player->y - line);
-    if (player->dir == SOUTH)
+    else if (player->dir == SOUTH)
         return get_tile_by_pos(trantor->map, player->x - nb_on_line, player->y + line);
-    if (player->dir == EAST)
+    else if (player->dir == EAST)
         return get_tile_by_pos(trantor->map, player->x + line, player->y + nb_on_line);
-    if (player->dir == WEST)
+    else
         return get_tile_by_pos(trantor->map, player->x - line, player->y - nb_on_line);
 }
 
 char *get_list_players(list_t *players)
 {
-    char *response = NULL;
+    char *response = my_asprintf("");
     char *tmp = NULL;
     list_t *tmp_list = players;
     int count = list_size(players);
 
     for (int i = 0; i != count; i++) {
-        tmp = " player";
-        if (response != NULL) {
-            response = my_realloc(response, strlen(response) + strlen(tmp) + 1);
-        } else {
-            response = my_realloc(response, strlen(tmp) + 1);
-        }
-        sprintf(response, "%s%s", response, tmp);
+        tmp = my_asprintf("%s player", response);
+        my_free(response);
+        response = tmp;
         tmp_list = tmp_list->next;
     }
     return response;
@@ -64,11 +60,16 @@ char *get_list_players(list_t *players)
 
 char *get_list_ressources(int ressources[NB_RESOURCE])
 {
-    char *response = "";
+    char *response = my_asprintf("");
+    char *tmp = NULL;
 
     for (int i = 0; i < NB_RESOURCE; i++) {
-        if (ressources[i] != 0)
-            response = my_asprintf("%s%s %d ", response, ressources_names[i], ressources[i]);
+        if (ressources[i] != 0) {
+            tmp = my_asprintf("%s%s %d ", response, ressources_names[i], ressources[i]);
+            my_free(response);
+            response = tmp;
+        }
+
     }
     return response;
 }
