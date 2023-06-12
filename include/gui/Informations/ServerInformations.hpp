@@ -19,6 +19,13 @@
 #include <memory>
 typedef std::vector<std::vector<std::vector<Ressource>>> ZappyMap;
 
+enum action_type {
+    BROADCAST,
+    ELEVATIONSTART,
+    ELEVATIONEND,
+    LEVELUP
+};
+
 class ServerInformations
 {
     public:
@@ -41,6 +48,8 @@ class ServerInformations
         void removePlayer(std::string name);
         void setPlayerDead(std::string name);
 
+
+
         Mateyak::Vec2f getMapSize() const;
         ZappyMap getMap() const;
         std::vector<Team> getTeams() const;
@@ -52,4 +61,5 @@ class ServerInformations
         std::vector<Team> teams;
         std::vector<std::unique_ptr<Player>> players;
         std::mutex mutex;
+        std::tuple<short, std::tuple<int, int>, short> audioAction;
 };

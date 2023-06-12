@@ -120,3 +120,11 @@ void GuiClient::PlayerDeath(std::vector<std::string> parameters)
     std::string name = parameters[0];
     _serverInformations.setPlayerDead(name);
 }
+
+void GuiClient::PlayerIncantation(std::vector<std::string> parameters)
+{
+}
+
+void GuiClient::PlayerIncantationEnd(std::vector<std::string> parameters)
+{
+}

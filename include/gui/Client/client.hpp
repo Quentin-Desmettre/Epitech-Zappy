@@ -34,6 +34,8 @@ class GuiClient
         void PlayerLevel(std::vector<std::string> parameters);
         void PlayerInventory(std::vector<std::string> parameters);
         void PlayerDeath(std::vector<std::string> parameters);
+        void PlayerIncantation(std::vector<std::string> parameters);
+        void PlayerIncantationEnd(std::vector<std::string> parameters);
     private:
         boost::asio::io_context _io_context;
         boost::asio::ip::tcp::resolver _resolver;
