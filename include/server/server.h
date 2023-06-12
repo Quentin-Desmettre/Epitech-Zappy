@@ -30,6 +30,12 @@
     #define UNUSED __attribute__((unused))
     #define MAP_SPAWN_FREQ 20
     #define FOOD_CONSUMPTION_FREQ 126
+    #define TRY_SYSCALL(var, func, ...) \
+if ((var = func(__VA_ARGS__)) == -1) {  \
+    *err = perror_str(#func);   \
+    return false;               \
+}
+
 
 UNUSED static char *NO_ARGS[2] = {"", NULL};
 
@@ -39,11 +45,11 @@ enum gui_event {
     BROADCAST,
     START_INCANTATION,
     END_INCANTATION,
-    EGG_LAYED_BY_ME,
+    EGG_PLANTED,
     RESOURCE_DROP,
     RESOURCE_COLLECT,
     PLAYER_DEATH,
-    EGG_LAYED_BY_OTHER,
+    EGG_READY,
     EGG_HATCHED,
     EGG_DEAD,
     END_OF_GAME,
@@ -156,7 +162,7 @@ void handle_ai(server_t *server, client_t *cli, const char *cmd);
  * @return True if the action does not have a pre-check or if it
  * was successful, false otherwise.
  */
-bool do_action_pre_check(action_t *action, trantor_t *trantor, client_t *cli);
+bool do_action_pre_check(action_t *action, server_t *trantor, client_t *cli);
 
 /**
  * @brief Performs an action.
@@ -166,7 +172,7 @@ bool do_action_pre_check(action_t *action, trantor_t *trantor, client_t *cli);
  * @param server
  * @param cli
  */
-void do_action(action_t *action, trantor_t *trantor);
+void do_action(action_t *action, server_t *trantor);
 
 void handle_actions(server_t *server);
 void put_action_in_waitlist(server_t *server, action_t *action);
@@ -206,5 +212,24 @@ ai_cmd_response_t ai_incantation_start_handler(action_t *action,
     server_t *server, player_t *player);
 ai_cmd_response_t ai_incantation_end_handler(action_t *action,
     server_t *server, player_t *player);
+ai_cmd_response_t ai_fork_pre_check(UNUSED action_t *action,
+    server_t *server, player_t *player);
+int action_cmp(const void *a, const void *b);
+struct timespec timespec_add(struct timespec a, struct timeval b);
+void send_to_clients_on_tile(server_t *server, char *mess, player_t *player);
+void freeze_players(map_tile_t *tile, player_t *player);
+void unfreeze_players(server_t *server, map_tile_t *tile, player_t *player);
+void check_resource_spawn(server_t *server);
+
+UNUSED static const int requirements_for_level[8][7] = {
+        {}, // UNUSED
+        {1, 1, 0, 0, 0, 0, 0}, // 1->2
+        {2, 1, 1, 1, 0, 0, 0}, // 2->3
+        {2, 2, 0, 1, 0, 2, 0}, // 3->4
+        {4, 1, 1, 2, 0, 1, 0}, // 4->5
+        {4, 1, 2, 1, 3, 0, 0}, // 5->6
+        {6, 1, 2, 3, 0, 1, 0}, // 6->7
+        {6, 2, 2, 2, 2, 2, 1}, // 7->8
+};
 
 #endif //EPITECH_ZAPPY_SERVER_H
