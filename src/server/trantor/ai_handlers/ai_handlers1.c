@@ -67,7 +67,6 @@ ai_cmd_response_t ai_look_handler(action_t *action UNUSED,
     }
     response = my_realloc(response, strlen(response) + 2);
     sprintf(response, "%s]", response);
-    printf("%s\n", response);
     return AI_CMD_RESPONSE_TEXT(response);
 }
 
