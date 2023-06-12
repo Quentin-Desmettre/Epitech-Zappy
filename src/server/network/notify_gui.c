@@ -13,7 +13,7 @@ const gui_event_t GUI_EVENTS[] = {
         {PLAYER_CONNECTION, "pnw #%d %d %d %d %d %s\n"},
         {EXPULSION, "pex %d\n"},
         {BROADCAST, "pbc %d %s\n"},
-        {START_INCANTATION, NULL},
+        {START_INCANTATION, "pic %d %d %d %s\n"},
         {END_INCANTATION, "pie %d %d %d\n"},
         {EGG_PLANTED, "pfk %d\n"},
         {RESOURCE_DROP, "pdr %d %d\n"},
@@ -24,6 +24,11 @@ const gui_event_t GUI_EVENTS[] = {
         {EGG_DEAD, "edi %d\n"},
         {END_OF_GAME, "seg %s\n"},
         {SERVER_MESSAGE, "smg %s\n"},
+        {TILE_CONTENT, "plv %d %d %d %d %d %d %d %d %d\n"},
+        {PLAYER_LVL_UP, "plv %d %d\n"},
+        {PLAYER_POS, "plv %d %d %d %d\n"},
+        {PLAYER_INVENTORY, "plv %d %d %d %d %d %d %d %d %d %d\n"},
+        {TIME_UNIT_CHANGED, "sst %d\n"},
         {NUM_GUI_EVENTS, NULL}
 };
 

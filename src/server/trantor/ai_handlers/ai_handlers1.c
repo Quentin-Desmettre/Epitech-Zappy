@@ -28,6 +28,7 @@ ai_cmd_response_t ai_forward_handler(action_t *action UNUSED,
     player->x = tile->x;
     player->y = tile->y;
     append_node(&tile->players, player);
+    notify_gui(server, PLAYER_POS, player->id, player->x, player->y, player->dir);
     return AI_CMD_RESPONSE_OK;
 }
 

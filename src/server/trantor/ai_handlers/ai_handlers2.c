@@ -26,6 +26,7 @@ ai_cmd_response_t ai_broadcast_handler(action_t *action,
         safe_write(client->fd, msg, strlen(msg));
         list_client = list_client->next;
     } while (list_client != server->clients);
+    notify_gui(server, BROADCAST, player->id, action->arg);
     return AI_CMD_RESPONSE_OK;
 }
 
@@ -37,11 +38,14 @@ ai_cmd_response_t ai_connect_nbr_handler(action_t *action UNUSED,
     return AI_CMD_RESPONSE_TEXT(msg);
 }
 
+// TODO: notify TILE_CONTENT / PLAYER_INVENTORY
 ai_cmd_response_t ai_set_handler(action_t *action,
     server_t *server, player_t *player)
 {
+    return AI_CMD_RESPONSE_OK;
 }
 
+// TODO: notify EXPULSION
 ai_cmd_response_t ai_eject_handler(action_t *action,
     server_t *server, player_t *player)
 {
@@ -65,7 +69,9 @@ ai_cmd_response_t ai_eject_handler(action_t *action,
     return AI_CMD_RESPONSE_OK;
 }
 
+// TODO: notify TILE_CONTENT / PLAYER_INVENTORY
 ai_cmd_response_t ai_take_handler(action_t *action,
     server_t *server, player_t *player)
 {
+    return AI_CMD_RESPONSE_OK;
 }

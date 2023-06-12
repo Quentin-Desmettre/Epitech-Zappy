@@ -14,19 +14,21 @@ bool cmp_cli_food(void *cli, void *food)
 }
 
 void delete_ai_from_server(server_t *server, client_t *cli,
-                            bool has_disconnect)
-{
+                            bool has_disconnect) {
     player_t *player = cli->data;
 
     if (!has_disconnect)
         safe_write(cli->fd, "dead\n", 5);
     player->team->available_slots += (player->is_from_egg ? 0 : 1);
     for (int i = 0; i < server->action_count; i++) {
-        if (server->actions[i]->cli == player) {
-            memmove(&server->actions[i], &server->actions[i + 1],
-                    sizeof(action_t *) * (server->action_count - i - 1));
-            server->action_count--;
-        }
+        printf("here: %p vs %p\n", server->actions[i]->cli, cli);
+        if (server->actions[i]->cli != cli)
+            continue;
+        printf("Deleting an action...\n");
+        memmove(&server->actions[i], &server->actions[i + 1],
+                sizeof(action_t *) * (server->action_count - i - 1));
+        server->action_count--;
+        i--;
     }
     remove_if(&server->food_timeouts, cli, cmp_cli_food, my_free);
     notify_gui(server, PLAYER_DEATH, player->id);
@@ -37,8 +39,10 @@ void destroy_client(server_t *server, void *data, bool has_disconnect)
 {
     client_t *cli = (client_t *)data;
 
-    if (cli->state == AI)
+    if (cli->state == AI) {
+        printf("Deleting AI...\n");
         delete_ai_from_server(server, cli, has_disconnect);
+    }
     close(cli->fd);
     my_free(cli->buffer);
     my_free(cli);

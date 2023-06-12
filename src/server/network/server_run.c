@@ -74,26 +74,59 @@ static void accept_client(server_t *server)
     server->client_count++;
 }
 
+char *get_winning_team(trantor_t *trantor)
+{
+    list_t *teams = trantor->teams;
+    list_t *players;
+    player_t *player;
+    int nb_level_max;
+
+    do {
+        nb_level_max = 0;
+        teams = teams->next;
+        if (!((team_t *)teams->data)->players)
+            continue;
+        players = ((team_t *)teams->data)->players;
+        do {
+            player = players->data;
+            nb_level_max += (player->level == 8 ? 1 : 0);
+            players = players->next;
+        } while (players != ((team_t *)teams->data)->players);
+        if (nb_level_max >= 6)
+            return ((team_t *)teams->data)->name;
+    } while (teams != trantor->teams);
+    return NULL;
+}
+
+void handle_events(int select_rval, server_t *server,
+    fd_set *readfds, fd_set *writefds)
+{
+    if (select_rval == 0) {
+        handle_actions(server);
+        check_food(server);
+        check_resource_spawn(server);
+        return;
+    }
+    if (FD_ISSET(server->fd, readfds))
+        accept_client(server);
+    handle_clients(server, readfds);
+    write_packets_for_fds(writefds);
+}
+
 void run_server(server_t *server)
 {
     fd_set readfds;
     fd_set writefds;
     struct timeval timeout = {0, 0};
     int select_rval;
-    while (server->run) {
+    char *winning_team;
+
+    while (!(winning_team = get_winning_team(server->trantor))) {
         init_write_set(&writefds);
         fetch_timeout(server, &timeout);
         readfds = server->read_fds;
         select_rval = try_select(FD_SETSIZE, &readfds, &writefds, &timeout);
-        if (select_rval == 0) {
-            handle_actions(server);
-            check_food(server);
-            check_resource_spawn(server);
-            continue;
-        }
-        if (FD_ISSET(server->fd, &readfds))
-            accept_client(server);
-        handle_clients(server, &readfds);
-        write_packets_for_fds(&writefds);
+        handle_events(select_rval, server, &readfds, &writefds);
     }
+    notify_gui(server, END_OF_GAME, winning_team);
 }

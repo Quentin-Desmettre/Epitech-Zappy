@@ -31,8 +31,10 @@ int main(int ac, char **av)
     server_t *server = init_server(ac, av, &err);
 
     if (!server) {
-        safe_write(2, err, strlen(err));
-        safe_write(2, "\n", 1);
+        if (err) {
+            safe_write(2, err, strlen(err));
+            safe_write(2, "\n", 1);
+        }
         return 84;
     }
     srandom(time(NULL));
