@@ -24,6 +24,20 @@ static void init_write_set(fd_set *write_fds)
     } while (tmp != *packet_waitlist());
 }
 
+static struct timespec *
+        get_first_action_timeout(action_t *actions[], int nb_actions)
+{
+    client_t *cli;
+
+    for (int i = 0; i < nb_actions; i++) {
+        cli = actions[i]->cli;
+        if (cli->data->is_freezed)
+            continue;
+        return &actions[i]->end_time;
+    }
+    return NULL;
+}
+
 static void fetch_timeout(server_t *server, struct timeval *timeout)
 {
     struct timespec now;
@@ -31,7 +45,7 @@ static void fetch_timeout(server_t *server, struct timeval *timeout)
     struct timespec *ends[] = {
         server->food_timeouts ?
             &((food_timeout_t *)server->food_timeouts->data)->end : NULL,
-        server->actions[0] ? &server->actions[0]->end_time : NULL,
+        get_first_action_timeout(server->actions, server->action_count),
         &server->next_spawn
     };
     const size_t possible_ends = sizeof(ends) / sizeof(ends[0]);
@@ -58,17 +72,6 @@ static void accept_client(server_t *server)
     safe_write(cli->fd, WELCOME_MESSAGE, strlen(WELCOME_MESSAGE));
     FD_SET(cli->fd, &server->read_fds);
     server->client_count++;
-}
-
-static void check_resource_spawn(server_t *server)
-{
-    struct timespec now;
-
-    get_time(&now);
-    if (is_timespec_less(&now, &server->next_spawn))
-        return;
-    spawn_resources(server->trantor);
-    update_next_spawn(server);
 }
 
 void run_server(server_t *server)

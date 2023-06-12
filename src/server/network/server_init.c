@@ -15,22 +15,16 @@
 static bool init_server_network(server_t *server, char **err)
 {
     struct sockaddr_in addr;
+    int tmp;
 
-    if ((server->fd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-        *err = perror_str("socket");
-        return false;
-    }
+    TRY_SYSCALL(server->fd, socket, AF_INET, SOCK_STREAM, 0);
     addr = (struct sockaddr_in){.sin_family = AF_INET,
         .sin_addr.s_addr = INADDR_ANY, .sin_port = htons(server->params.port)
     };
-    if (bind(server->fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-        *err = perror_str("bind");
-        return false;
-    }
-    if (listen(server->fd, MAX_CLIENTS) < 0) {
-        *err = perror_str("listen");
-        return false;
-    }
+    TRY_SYSCALL(tmp, setsockopt, server->fd, SOL_SOCKET, SO_REUSEADDR,
+                    &(int){1}, sizeof(int));
+    TRY_SYSCALL(tmp, bind, server->fd, (struct sockaddr *)&addr, sizeof(addr));
+    TRY_SYSCALL(tmp, listen, server->fd, MAX_CLIENTS);
     return true;
 }
 

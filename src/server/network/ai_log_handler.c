@@ -11,15 +11,7 @@
 
 static char *get_ai_connected_answer(team_t *team, int map_x, int map_y)
 {
-    size_t len = 0;
-    char slots[10];
-    char x_pos[10];
-    char y_pos[10];
-
-    sprintf(slots, "%d", team->available_slots);
-    sprintf(x_pos, "%d", map_x);
-    sprintf(y_pos, "%d", map_y);
-    return str_concat(&len, 6, slots, "\n", x_pos, " ", y_pos, "\n");
+    return my_asprintf("%d\n%d %d\n", team->available_slots, map_x, map_y);
 }
 
 static char *gui_mess_ai_connected(server_t *server, player_t *player)
@@ -67,13 +59,8 @@ void handle_ai(server_t *server, client_t *cli, const char *cmd)
     action = create_action(cmd, cli, server->params.freq);
     if (!action)
         return safe_write(cli->fd, ERR_NO_CMD, strlen(ERR_NO_CMD));
-    if (!do_action_pre_check(action, server->trantor, cli))
-        return free(action);
-    if (action->data.ticks == 0) {
-        do_action(action, server->trantor);
-        return free(action);
-    }
     if (!cli->data->current_action) {
+        do_action_pre_check(action, server, cli);
         cli->data->current_action = action;
         put_action_in_waitlist(server, action);
     } else

@@ -12,17 +12,18 @@
 ai_cmd_response_t ai_forward_handler(action_t *action UNUSED,
     server_t *server, player_t *player)
 {
-    map_tile_t *tile = get_tile_by_pos(server->trantor->map, player->x, player->y);
+    map_tile_t *tile = get_tile_by_pos(server->trantor->map,
+        player->x, player->y);
 
     remove_if(&tile->players, player, NULL, NULL);
     if (player->dir == NORTH)
-        player->y = (player->y - 1) % dim_list_size(server->trantor->map, HORIZONTAL);
+        player->y = (player->y - 1) % server->params.height;
     if (player->dir == SOUTH)
-        player->y = (player->y + 1) % dim_list_size(server->trantor->map, HORIZONTAL);
+        player->y = (player->y + 1) % server->params.height;
     if (player->dir == EAST)
-        player->x = (player->x + 1) % dim_list_size(server->trantor->map, VERTICAL);
+        player->x = (player->x + 1) % server->params.width;
     if (player->dir == WEST)
-        player->x = (player->x - 1) % dim_list_size(server->trantor->map, VERTICAL);
+        player->x = (player->x - 1) % server->params.width;
     tile = get_tile_by_pos(server->trantor->map, player->x, player->y);
     player->x = tile->x;
     player->y = tile->y;

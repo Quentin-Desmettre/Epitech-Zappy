@@ -67,7 +67,6 @@ map_tile_t *get_tile_by_pos(dim_list_t *map, int x, int y)
     else
         for (int i = 0; i > x; i--)
             sub_list = sub_list->prev;
-    map_tile_t *tile = sub_list->data;
     return sub_list->data;
 }
 
@@ -91,4 +90,3 @@ char *get_tile_content(map_tile_t *tile)
     }
     return content;
 }
-

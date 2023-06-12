@@ -18,7 +18,9 @@ const action_data_t AI_ACTIONS[] = {
         {0, true, "Broadcast", NULL, (ai_cmd_handler_t)ai_broadcast_handler},
         {7, false, "Connect_nbr", NULL,
                                     (ai_cmd_handler_t)ai_connect_nbr_handler},
-        {42, false, "Fork", NULL, (ai_cmd_handler_t)ai_fork_handler},
+        {42, false, "Fork",
+                        (ai_cmd_handler_t)ai_fork_pre_check,
+                        (ai_cmd_handler_t)ai_fork_handler},
         {7, false, "Eject", NULL, (ai_cmd_handler_t)ai_eject_handler},
         {7, true, "Take", NULL, (ai_cmd_handler_t)ai_take_handler},
         {7, true, "Set", NULL, (ai_cmd_handler_t)ai_set_handler},
@@ -81,14 +83,14 @@ action_t *create_action(const char *cmd, void *client, int f)
     return NULL;
 }
 
-void do_action(action_t *action, trantor_t *trantor)
+void do_action(action_t *action, server_t *server)
 {
     ai_cmd_response_t resp;
     char *answer;
     client_t *cli = action->cli;
     size_t len = 3;
 
-    resp = action->data.handler(action, trantor, cli->data);
+    resp = action->data.handler(action, server, cli->data);
     if (resp.type == KO)
         answer = my_strdup("ko\n");
     else if (resp.type == OK)
@@ -100,17 +102,23 @@ void do_action(action_t *action, trantor_t *trantor)
     my_free(answer);
 }
 
-bool do_action_pre_check(action_t *action, trantor_t *trantor, client_t *cli)
+bool do_action_pre_check(action_t *action, server_t *server, client_t *cli)
 {
     ai_cmd_response_t resp;
+    char *answer;
+    size_t len = 3;
 
     if (!action->data.pre_check)
         return true;
-    resp = action->data.pre_check(action, trantor, cli->data);
-    free(resp.data);
-    if (resp.type == KO) {
-        safe_write(cli->fd, "ko\n", 3);
-        return false;
-    }
-    return true;
+    resp = action->data.pre_check(action, server, cli->data);
+    if (resp.type == KO)
+        answer = my_strdup("ko\n");
+    else if (resp.type == OK)
+        answer = my_strdup("ok\n");
+    else
+        answer = str_concat(&len, 2, resp.data, "\n");
+    safe_write(cli->fd, answer, len);
+    my_free(resp.data);
+    my_free(answer);
+    return resp.type != KO;
 }
