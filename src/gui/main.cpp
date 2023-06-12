@@ -50,25 +50,17 @@ void Graphic::loop(Mateyak::Vec2f mapSize)
     Mateyak::Window win(_windowWidth, _windowHeight, "Zappy", 400);
     int seed = rand();
     Mateyak::Camera cam({5.0f, 5.0f, 5.0f}, {0.0f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, 45.0f);
-    Mateyak::Model3D sky(GenMeshSphere(200, 8, 8), Mateyak::Vec3f{0, 0, 0}, 1.0f, BLACK);
     Map map(mapSize * 10, 0.5);
-    Mateyak::Sprite mapMdl = map.getMap();
-    Mateyak::Sprite color = map.getColor();
     Venom ven({0, 0});
-//    Mesh mesh = GenMeshHeightmap(mapMdl, (Vector3){mapSize.x * 10 / 3, 1, mapSize.y * 10 / 3});
-//    Mateyak::Model3D model(mesh, Mateyak::Vec3f{0, -0.5, 0});
     Mateyak::Model3D flat(GenMeshPoly(10, 10000.0f), Mateyak::Vec3f{-500, -1, -500}, 1.0f, BLACK);
     Mateyak::Shaders shader("src/gui/shader/base_lighting.vs", "src/gui/shader/test.fs");
 
-//    model.setTexture(color);
-    shader.setUniform("fogDensity", 0.02f);
-    shader.setUniform("lightsPos", {0.0f, 20.0f, 0.0f});
+    shader.setUniform("fogDensity", 0.015f);
+    shader.setUniform("lightsPos", {mapSize.x * 5.f / 3.f, 20.0f, mapSize.y * 5.f / 3.f});
     shader.setUniform("lightsColor", {0.5f, 0.5f, 0.5f});
     shader.setUniform("lightsEnabled", 1);
     int viewPos = shader.getUniformLocation("viewPos");
-//    model.setShader(shader);
     map.setShader(shader);
-    flat.setShader(shader);
     bool shaderEnabled = true;
     bool drawGrid = false;
     shader.setUniform("shaderEnabled", shaderEnabled);
@@ -91,14 +83,11 @@ void Graphic::loop(Mateyak::Vec2f mapSize)
         win.startDrawing();
         ClearBackground(Color{255 / 10, 255 / 20, 255 / 20, 255});
         win.begin3D(cam);
-        BeginShaderMode(shader);
         Mateyak::Window::draw(map);
-        Mateyak::Window::draw(sky);
         Mateyak::Window::draw(flat);
-        map.update(_serverInformations);
-        EndShaderMode();
         ven.draw_ven(seed, cam);
         _serverInformations.startComputing();
+        map.update(_serverInformations);
         for (auto &it : _serverInformations.getPlayers()) {
             it->ven.draw_ven(seed, cam);
             _serverInformations.updatePlayer(it);
@@ -106,6 +95,9 @@ void Graphic::loop(Mateyak::Vec2f mapSize)
         if (drawGrid) {
             Utils::drawGrid(mapSize, 10 / 3.F, {0, 0, 0});
         }
+        _serverInformations.endComputing();
+        if (drawGrid)
+            Utils::drawGrid(mapSize, 10/3.f, {0, 0, 0});
         win.end3D();
         DrawFPS(10, 10);
         drawTeams();

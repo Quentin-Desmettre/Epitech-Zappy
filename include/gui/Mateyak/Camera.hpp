@@ -29,6 +29,7 @@ namespace Mateyak
             float _fov;
             int _type;
             Camera3D _cam;
+            int _state;
         private:
             Vec2f _oldCamPos;
             Vec2f _camPos;

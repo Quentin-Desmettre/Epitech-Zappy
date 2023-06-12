@@ -17,12 +17,12 @@ class Ressource {
     public:
         Color clr[7] = {
             (Color){255, 255, 255, 255},
-            (Color){150, 0, 0, 100},
-            (Color){150, 150, 0, 100},
-            (Color){200, 100, 0, 100},
-            (Color){100, 100, 100, 100},
-            (Color){150, 150, 80, 100},
-            (Color){0, 150, 150, 100},
+            (Color){120, 0, 0, 100},
+            (Color){100, 70, 0, 100},
+            (Color){130, 50, 10, 100},
+            (Color){80, 80, 80, 100},
+            (Color){110, 110, 30, 100},
+            (Color){130, 100, 100, 100},
         };
 
         Ressource(Mateyak::Vec2f pos, int type) {
@@ -30,7 +30,7 @@ class Ressource {
             pos.y += rand() % 100 / 100.f;
             this->pos = pos;
             color = clr[type];
-            scale = rand() % 10 / 100.0 + 0.1;
+            scale = (rand() % 3) / 10.0 + 0.2;
             this->type = type;
         }
         ~Ressource() = default;

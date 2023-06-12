@@ -16,8 +16,8 @@ Venom::Venom(Mateyak::Vec2f pos)
         Mateyak::Vec3f ps;
         float x = GetRandomValue(0, 100) / 100.0;
         float y = GetRandomValue(0, 100) / 100.0;
-        ps.x = x + i % 100 - 50;
-        ps.z = (y + i / 100 - 50) * 2 + 50;
+        ps.x = x + i % 100;
+        ps.z = (y + i / 100) * 2;
         ps.y = 0;
         pos_feet.push_back(ps);
     }
@@ -83,31 +83,30 @@ void Venom::Draw_leg(Mateyak::Vec3f leg, int seed)
     }
 }
 
-
 void Venom::move_ven(Camera camera)
 {
-    float norm = 0;
-    Vector3 vec;
+    Mateyak::Vec3f vec;
 
     if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_RIGHT)) {
         vec = {camera.position.x - camera.target.x, 0, camera.position.z - camera.target.z};
-        norm = sqrt(pow(vec.x, 2) + pow(vec.z, 2));
+        vec = vec.Normalize();
+        vec = vec / 10.0;
     }
     if (IsKeyDown(KEY_UP)) {
-        _pos.x -= vec.x / norm / 20.0;
-        _pos.z -= vec.z / norm / 20.0;
+        _pos.x -= vec.x;
+        _pos.z -= vec.z;
     }
     if (IsKeyDown(KEY_DOWN)) {
-        _pos.x += vec.x / norm / 20.0;
-        _pos.z += vec.z / norm / 20.0;
+        _pos.x += vec.x;
+        _pos.z += vec.z;
     }
     if (IsKeyDown(KEY_RIGHT)) {
-        _pos.x += vec.z / norm / 20.0;
-        _pos.z -= vec.x / norm / 20.0;
+        _pos.x += vec.z;
+        _pos.z -= vec.x;
     }
     if (IsKeyDown(KEY_LEFT)) {
-        _pos.x -= vec.z / norm / 20.0;
-        _pos.z += vec.x / norm / 20.0;
+        _pos.x -= vec.z;
+        _pos.z += vec.x;
     }
 }
 

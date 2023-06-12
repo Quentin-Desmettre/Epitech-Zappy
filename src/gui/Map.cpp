@@ -120,6 +120,16 @@ void Map::setShader(const Mateyak::Shaders &shader) {
 }
 
 void Map::update(const ServerInformations &infos) {
-    //std::cout << "update" << std::endl;
-    //std::cout << "end update" << std::endl;
+    ZappyMap zpMap = infos.getMap();
+
+    for (auto &col : zpMap) {
+        for (auto &pos : col) {
+            for (auto &obj : pos) {
+                _rock.setColor(obj.color);
+                _rock.setPos({obj.pos.x * 10 / 3.f, 0, obj.pos.y * 10 / 3.f});
+                _rock.setScale(obj.scale);
+                Mateyak::Window::draw(_rock);
+            }
+        }
+    }
 }
