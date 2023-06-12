@@ -10,19 +10,12 @@
 int Venom::nbLegs = 5;
 int Venom::circlePerLeg = 30;
 int Venom::pointPerCircle = 4;
+std::vector<Mateyak::Vec3f> Venom::pos_feet;
 
 Venom::Venom(Mateyak::Vec2f pos, Mateyak::Vec2f mapSize, Color clr): mapSize(mapSize),
     _clr(clr)
 {
-    for (int i = 0; i < 5000; i++) {
-        Mateyak::Vec3f ps;
-        float x = GetRandomValue(0, 100) / 100.0;
-        float y = GetRandomValue(0, 100) / 100.0;
-        ps.x = x + i % 100;
-        ps.z = (y + i / 100) * 2;
-        ps.y = 0;
-        pos_feet.push_back(ps);
-    }
+    rnd = {rand() % 100 / 100.f - 0.5f, 0, rand() % 100 / 100.f - 0.5f};
     _pos = {(pos.x * 10 + 5) / 3.F, 0.75, (pos.y * 10 + 5) / 3.F};
     _nextPosition = _pos;
 }
@@ -149,14 +142,15 @@ void Venom::move_ven()
 void Venom::draw_ven(int seed, const Mateyak::Camera& camera)
 {
     c_pos = camera._position;
+    _pos = _pos - rnd;
     for (int i = 0; i < 5000; i++) {
-        time = GetTime();
         if ((_pos - pos_feet[i]).len() < DIS && (c_pos - pos_feet[i]).len() < 100) {
             if (Utils::differenceAngle((c_pos - camera._target).Normalize(), (c_pos - pos_feet[i]).Normalize()) > 45)
                 continue;
             Draw_leg(pos_feet[i], seed + i * 1000);
         }
     }
+    _pos = _pos + rnd;
 }
 
 Mateyak::Vec3f Venom::getPos() const

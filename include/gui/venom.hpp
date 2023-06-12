@@ -18,14 +18,14 @@ private:
     Mateyak::Vec3f c_pos;
     Mateyak::Vec2f mapSize;
     Color _clr;
+    Mateyak::Vec3f rnd;
 
 public:
     static int nbLegs;
     static int circlePerLeg;
     static int pointPerCircle;
     static void fpsHandler();
-    float time;
-    std::vector<Mateyak::Vec3f> pos_feet;
+    static std::vector<Mateyak::Vec3f> pos_feet;
     Venom(Mateyak::Vec2f pos = {0, 0}, Mateyak::Vec2f mapSize = {10, 10}, Color clr = WHITE);
     ~Venom();
     void Draw_leg(Mateyak::Vec3f pos, int seed);

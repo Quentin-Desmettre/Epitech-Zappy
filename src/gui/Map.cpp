@@ -11,6 +11,7 @@
 
 #include "Map.hpp"
 #include "Mateyak/Window.hpp"
+#include "venom.hpp"
 
 Map::Map(Mateyak::Vec2f size, float zoom):
     _size(size),
@@ -29,6 +30,16 @@ Map::Map(Mateyak::Vec2f size, float zoom):
     _ground = GenMeshHeightmap(map, (Vector3){_size.x / 3, 1, _size.y / 3});
     _ground.setPos({0, -0.5, 0});
     _ground.setTexture(clr);
+
+    for (int i = 0; i < 5000; i++) {
+        Mateyak::Vec3f ps;
+        float x = GetRandomValue(0, 100) / 100.0;
+        float y = GetRandomValue(0, 100) / 100.0;
+        ps.x = x + i % 100;
+        ps.z = (y + i / 100) * 2;
+        ps.y = 0;
+        Venom::pos_feet.push_back(ps);
+    }
 }
 
 void Map::generate()
