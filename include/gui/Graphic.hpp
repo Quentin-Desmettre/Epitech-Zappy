@@ -14,8 +14,16 @@ class Graphic {
     public:
         void loop(Mateyak::Vec2f mapSize);
         ServerInformations &getServerInformations() { return _serverInformations; }
-    private:
+        void drawTeams();
+        void getTeamsPlace(Mateyak::Window &win);
+
+private:
         ServerInformations _serverInformations;
+        int _windowWidth = 1920;
+        int _windowHeight = 1080;
+        int _boxSize = 50;
+        int _maxSize = 0;
+        int _teamNumber = 0;
 };
 
 #endif //EPITECH_ZAPPY_GRAPHIC_HPP

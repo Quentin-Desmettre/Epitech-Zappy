@@ -42,6 +42,7 @@ namespace Mateyak
         static void draw(const Model3D &model);
         static void draw(const std::string &text, float x = 0, float y = 0, int fontSize = 15, Color color = DARKGRAY);
         static void draw(const Map &map);
+        static void drawBox(float posX, float posY, float width, float height, Color color);
         void end3D();
         void endDrawing();
 

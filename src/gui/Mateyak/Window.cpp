@@ -43,21 +43,17 @@ void Mateyak::Window::draw(const Model3D &model)
 void Mateyak::Window::draw(const std::string &texts, float x, float y, int fontSize, Color color)
 {
     const char* text = texts.c_str();
-    Vector2 size = MeasureTextEx(_font, text, fontSize, 1);
-    double textWidth = size.x;
-    double textHeight = size.y;
+    Vector2 textPosition = { x, y };
 
-    float rectX = x;
-    float rectY = y;
-    auto rectWidth = static_cast<float>(textWidth);
-    auto rectHeight = static_cast<float>(textHeight);
-
-    Vector2 rectPosition = { rectX - 5, rectY - 3 };
-    Vector2 rectSize = { rectWidth + 10, rectHeight + 6 };
-    DrawRectangleV(rectPosition, rectSize, DARKGRAY);
-
-    Vector2 textPosition = { rectX, rectY };
     DrawTextEx(_font, text, textPosition, (float)fontSize, 1, color);
+}
+
+void Mateyak::Window::drawBox(float posX, float posY, float width, float height, Color color)
+{
+    Vector2 pos = {posX, posY};
+    Vector2 size = {width, height};
+
+    DrawRectangleV(pos, size, color);
 }
 
 void Mateyak::Window::startDrawing(Color color)

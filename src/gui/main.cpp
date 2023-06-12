@@ -11,9 +11,43 @@
 #include "Graphic.hpp"
 #include "Utils3d.hpp"
 
+
+void Graphic::drawTeams()
+{
+    int numberTeams = (_teamNumber / 4) + (_teamNumber % 4 > 0 ? 1 : 0);
+    int x = _windowWidth - _boxSize - (numberTeams * 20);
+    int y = 20;
+
+    Mateyak::Window::drawBox(x - 10, y - 10, _boxSize + numberTeams * 20, 4 * 20 + 20, {0, 0, 0, 100});
+    for (auto &it : _serverInformations.getTeams()) {
+        Mateyak::Window::draw(it.getName(), x, y, 15, it.getColor());
+        if (y == 80) {
+            x += _maxSize + 20;
+            y = 20;
+        } else
+            y += 20;
+    }
+}
+
+void Graphic::getTeamsPlace(Mateyak::Window &win)
+{
+    for (auto &it : _serverInformations.getTeams()) {
+        it.getName();
+        Vector2 size = MeasureTextEx(win._font, it.getName().c_str(), 15, 1);
+        it.width = size.x;
+        it.height = size.y;
+        if (size.x > _maxSize)
+            _maxSize = size.x;
+    }
+    _teamNumber = _serverInformations.getTeams().size();
+    _boxSize = _maxSize * (_teamNumber / 4) + (_teamNumber % 4 > 0 ? _maxSize : 0);
+}
+
 void Graphic::loop(Mateyak::Vec2f mapSize)
 {
-    Mateyak::Window win(1920 / 1.2, 1080 / 1.2, "Zappy", 400);
+    _windowWidth = 1920 / 2;
+    _windowHeight = 1080 / 2;
+    Mateyak::Window win(_windowWidth, _windowHeight, "Zappy", 400);
     int seed = rand();
     Mateyak::Camera cam({5.0f, 5.0f, 5.0f}, {0.0f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, 45.0f);
     Mateyak::Model3D sky(GenMeshSphere(200, 8, 8), Mateyak::Vec3f{0, 0, 0}, 1.0f, BLACK);
@@ -38,17 +72,9 @@ void Graphic::loop(Mateyak::Vec2f mapSize)
     bool shaderEnabled = true;
     bool drawGrid = false;
     shader.setUniform("shaderEnabled", shaderEnabled);
-    int maxSize = 0;
 
     _serverInformations.startComputing();
-    for (auto &it : _serverInformations.getTeams()) {
-        it.getName();
-        Vector2 size = MeasureTextEx(win._font, it.getName().c_str(), 15, 1);
-        it.width = size.x;
-        it.height = size.y;
-        if (size.x > maxSize)
-            maxSize = size.x;
-    }
+    getTeamsPlace(win);
     _serverInformations.endComputing();
 
     while (!WindowShouldClose()) {
@@ -82,12 +108,7 @@ void Graphic::loop(Mateyak::Vec2f mapSize)
         }
         win.end3D();
         DrawFPS(10, 10);
-        int x = win.width - maxSize - 10;
-        int y = 10;
-        for (auto &it : _serverInformations.getTeams()) {
-            Mateyak::Window::draw(it.getName(), x, y, 15, it.getColor());
-            y += 20;
-        }
+        drawTeams();
         _serverInformations.endComputing();
         win.endDrawing();
     }

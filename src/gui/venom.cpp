@@ -3,7 +3,7 @@
 #define BALL_NB 30
 #define FLOAT_NB (float)BALL_NB
 #define DIS 3.f
-#define DIS2 0.5f
+#define DIS2 2.5f
 #define PRECI 4
 #define LEG 5
 #include "Utils3d.hpp"
@@ -118,8 +118,6 @@ void Venom::move_ven()
 
     if (_pos == _nextPosition)
         return;
-    std::cout << _pos.x << " " << _pos.z << std::endl;
-    std::cout << _nextPosition.x << " " << _nextPosition.z << std::endl;
     vec = {_nextPosition.x - _pos.x, _pos.y, _nextPosition.z - _pos.z};
     norm = sqrt(pow(vec.x, 2) + pow(vec.z, 2));
 
