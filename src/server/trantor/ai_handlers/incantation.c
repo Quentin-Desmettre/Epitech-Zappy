@@ -37,7 +37,7 @@ static bool can_level_up(player_t *player, map_tile_t *tile)
     return true;
 }
 
-ai_cmd_response_t ai_incantation_start_handler(action_t *action,
+ai_cmd_response_t ai_incantation_start_handler(UNUSED action_t *action,
     server_t *server, player_t *player)
 {
     map_tile_t *tile =
@@ -52,7 +52,7 @@ ai_cmd_response_t ai_incantation_start_handler(action_t *action,
     return AI_CMD_RESPONSE_TEXT(my_strdup("Elevation underway"));
 }
 
-void do_level_up(map_tile_t *tile, player_t *player)
+static void do_level_up(map_tile_t *tile, player_t *player, server_t *server)
 {
     list_t *players = tile->players;
     int base_level = player->level;
@@ -60,10 +60,16 @@ void do_level_up(map_tile_t *tile, player_t *player)
 
     for (int i = 0; i < NB_RESOURCE; i++)
         tile->resources[i] -= requirements_for_level[player->level][i + 1];
+    notify_gui(server, TILE_CONTENT, tile->x, tile->y, tile->resources[FOOD],
+    tile->resources[LINEMATE], tile->resources[DERAUMERE],
+    tile->resources[SIBUR], tile->resources[MENDIANE],
+    tile->resources[PHIRAS], tile->resources[THYSTAME]);
     do {
         pl = players->data;
-        if (pl->level == base_level)
+        if (pl->level == base_level) {
             pl->level++;
+            notify_gui(server, PLAYER_LVL_UP, pl->id, pl->level);
+        }
         players = players->next;
     } while (players != tile->players);
 }
@@ -76,9 +82,11 @@ ai_cmd_response_t ai_incantation_end_handler(UNUSED action_t *action,
         get_tile_by_pos(server->trantor->map, player->x, player->y);
 
     unfreeze_players(server, tile, player);
-    if (!can_level_up(player, tile))
+    if (!can_level_up(player, tile)) {
+        notify_gui(server, END_INCANTATION, player->x, player->y, 0);
         return AI_CMD_RESPONSE_KO;
-    do_level_up(tile, player);
+    }
+    do_level_up(tile, player, server);
     answer = my_asprintf("Current level: %d\n", player->level + 1);
     send_to_clients_on_tile(server, answer, player);
     return AI_CMD_RESPONSE_TEXT(answer);

@@ -18,7 +18,6 @@
     #include "utility/safe_write.h"
     #include "utility/garbage_collector.h"
 
-    #define UINT64_MAX 18446744073709551615ULL
     #define INT64_MAX 9223372036854775807LL
     #define GRAPHIC_COMMAND "GRAPHIC"
     #define ERR_NO_SLOTS "ko: Not enough opened slots\n"
@@ -54,6 +53,11 @@ enum gui_event {
     EGG_DEAD,
     END_OF_GAME,
     SERVER_MESSAGE,
+    TILE_CONTENT,
+    PLAYER_LVL_UP,
+    PLAYER_POS,
+    PLAYER_INVENTORY,
+    TIME_UNIT_CHANGED,
     NUM_GUI_EVENTS
 };
 
@@ -82,7 +86,6 @@ typedef struct server {
 
     trantor_t *trantor;
     args_t params;
-    bool run;
 
     fd_set read_fds;
 } server_t;

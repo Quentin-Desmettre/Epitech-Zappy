@@ -57,10 +57,10 @@ struct timeval timespec_diff(struct timespec a, struct timespec b)
     return res;
 }
 
-bool is_numeric(const char *str)
+bool str_array_contains(char **arr, char *str)
 {
-    for (int i = 0; str[i]; i++)
-        if (str[i] < '0' || str[i] > '9')
-            return false;
-    return true;
+    for (int i = 0; arr[i]; i++)
+        if (!strcmp(arr[i], str))
+            return true;
+    return false;
 }

@@ -26,6 +26,7 @@ ai_cmd_response_t ai_forward_handler(action_t *action UNUSED,
         player->x = (player->x - 1) % server->params.width;
     tile = get_tile_by_pos(server->trantor->map, player->x, player->y);
     append_node(&tile->players, player);
+    notify_gui(server, PLAYER_POS, player->id, player->x, player->y, player->dir);
     return AI_CMD_RESPONSE_OK;
 }
 

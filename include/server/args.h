@@ -21,7 +21,6 @@
     #define SIZE_T_MAX ((size_t)-1)
     #define IS_FREQ_VALID(freq) ((freq) >= 2 && (freq) <= 10000)
 
-
 extern const char *DEFAULT_TEAMS[];
 
     // Errors
@@ -32,6 +31,7 @@ extern const char *DEFAULT_TEAMS[];
     #define ERR_TEAMS "Error: invalid team names"
     #define ERR_SLOTS "Error: invalid slots"
     #define ERR_MULTI_TEAMS "ko: Multiple teams with the same name\n"
+    #define ERR_INVALID_TEAM_NAME "ko: Invalid team name\n"
 
 typedef struct {
     char optname;

@@ -11,3 +11,5 @@ cmake-build-debug
 build
 .DS_Store
 test.sh
+__pycache__
+out

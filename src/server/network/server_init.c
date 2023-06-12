@@ -47,7 +47,8 @@ void update_next_spawn(server_t *server)
     struct timespec now;
 
     get_time(&now);
-    server->next_spawn = get_end_time(20, server->params.freq, now);
+    server->next_spawn = get_end_time(MAP_SPAWN_FREQ,
+        server->params.freq, now);
 }
 
 server_t *init_server(int ac, char **av, char **err)
@@ -59,7 +60,6 @@ server_t *init_server(int ac, char **av, char **err)
         return NULL;
     server = my_calloc(1, sizeof(server_t));
     server->params = args;
-    server->run = true;
     server->trantor = init_trantor(args.width,
         args.height, args.names, args.slots);
     if (!init_server_network(server, err)) {

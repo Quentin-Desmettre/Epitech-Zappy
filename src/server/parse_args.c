@@ -7,6 +7,7 @@
 
 #include "args.h"
 #include "utility/strings.h"
+#include "server.h"
 #include <stdbool.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -49,7 +50,7 @@ static size_t offset_of_arg(int arg)
     return SIZE_T_MAX;
 }
 
-static void fetch_team_names(args_t *args, int ac, char **av, char **err)
+static void fetch_team_names(args_t *args, int ac, char **av)
 {
     free_str_array(args->names);
     args->names = my_calloc(1, sizeof(char *));
@@ -76,6 +77,8 @@ static bool check_args(args_t *args, char **err)
         *err = ERR_TEAMS;
     if (has_duplicates(args->names))
         *err = ERR_MULTI_TEAMS;
+    if (str_array_contains(args->names, GRAPHIC_COMMAND))
+        *err = ERR_INVALID_TEAM_NAME;
     return *err == NULL;
 }
 
@@ -91,7 +94,7 @@ bool get_args(int ac, char **av, args_t *args, char **err)
             return false;
         }
         if (opt == 'n') {
-            fetch_team_names(args, ac, av, err);
+            fetch_team_names(args, ac, av);
             continue;
         }
         *(int *)((char *) args + offset_of_arg(opt)) = atoi(optarg);
