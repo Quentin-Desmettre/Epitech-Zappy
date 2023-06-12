@@ -172,3 +172,7 @@ void ServerInformations::endComputing()
 {
     mutex.unlock();
 }
+
+void ServerInformations::updateAudioAction(short state, std::tuple<int, int> pos, enum action_type type)
+{
+}

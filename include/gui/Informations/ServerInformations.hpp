@@ -47,8 +47,7 @@ class ServerInformations
         void setPlayerInventory(std::string name, std::vector<int> inventory);
         void removePlayer(std::string name);
         void setPlayerDead(std::string name);
-
-
+        void updateAudioAction(short state, std::tuple<int, int> pos, enum action_type type);
 
         Mateyak::Vec2f getMapSize() const;
         ZappyMap getMap() const;
@@ -61,5 +60,5 @@ class ServerInformations
         std::vector<Team> teams;
         std::vector<std::unique_ptr<Player>> players;
         std::mutex mutex;
-        std::tuple<short, std::tuple<int, int>, short> audioAction;
+        std::vector<std::tuple<short, std::vector<std::tuple<int, int, short>>>> audioAction;
 };
