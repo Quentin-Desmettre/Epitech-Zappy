@@ -11,7 +11,8 @@ int Venom::nbLegs = 5;
 int Venom::circlePerLeg = 30;
 int Venom::pointPerCircle = 4;
 
-Venom::Venom(Mateyak::Vec2f pos, Mateyak::Vec2f mapSize): mapSize(mapSize)
+Venom::Venom(Mateyak::Vec2f pos, Mateyak::Vec2f mapSize, Color clr): mapSize(mapSize),
+    _clr(clr)
 {
     for (int i = 0; i < 5000; i++) {
         Mateyak::Vec3f ps;
@@ -78,8 +79,8 @@ void Venom::Draw_leg(Mateyak::Vec3f leg, int seed)
             return;
         for (size_t i = 0; i < triangles.size(); i++) {
             Mateyak::Triangle tr = triangles[i];
-            float clr_mul = (float)i / (float)triangles.size();
-            Mateyak::Window::draw(tr, Color{u_char(80 - (clr_mul * 80)), 0, 0, (unsigned char)(2.55 * len)});
+            float clr_mul = 1 - (float)i / (float)triangles.size();
+            Mateyak::Window::draw(tr, Color{u_char(_clr.a * clr_mul), u_char(_clr.g * clr_mul), u_char(_clr.b * clr_mul), (unsigned char)(2.55 * len)});
         }
     }
 }

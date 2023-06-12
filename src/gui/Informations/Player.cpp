@@ -8,14 +8,15 @@
 #include "Informations/Player.hpp"
 #include <iostream>
 
-Player::Player(std::string name, int x, int y, Player::ORIENTATION orientation, int level, std::string team, Mateyak::Vec2f mapSize) : ven({static_cast<float>(x), static_cast<float>(y)}, mapSize)
+Player::Player(std::string name, int x, int y, Player::ORIENTATION orientation, int level, const Team& team, Mateyak::Vec2f mapSize) :
+    ven({static_cast<float>(x), static_cast<float>(y)}, mapSize, team.getColor()),
+    _team(team)
 {
     _position.x = x;
     _position.y = y;
     _level = level;
     _inventory.fill(0);
     _orientation = orientation;
-    _team = team;
     _name = name;
     _state = Player::STATE::NONE;
     _eggTime = 0;

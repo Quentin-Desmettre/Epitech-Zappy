@@ -16,13 +16,15 @@ Map::Map(Mateyak::Vec2f size, float zoom):
     _size(size),
     map(size),
     clr(size),
-    _zoom(zoom),
+    _rock("assets/rock.obj", Mateyak::Vec3f{0, 0, 0}, 0.3f, WHITE),
     _ground(),
-    _rock("assets/rock.obj", Mateyak::Vec3f{0, 0, 0}, 0.3f, WHITE)
+    _food("assets/ham.obj", Mateyak::Vec3f{0, 0, 0}, 0.01f, WHITE),
+    _zoom(zoom)
 {
     srand(time(NULL));
     generate();
     generateColor();
+    _food.setTexture({"assets/ham_text.png"});
 
     _ground = GenMeshHeightmap(map, (Vector3){_size.x / 3, 1, _size.y / 3});
     _ground.setPos({0, -0.5, 0});
@@ -32,8 +34,8 @@ Map::Map(Mateyak::Vec2f size, float zoom):
 void Map::generate()
 {
     std::vector<char> pixels;
-    mpp.clear();
     int rng = rand();
+    mpp.clear();
     unsigned char noise = 0;
     for (int j = 0; j < _size.y; j++) {
         for (int i = 0; i < _size.x; i++) {
@@ -117,6 +119,7 @@ const Mateyak::Model3D &Map::getGround() const
 void Map::setShader(const Mateyak::Shaders &shader) {
     _ground.setShader(shader);
     _rock.setShader(shader);
+    _food.setShader(shader);
 }
 
 void Map::update(const ServerInformations &infos) {
@@ -125,6 +128,11 @@ void Map::update(const ServerInformations &infos) {
     for (auto &col : zpMap) {
         for (auto &pos : col) {
             for (auto &obj : pos) {
+                if (obj.type == 0) {
+                    _food.setPos({obj.pos.x * 10 / 3.f, 0, obj.pos.y * 10 / 3.f});
+                    Mateyak::Window::draw(_food);
+                    continue;
+                }
                 _rock.setColor(obj.color);
                 _rock.setPos({obj.pos.x * 10 / 3.f, 0, obj.pos.y * 10 / 3.f});
                 _rock.setScale(obj.scale);
