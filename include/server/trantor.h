@@ -158,7 +158,6 @@ extern const action_data_t AI_ACTIONS[];
 
 bool is_action_finished(action_t *action, struct timespec *now);
 action_t *create_action(const char *cmd, void *client_t, int f);
-void spawn_resources(trantor_t *trantor);
 
 map_tile_t *init_tile(int x, int y);
 void link_layers(dim_list_t *map);

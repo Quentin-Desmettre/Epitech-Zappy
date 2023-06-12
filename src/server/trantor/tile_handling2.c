@@ -79,6 +79,7 @@ int find_direction(player_t *from, player_t *to, trantor_t *trantor)
     double angle;
     int dir[4] = {0, 90, 180, 270};
 
+    printf("%p, %p\n", from, to);
     vect[0] = (abs(from->x - to->x) > (trantor->width / 2)) ? ((from->x - to->x) - trantor->width) : (from->x - to->x);
     vect[1] = (abs(from->y - to->y) > (trantor->height / 2)) ? ((from->y - to->y) - trantor->height) : (from->y - to->y);
     angle = atan2(vect[1], vect[0]) * (180 / M_PI);

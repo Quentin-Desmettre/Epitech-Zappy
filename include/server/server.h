@@ -35,27 +35,26 @@ if ((var = func(__VA_ARGS__)) == -1) {  \
     return false;               \
 }
 
-
 UNUSED static char *NO_ARGS[2] = {"", NULL};
 
 enum gui_event {
-    PLAYER_CONNECTION,
-    EXPULSION,
-    BROADCAST,
-    START_INCANTATION,
-    END_INCANTATION,
-    EGG_PLANTED,
-    RESOURCE_DROP,
-    RESOURCE_COLLECT,
-    PLAYER_DEATH,
-    EGG_READY,
-    EGG_HATCHED,
-    EGG_DEAD,
-    END_OF_GAME,
-    SERVER_MESSAGE,
-    TILE_CONTENT,
-    PLAYER_LVL_UP,
-    PLAYER_POS,
+    PLAYER_CONNECTION, // AI connected
+    EXPULSION, // Eject
+    BROADCAST, // Broadcast
+    START_INCANTATION, // Incantation, start handler
+    END_INCANTATION, // Incantation, end handler
+    EGG_PLANTED, // Fork start
+    RESOURCE_DROP, // Set
+    RESOURCE_COLLECT, // Take
+    PLAYER_DEATH, // Death
+    EGG_READY, // Fork end
+    EGG_HATCHED, // Player connected on an egg
+    EGG_DEAD, // Egg ejected
+    END_OF_GAME, // End of game
+    SERVER_MESSAGE, // ????
+    TILE_CONTENT, // resources spawned / removed after incantation
+    PLAYER_LVL_UP, // Lvl up after incantation
+    PLAYER_POS, // Forward / eject
     PLAYER_INVENTORY,
     TIME_UNIT_CHANGED,
     NUM_GUI_EVENTS
@@ -223,6 +222,7 @@ void send_to_clients_on_tile(server_t *server, char *mess, player_t *player);
 void freeze_players(map_tile_t *tile, player_t *player);
 void unfreeze_players(server_t *server, map_tile_t *tile, player_t *player);
 void check_resource_spawn(server_t *server);
+void spawn_resources(server_t *server);
 
 UNUSED static const int requirements_for_level[8][7] = {
         {}, // UNUSED
