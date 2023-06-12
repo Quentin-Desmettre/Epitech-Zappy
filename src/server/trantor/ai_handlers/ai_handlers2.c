@@ -45,6 +45,24 @@ ai_cmd_response_t ai_set_handler(action_t *action,
 ai_cmd_response_t ai_eject_handler(action_t *action,
     server_t *server, player_t *player)
 {
+    int save_direct;
+    map_tile_t *tile = get_tile_by_pos(server->trantor->map,
+        player->x, player->y);
+    list_t *players = tile->players;
+    player_t *pl;
+
+    while (list_size(tile->players) > 1) {
+        if (players->data != player) {
+            pl = players->data;
+            save_direct = pl->dir;
+            pl->dir = player->dir;
+            ai_forward_handler(NULL, server, pl);
+            pl->dir = save_direct;
+            players = tile->players;
+        } else
+            players = players->next;
+    }
+    return AI_CMD_RESPONSE_OK;
 }
 
 ai_cmd_response_t ai_take_handler(action_t *action,
