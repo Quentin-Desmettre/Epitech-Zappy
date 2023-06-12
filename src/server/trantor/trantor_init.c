@@ -34,6 +34,16 @@ trantor_t *init_trantor(int width, int height,
     trantor->map = init_map(width, height);
     trantor->width = width;
     trantor->height = height;
+    player_t *player = malloc(sizeof(player_t));
+    player->x = 0;
+    player->y = 0;
+    player->dir = NORTH;
+    server_t *server = malloc(sizeof(server_t));
+    server->trantor = trantor;
+    map_tile_t *tile = get_tile_by_pos(trantor->map, 0, 0);
+    append_node(&tile->players, player);
+    ai_forward_handler(NULL, server, player);
+    printf("x: %d, y: %d\n", player->x, player->y);
     for (int i = 0; team_names[i]; i++)
         append_node(&trantor->teams, create_team(team_names[i], max_players));
     return trantor;
