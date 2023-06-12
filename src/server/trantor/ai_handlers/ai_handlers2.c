@@ -86,5 +86,18 @@ ai_cmd_response_t ai_eject_handler(action_t *action UNUSED,
 ai_cmd_response_t ai_take_handler(action_t *action,
     server_t *server, player_t *player)
 {
+    map_tile_t *tile = get_tile_by_pos(server->trantor->map,
+        player->x, player->y);
+    int i;
+
+    if (!str_array_contains(ressources_names, (char *)action->arg))
+        return AI_CMD_RESPONSE_KO;
+    for (i = 0; i < NB_RESOURCE; i++)
+        if (!strcmp(ressources_names[i], (char *)action->arg))
+            break;
+    if (tile->resources[i] <= 0)
+        return AI_CMD_RESPONSE_KO;
+    player->inventory[i]++;
+    tile->resources[i]--;
     return AI_CMD_RESPONSE_OK;
 }
