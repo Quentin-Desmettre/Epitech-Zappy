@@ -10,6 +10,7 @@
 #include <string.h>
 #include <math.h>
 #include "utility/garbage_collector.h"
+#include "utility/strings.h"
 
 int get_nb_tile(int level)
 {
@@ -61,22 +62,13 @@ char *get_list_players(list_t *players)
     return response;
 }
 
-char *get_list_ressources(list_t *ressources)
+char *get_list_ressources(int ressources[NB_RESOURCE])
 {
-    char *response = NULL;
-    char *tmp = NULL;
-    list_t *tmp_list = ressources;
-    int count = list_size(ressources);
+    char *response = "";
 
-    for (int i = 0; i != count; i++) {
-        tmp = ressources_names[(size_t)tmp_list->data];
-        if (response != NULL) {
-            response = my_realloc(response, strlen(response) + strlen(tmp) + 1);
-        } else {
-            response = my_realloc(response, strlen(tmp) + 1);
-        }
-        sprintf(response, "%s %s", response, tmp);
-        tmp_list = tmp_list->next;
+    for (int i = 0; i < NB_RESOURCE; i++) {
+        if (ressources[i] != 0)
+            response = my_asprintf("%s%s %d ", response, ressources_names[i], ressources[i]);
     }
     return response;
 }

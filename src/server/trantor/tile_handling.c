@@ -8,6 +8,7 @@
 #include "trantor.h"
 #include <stdlib.h>
 #include "utility/garbage_collector.h"
+#include "utility/strings.h"
 
 map_tile_t *init_tile(int x, int y)
 {
@@ -72,21 +73,15 @@ map_tile_t *get_tile_by_pos(dim_list_t *map, int x, int y)
 
 char *get_tile_content(map_tile_t *tile)
 {
-    char *content = NULL;
+    char *content = "";
     char *tmp = NULL;
     list_t *tmp_list = tile->players;
 
-    printf("tile->x = %d, tile->y = %d\n", tile->x, tile->y);
     tmp = get_list_players(tmp_list);
-    if (tmp != NULL) {
-        content = my_realloc(content, strlen(tmp) + 1);
-        sprintf(content, "%s", tmp);
-    }
-    tmp_list = tile->resources;
-    tmp = get_list_ressources(tmp_list);
-    if (tmp != NULL) {
-        content = my_realloc(content, strlen(content) + strlen(tmp) + 1);
-        sprintf(content, "%s%s", content, tmp);
-    }
+    if (tmp != NULL)
+        content = my_asprintf("%s%s ", content, tmp);
+    tmp = get_list_ressources(tile->resources);
+    if (tmp != NULL)
+        content = my_asprintf("%s%s", content, tmp);
     return content;
 }

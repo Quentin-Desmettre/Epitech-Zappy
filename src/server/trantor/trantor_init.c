@@ -34,6 +34,19 @@ trantor_t *init_trantor(int width, int height,
     trantor->map = init_map(width, height);
     trantor->width = width;
     trantor->height = height;
+    map_tile_t *tile = get_tile_by_pos(trantor->map, 0, 0);
+    tile->resources[FOOD] = 100;
+    tile->resources[LINEMATE] = 100;
+    tile->resources[DERAUMERE] = 100;
+    server_t *server = malloc(sizeof(server_t));
+    server->trantor = trantor;
+    player_t *player = malloc(sizeof(player_t));
+    player->level = 1;
+    player->dir = NORTH;
+    player->x = 0;
+    player->y = 0;
+    append_node(&tile->players, player);
+    ai_look_handler(NULL, server, player);
     for (int i = 0; team_names[i]; i++)
         append_node(&trantor->teams, create_team(team_names[i], max_players));
     return trantor;
