@@ -36,13 +36,14 @@ class Ai:
     from ._evolve import get_needed_stones, can_evolve, elevate, drop_elevation_stones, check_requirements, get_items_on_ground
 
     def take_food(self, inventory: dict[str, int], tiles = None):
-        """Takes food from the map until the player has 20 food."""
+        """Takes food from the map until the player has 25 food."""
         my_print("Looting food")
         if "food" not in inventory:
             inventory["food"] = 0
         for i in range(25 - inventory["food"]):
             if not self.loot_object(Objects.FOOD, tiles=tiles):
                 i -= 1
+            tiles = self.send(CommandNames.LOOK)
 
     def take_stones(self, inventory: dict[str, int], tiles = None):
         """Takes stones from the map until the player has all the stones needed to evolve."""
@@ -59,8 +60,9 @@ class Ai:
                 sucess = True
                 break
         if not sucess:
+            self.move_randomly()
             self.last_movement = time()
-            return self.move_randomly()
+            return
         if stone.value not in inventory:
             inventory[stone.value] = 0
         inventory[stone.value] += 1

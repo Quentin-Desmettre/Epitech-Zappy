@@ -47,7 +47,7 @@ class Reader:
             raise Exception("You died")
         if match(PossibleResponsesRegex.MESSAGE.value[0], msg):
             if msg.count(self.team) == 0 and randint(0, 3) != 0:
-                return # à remplacer pour les renvoyer aux autres
+                return
             if msg.count("incantation") > 0:
                 self.clean_broadcast_queue()
             self.broadcast_queue.put([msg, time()])
