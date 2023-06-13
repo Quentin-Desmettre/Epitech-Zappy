@@ -45,7 +45,7 @@ def elevate(self, send_cmd: bool = True, msg: str = None):
         my_print("Elevated to level %d !!!" % self.level)
         if self.level == 8:
             my_print("Congratulations, you won !!!")
-        if self.level == 3:
+        if self.level == 2:
             self.send(CommandNames.FORK)
     else:
         my_print("Error: could not elevate")
