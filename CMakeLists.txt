@@ -16,24 +16,36 @@ include_directories(include/gui)
 include_directories(include/server)
 include_directories(/usr/local/include)
 
-
 find_package(raylib QUIET)
+find_package(Boost COMPONENTS system filesystem QUIET)
 include_directories(${RAYLIB_INCLUDE_DIRS})
+
+if (NOT Boost_FOUND)
+    message(FATAL_ERROR "Please install boost!\nsudo apt install build-essential git cmake -y\nsudo apt install libboost-all-dev -y")
+endif ()
+
+if (NOT raylib_FOUND)
+    message(FATAL_ERROR "Please install raylib!\nsudo apt install libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev -y\ngit clone https://github.com/raysan5/raylib.git raylib\ncd raylib\nmkdir build && cd build\ncmake -DBUILD_SHARED_LIBS=ON ..\nmake\nsudo make install\ncd ../../\nrm -rf raylib")
+endif ()
 
 add_executable(zappy_gui
         src/gui/Map.cpp
         src/gui/Mateyak/Camera.cpp
+        src/gui/Mateyak/Model3D.cpp
         src/gui/Mateyak/Window.cpp
         src/gui/Mateyak/Sprite.cpp
         src/gui/Mateyak/Triangle.cpp
         src/gui/Mateyak/Matrix.cpp
         src/gui/Mateyak/Shaders.cpp
         src/gui/venom.cpp
+        src/gui/Informations/Player.cpp
+        src/gui/Informations/Team.cpp
+        src/gui/Informations/ServerInformations.cpp
         src/gui/Perlin/Perlin.cpp
         src/gui/Client/receive.cpp
         src/gui/Client/client.cpp
+        src/gui/Client/setter.cpp
         src/gui/Client/client_loop.cpp
-        src/gui/Client/send.cpp
         src/gui/Utils3d.cpp
         src/gui/main.cpp
 )
@@ -88,7 +100,9 @@ add_executable(zappy_server
         src/server/utility/garbage_collector/garbage_handling.c
         src/server/utility/garbage_collector/my_malloc.c
         src/server/utility/strings.c)
+
 find_library(MATH_LIBRARY m)
+
 if(MATH_LIBRARY)
     target_link_libraries(zappy_server PUBLIC ${MATH_LIBRARY})
 endif()

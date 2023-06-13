@@ -1,37 +1,24 @@
 #include <math.h>
 #include "venom.hpp"
-#define BALL_NB 30
-#define FLOAT_NB (float)BALL_NB
+#define FLOAT_NB (float)circlePerLeg
 #define DIS 3.f
 #define DIS2 2.5f
-#define PRECI 4
-#define LEG 5
-#include <cfloat>
 #include "Utils3d.hpp"
 #include "Mateyak/Vector.hpp"
 #include "Perlin/Perlin.hpp"
-#include "Map.hpp"
 
-Venom::Venom()
+int Venom::nbLegs = 5;
+int Venom::circlePerLeg = 30;
+int Venom::pointPerCircle = 4;
+std::vector<Mateyak::Vec3f> Venom::pos_feet;
+
+Venom::Venom(Mateyak::Vec2f pos, Mateyak::Vec2f mapSize, Color clr): mapSize(mapSize),
+    _clr(clr)
 {
-    for (int i = 0; i < 5000; i++) {
-        Mateyak::Vec3f ps;
-        float x = GetRandomValue(0, 100) / 100.0;
-        float y = GetRandomValue(0, 100) / 100.0;
-        ps.x = x + i % 100 - 50;
-        ps.z = (y + i / 100 - 50) * 2 + 50;
-        ps.y = 0;
-        pos_feet.push_back(ps);
-    }
-    models = LoadModelFromMesh(mesh);
-    pos = {2.5, 0.75, 2.5};
-
-    Image checked = GenImageChecked(2, 2, 1, 1, RED, BLUE);
-    texture = LoadTextureFromImage(checked);
-    UnloadImage(checked);
-    models.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+    rnd = {rand() % 100 / 100.f - 0.5f, 0, rand() % 100 / 100.f - 0.5f};
+    _pos = {(pos.x * 10 + 5) / 3.F, 0.75, (pos.y * 10 + 5) / 3.F};
+    _nextPosition = _pos;
 }
-
 
 Venom::~Venom()
 {
@@ -40,86 +27,169 @@ Venom::~Venom()
 
 void Venom::Draw_leg(Mateyak::Vec3f leg, int seed)
 {
-    Mateyak::Vec3f vec(pos.x - leg.x, 0, pos.z - leg.z);
+    Mateyak::Vec3f vec(_pos.x - leg.x, 0, _pos.z - leg.z);
+    float len = 100 - (c_pos - leg).len();
     vec = -vec;
-    int nb = BALL_NB;
-    std::vector<Mateyak::Vec3f> points;
-    float dis = (pos - leg).len();
+    int nb = circlePerLeg;
+    std::vector<Mateyak::Vec3f> center;
+    std::vector<Mateyak::Vec3f> angles;
+    center.reserve(nb + 1);
+    angles.reserve(nb + 1);
+    float dis = (_pos - leg).len();
     vec.x /= FLOAT_NB;
     vec.z /= FLOAT_NB;
     if (dis > DIS2)
-        nb = BALL_NB * (1 - (dis - DIS2) / (DIS - DIS2));
-    Mateyak::Vec3f last = pos;
-    for (int j = 0; j < LEG; j++) {
-        last = pos;
-        last.y = sinf((-1 / FLOAT_NB * PI * 4 + PI) / 5.0);
-        Mateyak::Vec3f tmp = pos;
+        nb = circlePerLeg * (1 - (dis - DIS2) / (DIS - DIS2));
+    Mateyak::Vec3f last = _pos;
+    last.y = sinf((-1 / FLOAT_NB * PI * 4 + PI) / 5.0);
+    Mateyak::Vec3f tmp = _pos;
+    for (int i = 0; i <= nb; i++) {
+        tmp += vec;
+        tmp.y = sinf((i / FLOAT_NB * PI * 4 + PI) / 5.0f);
+
+        center.push_back(tmp);
+        angles.push_back(tmp - last);
+        last = tmp;
+    }
+
+    if (center.size() <= static_cast<size_t>(pointPerCircle))
+        return;
+
+    std::vector<Mateyak::Vec3f> points;
+    points.reserve(pointPerCircle * center.size());
+
+    for (int h = 0; h < nbLegs; h++) {
         points.clear();
-        for (int i = 0; i <= nb; i++) {
-            tmp += vec;
-            Mateyak::Vec3f noise = {0, 0, 0};
-            tmp.y = sinf((i / FLOAT_NB * PI * 4 + PI) / 5.0);
+        Mateyak::Vec3f noise = {0, 0, 0};
 
-            Mateyak::Vec3f angle = tmp - last;
-            noise.x = Perlin::Noise2D(seed * j, i / (FLOAT_NB / 12.5), seed, 1) * ((i / FLOAT_NB + 0.5) / 2.0);
-            noise.z = Perlin::Noise2D(seed * j * 2, i / (FLOAT_NB / 12.5), seed, 1) * ((i / FLOAT_NB + 0.5) / 2.0);
-            Utils::generateCirclePoints(last + noise / 2, angle, ((nb - i) / FLOAT_NB) / ((j + 1) * 3), PRECI, points);
-            last = tmp;
+        for (size_t i = 0; i < center.size(); i++) {
+            noise.x = Perlin::Noise2D(seed * h, i / (FLOAT_NB / 12.5), seed, 1) * ((i / FLOAT_NB + 0.5) / 2.0) / 2;
+            noise.z = Perlin::Noise2D(seed * h * 2, i / (FLOAT_NB / 12.5), seed, 1) * ((i / FLOAT_NB + 0.5) / 2.0) / 2;
+            Utils::generateCirclePoints(center[i] + noise, angles[i], ((nb - i) / FLOAT_NB) / ((h - 1) * 3), pointPerCircle, points);
         }
-
-        if (points.size() <= PRECI)
-            return;
-        std::vector<Mateyak::Triangle> triangles = Utils::connectPointsWithTriangles(points, PRECI);
-        int line = triangles.size() / PRECI;
+        std::vector<Mateyak::Triangle> triangles = Utils::connectPointsWithTriangles(points, pointPerCircle);
         if (triangles.empty())
             return;
-        for (int i = 0; i < PRECI; i++) {
-            for (int j = 0; j < line; j++) {
-                Mateyak::Triangle tr = triangles[j * PRECI + i];
-                Mateyak::Window::draw(tr, Color{u_char(80 - (j * 80) / line), 0, 0, 255});
-            }
+        for (size_t i = 0; i < triangles.size(); i++) {
+            Mateyak::Triangle tr = triangles[i];
+            float clr_mul = 1 - (float)i / (float)triangles.size();
+            Mateyak::Window::draw(tr, Color{u_char(_clr.a * clr_mul), u_char(_clr.g * clr_mul), u_char(_clr.b * clr_mul), (unsigned char)(2.55 * len)});
         }
     }
 }
-
 
 void Venom::move_ven(Camera camera)
 {
-    float norm = 0;
-    Vector3 vec;
+    Mateyak::Vec3f vec;
+
     if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_RIGHT)) {
         vec = {camera.position.x - camera.target.x, 0, camera.position.z - camera.target.z};
-        norm = sqrt(pow(vec.x, 2) + pow(vec.z, 2));
+        vec = vec.Normalize();
+        vec = vec / 10.0;
     }
     if (IsKeyDown(KEY_UP)) {
-        pos.x -= vec.x / norm / 20.0;
-        pos.z -= vec.z / norm / 20.0;
+        _pos.x -= vec.x;
+        _pos.z -= vec.z;
     }
     if (IsKeyDown(KEY_DOWN)) {
-        pos.x += vec.x / norm / 20.0;
-        pos.z += vec.z / norm / 20.0;
+        _pos.x += vec.x;
+        _pos.z += vec.z;
     }
     if (IsKeyDown(KEY_RIGHT)) {
-        pos.x += vec.z / norm / 20.0;
-        pos.z -= vec.x / norm / 20.0;
+        _pos.x += vec.z;
+        _pos.z -= vec.x;
     }
     if (IsKeyDown(KEY_LEFT)) {
-        pos.x -= vec.z / norm / 20.0;
-        pos.z += vec.x / norm / 20.0;
+        _pos.x -= vec.z;
+        _pos.z += vec.x;
     }
 }
 
-void Venom::draw_ven(int seed)
+void Venom::move_ven()
 {
+    float norm = 0;
+    Vector3 vec;
+
+    if (_pos == _nextPosition) {
+        return;
+    }
+    vec = {_nextPosition.x - _pos.x, _pos.y, _nextPosition.z - _pos.z};
+    if (std::abs(vec.x) > 3.334 || std::abs(vec.z) > 3.334) {
+        vec = {-vec.x, vec.y, -vec.z};
+    }
+    norm = sqrt(pow(vec.x, 2) + pow(vec.z, 2));
+
+    if (norm < 0.1) {
+        _pos = _nextPosition;
+    } else {
+        _pos.x += vec.x / norm / 20.f;
+        _pos.z += vec.z / norm / 20.f;
+    }
+    if (_pos.x > mapSize.x * 10 / 3) {
+        _pos.x -= mapSize.x * 10 / 3;
+    }
+    if (_pos.x < 0) {
+        _pos.x += mapSize.x * 10 / 3;
+    }
+    if (_pos.z > mapSize.y * 10 / 3) {
+        _pos.z -= mapSize.y * 10 / 3;
+    }
+    if (_pos.z < 0) {
+        _pos.z += mapSize.y * 10 / 3;
+    }
+}
+
+void Venom::draw_ven(int seed, const Mateyak::Camera& camera)
+{
+    c_pos = camera._position;
+    _pos = _pos - rnd;
     for (int i = 0; i < 5000; i++) {
-        time = GetTime();
-        if ((pos - pos_feet[i]).len() < DIS) {
+        if ((_pos - pos_feet[i]).len() < DIS && (c_pos - pos_feet[i]).len() < 100) {
+            if (Utils::differenceAngle((c_pos - camera._target).Normalize(), (c_pos - pos_feet[i]).Normalize()) > 45)
+                continue;
             Draw_leg(pos_feet[i], seed + i * 1000);
         }
     }
+    _pos = _pos + rnd;
 }
 
 Mateyak::Vec3f Venom::getPos() const
 {
-    return pos;
+    return _pos;
+}
+
+Mateyak::Vec3f &Venom::getPosition()
+{
+    return _pos;
+}
+
+void Venom::setPos(const Mateyak::Vec3f &pos)
+{
+    _nextPosition = {(pos.x * 10 + 5) / 3.F, _pos.y, (pos.y * 10 + 5) / 3.F};
+}
+
+void Venom::fpsHandler() {
+    int fps = GetFPS();
+    if (fps < 60) {
+        if (nbLegs > 1) {
+            nbLegs--;
+        } else if (pointPerCircle > 3) {
+            pointPerCircle--;
+        } else if (circlePerLeg > 6) {
+            circlePerLeg--;
+        }
+    }
+    if (fps > 60) {
+        if (circlePerLeg < 15) {
+            circlePerLeg++;
+        } else if (nbLegs < 3) {
+            nbLegs++;
+        } else if (pointPerCircle < 4) {
+            pointPerCircle++;
+        } else if (circlePerLeg < 30) {
+            circlePerLeg++;
+        } if (nbLegs < 5) {
+            nbLegs++;
+        }
+    }
 }

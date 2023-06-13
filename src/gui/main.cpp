@@ -1,4 +1,3 @@
-// #include "Include.hpp"
 #include <raylib.h>
 #include "venom.hpp"
 #include "Mateyak/Window.hpp"
@@ -8,153 +7,220 @@
 #include "Mateyak/Shaders.hpp"
 #include "Client/client.hpp"
 #include "Mateyak/Vector2.hpp"
-#include <boost/asio.hpp>
+#include "Mateyak/Model3D.hpp"
+#include "Graphic.hpp"
+#include "Utils3d.hpp"
 
-class Player
+
+void Graphic::drawTeams()
 {
-    enum STATE {INCANTING, DEAD, EGG, BROADCASTING, DROPING, TAKING};
+    int numberTeams = (_teamNumber / 4) + (_teamNumber % 4 > 0 ? 1 : 0);
+    int x = _windowWidth - _boxSize - (numberTeams * 20);
+    int y = 20;
 
-    public:
-        Player() = default;
-        ~Player() = default;
-    private:
-        Mateyak::Vec2f position;
-        Mateyak::Vec2f nextPosition;
-        int level;
-        int inventory[7];
-        int orientation;
-        int team;
-        STATE state;
-        int eggTime;
-        std::string broadcastMessage;
-};
+    Mateyak::Window::drawBox(x - 10, y - 10, _boxSize + numberTeams * 20, 4 * 20 + 20, {0, 39, 97, 110});
+    for (auto &it : _serverInformations.getTeams()) {
+        Mateyak::Window::draw(it.getName(), x, y, 15, it.getColor());
+        if (y == 80) {
+            x += _maxSize + 20;
+            y = 20;
+        } else
+            y += 20;
+    }
+}
 
-
-class ServerInformations
+void Graphic::drawBroadCastMessage(Mateyak::Window &win)
 {
-    public:
-        ServerInformations() = default;
-        ~ServerInformations() = default;
-    private:
-        Mateyak::Vec2f mapSize;
-        std::vector<std::vector<int>> map;
-        std::vector<std::string> teams;
-        std::vector<Player> players;
-};
+    float boxPosY = _windowHeight - _windowHeight / 3 - 30;
+    float boxWidth = _windowWidth / 3 - 20;
+    float boxHeight = _windowHeight / 3 + 20;
 
-void graph()
+    Mateyak::Window::drawBox(10, boxPosY, boxWidth, boxHeight, {0, 39, 97, 94});
+
+    if (_charSize.x == 0 && _charSize.y == 0)
+        _charSize = MeasureTextEx(win._font, "Z", 15, 1);
+
+    int maxCharInLine;
+    float maxLineNumber = (boxHeight) / (_charSize.y + 5);
+    float yStart = _windowHeight - 30;
+    std::vector<Message> &mes = _serverInformations.getBroadCastMessage();
+    for (int index = mes.size() - 1; index >= 0; index--) {
+        if (!mes[index]._formated) {
+            maxCharInLine = boxWidth / _charSize.x;
+            mes[index].FormatMessage(maxCharInLine);
+        }
+        for (int i = mes[index]._lines.size() - 1; i >= 0; i--) {
+            if (i == 0) {
+                Mateyak::Window::draw(mes[index]._name + ":", 20, yStart, 15, mes[index]._color);
+                Mateyak::Window::draw(mes[index]._lines[i], 20 + ((mes[index]._name.size() + 1) * _charSize.x), yStart, 15, {255, 255, 255, 255});
+            } else {
+                Mateyak::Window::draw(mes[index]._lines[i], 20, yStart, 15, {255, 255, 255, 255});
+            }
+            yStart -= 20;
+            maxLineNumber--;
+            if (maxLineNumber <= 0)
+                return;
+        }
+    }
+}
+
+void Graphic::getTeamsPlace(Mateyak::Window &win)
 {
-    Mateyak::Window win(1920 / 2, 1080 / 2, "Zappy", 500);
+    for (auto &it : _serverInformations.getTeams()) {
+        it.getName();
+        Vector2 size = MeasureTextEx(win._font, it.getName().c_str(), 15, 1);
+        it.width = size.x;
+        it.height = size.y;
+        if (size.x > _maxSize)
+            _maxSize = size.x;
+    }
+    _teamNumber = _serverInformations.getTeams().size();
+    _boxSize = _maxSize * (_teamNumber / 4) + (_teamNumber % 4 > 0 ? _maxSize : 0);
+}
+
+void Graphic::loop(Mateyak::Vec2f mapSize)
+{
+    _windowWidth = 1920 / 1.3;
+    _windowHeight = 1080 / 1.3;
+    Mateyak::Window win(_windowWidth, _windowHeight, "Zappy", 400);
     int seed = rand();
     Mateyak::Camera cam({5.0f, 5.0f, 5.0f}, {0.0f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, 45.0f);
-    Model sky = LoadModelFromMesh(GenMeshSphere(200, 8, 8));
+    Map map(mapSize * 10, 0.5);
+    Mateyak::Model3D flat(GenMeshPoly(10, 10000.0f), Mateyak::Vec3f{-500, -1, -500}, 1.0f, BLACK);
+    Mateyak::Shaders shader("src/gui/shader/base_lighting.vs", "src/gui/shader/test.fs");
 
-    Map map({400, 400}, 0.5);
-    Mateyak::Sprite mapMdl = map.getMap();
-    Mateyak::Sprite color = map.getColor();
-    Venom ven;
-    Mesh mesh = GenMeshHeightmap(mapMdl, (Vector3){100, 1, 100});
-    Model model = LoadModelFromMesh(mesh);
-    model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = color;
-    Model flat = LoadModelFromMesh(GenMeshPoly(10, 10000.0f));
-    Mateyak::Shaders shader("shader/base_lighting.vs", "shader/fog.fs");
-    shader.setUniform("fogDensity", 0.02f);
+    shader.setUniform("fogDensity", 0.015f);
+    shader.setUniform("lightsPos", {mapSize.x * 5.f / 3.f, 20.0f, mapSize.y * 5.f / 3.f});
+    shader.setUniform("lightsColor", {0.5f, 0.5f, 0.5f});
+    shader.setUniform("lightsEnabled", 1);
     int viewPos = shader.getUniformLocation("viewPos");
-    flat.materials[0].shader = shader;
-    model.materials[0].shader = shader;
+    map.setShader(shader);
+    bool shaderEnabled = true;
+    bool drawGrid = false;
+    shader.setUniform("shaderEnabled", shaderEnabled);
+
+    _serverInformations.startComputing();
+    getTeamsPlace(win);
+    _serverInformations.endComputing();
+
     while (!WindowShouldClose()) {
+        if (IsKeyPressed(KEY_F1)) {
+            shaderEnabled = !shaderEnabled;
+            shader.setUniform("shaderEnabled", shaderEnabled);
+        }
+        if (IsKeyPressed(KEY_F2)) {
+            drawGrid = !drawGrid;
+        }
         shader.setUniform(viewPos, cam._position);
-        ven.move_ven(cam.getRayCam());
         cam.Update();
         win.startDrawing();
         ClearBackground(Color{255 / 10, 255 / 20, 255 / 20, 255});
         win.begin3D(cam);
-        BeginShaderMode(shader);
-        DrawModel(model, Vector3{-50, -0.5, -50}, 1.0f, WHITE);
-        DrawModel(sky, Vector3{0, 0, 0}, 1.0f, WHITE);
-        DrawModel(flat, Vector3{-500, -1, -500}, 1.0f, BLACK);
-        EndShaderMode();
-        ven.draw_ven(seed);
-        //DrawGrid(30, 10/3.f);
+        Mateyak::Window::draw(map);
+        Mateyak::Window::draw(flat);
+        Venom::fpsHandler();
+        _serverInformations.startComputing();
+        map.update(_serverInformations);
+        for (auto &it : _serverInformations.getPlayers()) {
+            it->ven.draw_ven(seed, cam);
+            _serverInformations.updatePlayer(it);
+        }
+        if (drawGrid) {
+            Utils::drawGrid(mapSize, 10 / 3.F, {0, 0, 0});
+        }
         win.end3D();
         DrawFPS(10, 10);
+        drawTeams();
+        drawBroadCastMessage(win);
+        _serverInformations.endComputing();
         win.endDrawing();
     }
 }
 
-void tcpClient()
+class ErrorHandling {
+    public:
+        class Error : public std::exception {
+            public:
+                Error(std::string const &message) : _message(message) {}
+                const char *what() const noexcept override { return _message.c_str(); }
+            private:
+                std::string _message;
+        };
+        void parse();
+        ErrorHandling(int ac, char **av);
+        std::string getPort() const;
+        std::string getIp() const;
+        ~ErrorHandling() = default;
+    private:
+        int _ac;
+        char **_av;
+        std::string _port;
+        std::string _ip;
+};
+
+ErrorHandling::ErrorHandling(int ac, char **av) : _ac(ac), _av(av)
 {
-    // Create an I/O context
-    boost::asio::io_context io_context;
-
-    // Create a TCP resolver
-    boost::asio::ip::tcp::resolver resolver(io_context);
-
-    // Resolve the server address and port
-    boost::asio::ip::tcp::resolver::results_type endpoints =
-            resolver.resolve("localhost", "4242");
-
-    // Create a TCP socket
-    boost::asio::ip::tcp::socket socket(io_context);
-
-    // Connect to the server
-    boost::asio::connect(socket, endpoints);
-
-    std::string message = "GRAPHIC\n";
-    boost::asio::write(socket, boost::asio::buffer(message));
-
-    char response[1024];
-    size_t bytesReceived = socket.read_some(boost::asio::buffer(response));
-
-    std::string buf;
-    bytesReceived = 1024;
-    while (bytesReceived == 1024) {
-        bzero(response, 1024);
-        bytesReceived = socket.read_some(boost::asio::buffer(response));
-        buf += response;
-    }
-    std::cout << "Server response: " << buf << std::endl;
+    if (!(ac == 3 || ac == 5))
+        throw Error("Invalid number of arguments");
 }
 
+void ErrorHandling::parse()
+{
+    for (int i = 1; i < _ac; i++) {
+        if (std::string(_av[i]) == "-p") {
+            if (i + 1 >= _ac)
+                throw Error("Port not defined after -p");
+            _port = _av[i + 1];
+            i++;
+        }
+        else if (std::string(_av[i]) == "-h") {
+            if (i + 1 >= _ac)
+                throw Error("Ip not defined after -h");
+            _ip = _av[i + 1];
+            i++;
+        }
+        else {
+            std::string test(_av[i]);
+            throw Error(test + std::string(" is not a valid argument"));
+        }
+    }
+    if (_port.empty())
+        throw Error("Port not defined");
+}
+
+std::string ErrorHandling::getPort() const
+{
+    return _port;
+}
+
+std::string ErrorHandling::getIp() const
+{
+    if (_ip.empty())
+        return std::string("localhost");
+    return _ip;
+}
 
 int main(int ac, char **av)
 {
-    try
-    {
-        //tcpClient();
-        graph();
-    }
-    catch (const std::exception& ex)
-    {
+    Graphic graphic;
+
+    try {
+        ErrorHandling errorHandling(ac, av);
+        errorHandling.parse();
+        GuiClient client(graphic.getServerInformations(), errorHandling.getIp(), errorHandling.getPort());
+
+        if (!client.CheckValidServer())
+            return 84;
+        Mateyak::Vec2f mapSize = graphic.getServerInformations().getMapSize();
+
+       std::thread t(&GuiClient::compute, &client);
+        graphic.loop(mapSize);
+        client.stop();
+        t.join();
+
+    } catch (const std::exception& ex) {
         std::cerr << "Exception: " << ex.what() << std::endl;
     }
 
     return 0;
-    std::vector<std::string> args(av, av + ac);
-
-    if (args.size() > 1 && args.size() < 5) {
-        std::cerr << "USAGE: ./zappy_ai -p port -h machine" << std::endl;
-        std::cerr << "\tport is the port number" << std::endl;
-        std::cerr << "\tmachine is the name of the machine; localhost by default" << std::endl;
-        return 84;
-    }
-
-    //std::cout << "Awaiting connection" << std::endl;
-    //Client client("127.0.0.1", 4242);
-//
-    //if (client.connect_client()) {
-    //    std::cout << "Not connected to a nice server" << std::endl;
-    //    return 84;
-    //}
-    //client.receive_message();
-//
-    //std::cout << "Game can start now" << std::endl;
-    //std::thread t1(computeClient, std::ref(client));
-    //t1.join();
-    return 0;
 }
-
-//(bct) ([0-9]+ ){8}[0-9]+
-//(msz) [0-9]+ [0-9]+
-//(sgt) [0-9]+
-//(tna) [a-zA-Z0-9]+

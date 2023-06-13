@@ -16,6 +16,7 @@ Mateyak::Camera::Camera(Vec3f position, Vec3f target, Vec3f up, float fov, int m
     _cam.up = _up;
     _cam.fovy = _fov;
     _cam.projection = CAMERA_PERSPECTIVE;
+    _state = 1;
 
     _oldCamPos = {static_cast<float>(GetMouseX()), static_cast<float>(GetMouseY())};
     DisableCursor();
@@ -46,14 +47,24 @@ void Mateyak::Camera::RecalculateCamTarget(Mateyak::Vec2f mouseOffset) {
 
 void Mateyak::Camera::Update()
 {
+    if (IsKeyPressed(KEY_F3)) {
+        _state = !_state;
+        if (_state == 1)
+            DisableCursor();
+        else
+            EnableCursor();
+    }
+
     Vector2 tmp = GetMousePosition();
     _camPos = {tmp.x, tmp.y};
     Vec2f mouseOffset = _camPos - _oldCamPos;
     const float mouseSensitivity = 0.1f;
     mouseOffset = mouseOffset * mouseSensitivity;
 
-    RecalculateCamTarget(mouseOffset);
-    RecalculateCamPos();
+    if (_state == 1) {
+        RecalculateCamTarget(mouseOffset);
+        RecalculateCamPos();
+    }
     _oldCamPos = _camPos;
 }
 

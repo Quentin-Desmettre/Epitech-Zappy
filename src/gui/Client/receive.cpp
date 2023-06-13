@@ -7,29 +7,33 @@
 
 #include "Client/client.hpp"
 
-std::string Client::receive_message()
+std::string GuiClient::getInformations()
 {
-    fd_set readfds;
-    int max_sd = _sockfd;
+    char response[1024];
+    std::string buf;
+    size_t bytesReceived;
 
-    FD_SET(_sockfd, &readfds);
-    int activity = select(max_sd + 1, &readfds, NULL, NULL, NULL);
-    if (activity < 0)
-        std::cerr << "select error" << std::endl;
-    if (FD_ISSET(_sockfd, &readfds)) {
-        int readableSize = 0;
-
-        if (ioctl(_sockfd, FIONREAD, &readableSize) < 0) {
-            std::cerr << "ioctl error" << std::endl;
-            return "";
-        }
-        auto buffer = std::make_unique<char[]>(readableSize);
-        read(_sockfd, buffer.get(), readableSize);
-        return buffer.get();
-    }
-    return "";
+    do {
+        bzero(response, 1024);
+        bytesReceived = _socket.read_some(boost::asio::buffer(response));
+        for (size_t i = 0; i < bytesReceived; i++)
+            buf += response[i];
+    } while (bytesReceived == 1024);
+    return buf;
 }
-void Client::operator >>(std::string &str)
+
+std::vector<std::string> GuiClient::splitStrings(std::string str, std::string delimiter)
 {
-    str = receive_message();
+    size_t pos;
+    std::string token;
+    std::vector<std::string> res;
+
+    while ((pos = str.find(delimiter)) != std::string::npos) {
+        token = str.substr(0, pos);
+        res.push_back(token);
+        str.erase(0, pos + delimiter.length());
+    }
+    if (str.length() > 0)
+        res.push_back(str);
+    return res;
 }

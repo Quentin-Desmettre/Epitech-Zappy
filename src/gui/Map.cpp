@@ -10,32 +10,51 @@
 //
 
 #include "Map.hpp"
-
+#include "Mateyak/Window.hpp"
+#include "venom.hpp"
 
 Map::Map(Mateyak::Vec2f size, float zoom):
     _size(size),
     map(size),
     clr(size),
+    _rock("assets/rock.obj", Mateyak::Vec3f{0, 0, 0}, 0.3f, WHITE),
+    _ground(),
+    _food("assets/ham.obj", Mateyak::Vec3f{0, 0, 0}, 0.01f, WHITE),
     _zoom(zoom)
 {
     srand(time(NULL));
     generate();
     generateColor();
+    _food.setTexture({"assets/ham_text.png"});
+
+    _ground = GenMeshHeightmap(map, (Vector3){_size.x / 3, 1, _size.y / 3});
+    _ground.setPos({0, -0.5, 0});
+    _ground.setTexture(clr);
+
+    for (int i = 0; i < 5000; i++) {
+        Mateyak::Vec3f ps;
+        float x = GetRandomValue(0, 100) / 100.0;
+        float y = GetRandomValue(0, 100) / 100.0;
+        ps.x = x + i % 100;
+        ps.z = (y + i / 100) * 2;
+        ps.y = 0;
+        Venom::pos_feet.push_back(ps);
+    }
 }
 
 void Map::generate()
 {
     std::vector<char> pixels;
-    mpp.clear();
     int rng = rand();
+    mpp.clear();
     unsigned char noise = 0;
-    for (int i = 0; i < _size.x; i++)
-        for (int j = 0; j < _size.y; j++) {
+    for (int j = 0; j < _size.y; j++) {
+        for (int i = 0; i < _size.x; i++) {
             noise = ((Perlin::Noise2D(rng, i / _zoom, j / _zoom, 5)) + 1) * 127;
             noise = noise / 255.0 * 127;
             pixels.push_back(noise);
         }
-
+    }
     int max = 0;
     int min = 255;
     for (int i = 0; i < _size.x; i++)
@@ -47,7 +66,7 @@ void Map::generate()
         }
     for (int i = 0; i < _size.x; i++)
         for (int j = 0; j < _size.y; j++) {
-            pixels[i * 400 + j] = (pixels[i * _size.y + j] - min) / float(max - min) * 255;
+            pixels[i * _size.y + j] = (pixels[i * _size.y + j] - min) / float(max - min) * 255;
             color_u tmp;
             tmp.r = (255 - pixels[i * _size.y + j]);
             tmp.g = (255 - pixels[i * _size.y + j]);
@@ -56,6 +75,7 @@ void Map::generate()
             mpp.push_back(tmp.value);
         }
     map.setData(mpp.data());
+
 }
 
 unsigned char Map::randomClr(int rand, int i, int j, int prop)
@@ -79,9 +99,9 @@ void Map::generateColor()
     tmp.a = 255;
     for (int i = 0; i < _size.x; i++)
         for (int j = 0; j < _size.y; j++) {
-            tmp.r = Map::randomClr(rng, i, j, 1) / 2;
+            tmp.r = Map::randomClr(rng, i, j, 1) / 3;
             tmp.g = Map::randomClr(rng2, i, j, 2) / 3;
-            tmp.b = Map::randomClr(rng3, i, j, 4) / 4;
+            tmp.b = Map::randomClr(rng3, i, j, 4) / 3;
             colors.push_back(tmp.value);
         }
     clr.setData(colors.data());
@@ -101,47 +121,34 @@ Mateyak::Sprite Map::getColor() const
 {
     return clr;
 }
-//void set_map(Image &image, Image &color, int rng)
-//{
-//    char *pixels = new char[400 * 400];
-//    int *pixels_clr = new int[400 * 400];
-//    unsigned char noise = 0;
-//    image.format = PIXELFORMAT_UNCOMPRESSED_GRAYSCALE;
-//    image.mipmaps = true;
-//    color.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
-//    color.mipmaps = true;
-//    float zoom = 1.0;
-//    for (int i = 0; i < 400; i++)
-//        for (int j = 0; j < 400; j++) {
-//            noise = ((Perlin::Noise2D(rng, i / zoom, j / zoom, 5)) + 1) * 127;
-//            noise = noise / 255.0 * 127;
-//            pixels[i * 400 + j] = noise;
-//        }
-//    int max = 0;
-//    int min = 255;
-//    for (int i = 0; i < 400; i++)
-//        for (int j = 0; j < 400; j++) {
-//            if (pixels[i * 400 + j] > max)
-//                max = pixels[i * 400 + j];
-//            if (pixels[i * 400 + j] < min)
-//                min = pixels[i * 400 + j];
-//        }
-//    for (int i = 0; i < 400; i++)
-//        for (int j = 0; j < 400; j++) {
-//            pixels[i * 400 + j] = (pixels[i * 400 + j] - min) / float(max - min) * 255;
-//            noise = pixels[i * 400 + j];
-//            color_u tmp;
-//            tmp.value = 0;//rgba(121,4,235,255)
-//            tmp.r = 0;
-//            tmp.g = (255 - noise) / 255.0 * 255;
-//            tmp.b = (255 - noise) / 255.0 * 255;
-//            tmp.a = 255;
-//            pixels_clr[i * 400 + j] = (255) << 24 | tmp.value;
-//        }
-//    image.data = pixels;
-//    image.height = 400;
-//    image.width = 400;
-//    color.data = pixels_clr;
-//    color.height = 400;
-//    color.width = 400;
-//}
+
+const Mateyak::Model3D &Map::getGround() const
+{
+    return _ground;
+}
+
+void Map::setShader(const Mateyak::Shaders &shader) {
+    _ground.setShader(shader);
+    _rock.setShader(shader);
+    _food.setShader(shader);
+}
+
+void Map::update(const ServerInformations &infos) {
+    ZappyMap zpMap = infos.getMap();
+
+    for (auto &col : zpMap) {
+        for (auto &pos : col) {
+            for (auto &obj : pos) {
+                if (obj.type == 0) {
+                    _food.setPos({obj.pos.x * 10 / 3.f, 0, obj.pos.y * 10 / 3.f});
+                    Mateyak::Window::draw(_food);
+                    continue;
+                }
+                _rock.setColor(obj.color);
+                _rock.setPos({obj.pos.x * 10 / 3.f, 0, obj.pos.y * 10 / 3.f});
+                _rock.setScale(obj.scale);
+                Mateyak::Window::draw(_rock);
+            }
+        }
+    }
+}
