@@ -51,6 +51,7 @@ void ServerInformations::updatePlayer(std::unique_ptr<Player> &player)
     if (player->ven.getPos().y > 3.0) {
         removePlayer(player->getName());
     }
+    player->ven.setLevel(player->getLevel());
 }
 
 void ServerInformations::setMapSize(int x, int y)
