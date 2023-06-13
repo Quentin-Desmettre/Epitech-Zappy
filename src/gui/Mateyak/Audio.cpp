@@ -4,9 +4,9 @@
 
 #include "Mateyak/Audio.hpp"
 
-Mateyak::Audio::Audio(const Wave wave)
+Mateyak::Audio::Audio(AudioWave wave)
 {
-    _sound = LoadSoundFromWave(wave);
+    _sound = LoadSoundFromWave(wave.getWave());
 }
 
 Mateyak::Audio::~Audio()

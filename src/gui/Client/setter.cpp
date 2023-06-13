@@ -123,8 +123,10 @@ void GuiClient::PlayerDeath(std::vector<std::string> parameters)
 
 void GuiClient::PlayerIncantation(std::vector<std::string> parameters)
 {
+    _serverInformations.updateAudioAction(std::make_tuple(std::stoi(parameters[0]), std::stoi(parameters[1])), Mateyak::ELEVATIONSTART);
 }
 
 void GuiClient::PlayerIncantationEnd(std::vector<std::string> parameters)
 {
+    _serverInformations.updateAudioAction(std::make_tuple(std::stoi(parameters[0]), std::stoi(parameters[1])), Mateyak::ELEVATIONEND);
 }

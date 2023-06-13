@@ -173,6 +173,14 @@ void ServerInformations::endComputing()
     mutex.unlock();
 }
 
-void ServerInformations::updateAudioAction(short state, std::tuple<int, int> pos, enum action_type type)
+void ServerInformations::updateAudioAction(std::tuple<int, int> pos, enum Mateyak::action_type type)
 {
+    for (auto &action: audioAction) {
+        if (std::get<0>(action) == type) {
+            std::get<1>(action).emplace_back(std::get<0>(pos), std::get<1>(pos), std::make_unique<Mateyak::Audio>(Mateyak::AudioWave::getAudioWaveFromActionType(type)));
+            return;
+        }
+    }
+    std::tuple<short, std::vector<std::tuple<int, int, std::unique_ptr<Mateyak::Audio>>>> newAction = std::make_tuple(type, std::vector<std::tuple<int, int, std::unique_ptr<Mateyak::Audio>>>());
+    std::get<1>(newAction).emplace_back(std::get<0>(pos), std::get<1>(pos), std::make_unique<Mateyak::Audio>(Mateyak::AudioWave::getAudioWaveFromActionType(type)));
 }

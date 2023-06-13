@@ -12,19 +12,14 @@
 #include <array>
 #include <mutex>
 #include "Mateyak/Vector2.hpp"
+#include "Mateyak/Audio.hpp"
+#include "Mateyak/Wave.hpp"
 #include <algorithm>
 #include "Informations/Player.hpp"
 #include "Informations/Team.hpp"
 #include "Ressource.hpp"
 #include <memory>
 typedef std::vector<std::vector<std::vector<Ressource>>> ZappyMap;
-
-enum action_type {
-    BROADCAST,
-    ELEVATIONSTART,
-    ELEVATIONEND,
-    LEVELUP
-};
 
 class ServerInformations
 {
@@ -47,7 +42,7 @@ class ServerInformations
         void setPlayerInventory(std::string name, std::vector<int> inventory);
         void removePlayer(std::string name);
         void setPlayerDead(std::string name);
-        void updateAudioAction(short state, std::tuple<int, int> pos, enum action_type type);
+        void updateAudioAction(std::tuple<int, int> pos, enum Mateyak::action_type type);
 
         Mateyak::Vec2f getMapSize() const;
         ZappyMap getMap() const;
@@ -60,5 +55,5 @@ class ServerInformations
         std::vector<Team> teams;
         std::vector<std::unique_ptr<Player>> players;
         std::mutex mutex;
-        std::vector<std::tuple<short, std::vector<std::tuple<int, int, short>>>> audioAction;
+        std::vector<std::tuple<short, std::vector<std::tuple<int, int, std::unique_ptr<Mateyak::Audio>>>>> audioAction;
 };

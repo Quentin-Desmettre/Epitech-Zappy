@@ -7,12 +7,13 @@
 #include <raylib.h>
 #include <string>
 #include <memory>
+#include "Wave.hpp"
 
 namespace Mateyak
 {
     class Audio {
         public:
-            explicit Audio(Wave wave);
+            explicit Audio(AudioWave wave);
             ~Audio();
 
             void playSound();
