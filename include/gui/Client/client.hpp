@@ -43,4 +43,5 @@ class GuiClient
         boost::asio::ip::tcp::socket _socket;
         ServerInformations &_serverInformations;
         bool _loop = true;
+        std::string _buffer;
 };
