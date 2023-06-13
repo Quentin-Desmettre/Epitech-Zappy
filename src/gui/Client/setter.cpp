@@ -148,3 +148,59 @@ void GuiClient::PlayerExpulse(std::vector<std::string> parameters)
     // TODO: Verifier si le fait de le rendre mort est suffisant ou s'il faut vraiment l'expulser
     _serverInformations.setPlayerDead(name);
 }
+
+void GuiClient::PlayerIncantation(std::vector<std::string> parameters)
+{
+    if (parameters.size() < 3) {
+        std::cerr << "PlayerIncantationStart: invalid number of parameters" << std::endl;
+        return;
+    }
+
+    float X = std::stof(parameters[0]);
+    float Y = std::stof(parameters[1]);
+    int level = std::stoi(parameters[2]);
+
+    for (size_t i = 3; i < parameters.size(); i++) {
+        std::string name = parameters[i];
+
+        auto it = std::find_if(_serverInformations.getPlayers().begin(), _serverInformations.getPlayers().end(), [name](std::unique_ptr<Player> &player) {
+            return (*player).getName() == name;
+        });
+
+        if (it == _serverInformations.getPlayers().end())
+            continue;
+
+        // TODO: Besoin de check ca ?? Pourquoi y a X Y ?
+        if ((*it)->_position.x != X || (*it)->_position.y != Y)
+            continue;
+
+        _serverInformations.setIncantationLevel(name, level);
+        _serverInformations.setPlayerState(name, Player::STATE::INCANTING);
+    }
+}
+
+void GuiClient::PlayerIncantationEnd(std::vector<std::string> parameters)
+{
+    if (parameters.size() != 3) {
+        std::cerr << "PlayerIncantationEnd: invalid number of parameters" << std::endl;
+        return;
+    }
+
+    float X = std::stof(parameters[0]);
+    float Y = std::stof(parameters[1]);
+    int result = std::stoi(parameters[2]);
+
+    for (auto &it : _serverInformations.getPlayers()) {
+        if ((*it)._position.x != X || (*it)._position.y != Y)
+            continue;
+
+        if (result == 1) {
+            _serverInformations.setPlayerState((*it).getName(), Player::STATE::NONE);
+            _serverInformations.setPlayerLevel((*it).getName(), (*it).incantationLevel);
+            _serverInformations.setIncantationLevel((*it).getName(), -1);
+        } else {
+            _serverInformations.setPlayerState((*it).getName(), Player::STATE::NONE);
+            _serverInformations.setIncantationLevel((*it).getName(), -1);
+        }
+    }
+}

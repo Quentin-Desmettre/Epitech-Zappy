@@ -35,6 +35,7 @@ class Player
 
         Venom ven;
         Mateyak::Vec2f _position;
+        int incantationLevel = -1;
 
     private:
         int _level;

@@ -54,6 +54,7 @@ class ServerInformations
         void removePlayer(std::string name);
         void setPlayerDead(std::string name);
         void addBroadCastMessage(std::string name, std::string message);
+        void setIncantationLevel(std::string name, int level);
 
         Mateyak::Vec2f getMapSize() const;
         ZappyMap getMap() const;

@@ -219,3 +219,13 @@ void ServerInformations::endComputing()
 {
     mutex.unlock();
 }
+
+void ServerInformations::setIncantationLevel(std::string name, int level)
+{
+    for (auto &it : players) {
+        if (it->getName() == name) {
+            it->incantationLevel = level;
+            return;
+        }
+    }
+}
