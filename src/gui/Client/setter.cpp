@@ -136,3 +136,15 @@ void GuiClient::PlayerBroadcast(std::vector<std::string> parameters)
 
     _serverInformations.addBroadCastMessage(name, message);
 }
+
+void GuiClient::PlayerExpulse(std::vector<std::string> parameters)
+{
+    if (parameters.size() != 1) {
+        std::cerr << "PlayerExpulse: invalid number of parameters" << std::endl;
+        return;
+    }
+
+    std::string name = parameters[0];
+    // TODO: Verifier si le fait de le rendre mort est suffisant ou s'il faut vraiment l'expulser
+    _serverInformations.setPlayerDead(name);
+}
