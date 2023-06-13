@@ -122,6 +122,13 @@ void ServerInformations::addPlayer(std::string name, int x, int y, Player::ORIEN
             break;
         }
     }
+
+    for (auto &it : players) {
+        if (it->ven.getPos().x == x && it->ven.getPos().y == y && it->getState() == Player::STATE::EGGHATCHING) {
+            std::remove(players.begin(), players.end(), it), players.end();
+            break;
+        }
+    }
     if (!team_exist)
         throw std::runtime_error("Team doesn't exist");
     players.push_back(std::move(player));
