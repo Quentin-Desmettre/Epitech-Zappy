@@ -53,6 +53,8 @@ void GuiClient::NewPlayer(std::vector<std::string> parameters)
         return;
     }
     std::string name = parameters[0];
+    if (name[0] == '#')
+        name.erase(0, 1);
     int x = std::stoi(parameters[1]);
     int y = std::stoi(parameters[2]);
     Player::ORIENTATION orientation = static_cast<Player::ORIENTATION>(std::stoi(parameters[3]));
@@ -70,6 +72,8 @@ void GuiClient::MovePlayer(std::vector<std::string> parameters)
     }
 
     std::string name = parameters[0];
+    if (name[0] == '#')
+        name.erase(0, 1);
     int x = std::stoi(parameters[1]);
     int y = std::stoi(parameters[2]);
     Player::ORIENTATION orientation = static_cast<Player::ORIENTATION>(std::stoi(parameters[3]));
@@ -85,6 +89,8 @@ void GuiClient::PlayerLevel(std::vector<std::string> parameters)
     }
 
     std::string name = parameters[0];
+    if (name[0] == '#')
+        name.erase(0, 1);
     int level = std::stoi(parameters[1]);
 
     _serverInformations.setPlayerLevel(name, level);
@@ -98,6 +104,8 @@ void GuiClient::PlayerInventory(std::vector<std::string> parameters)
     }
 
     std::string name = parameters[0];
+    if (name[0] == '#')
+        name.erase(0, 1);
     int x = std::stoi(parameters[1]);
     int y = std::stoi(parameters[2]);
     std::cerr << "PlayerInventory: " << name << " " << x << " " << y << std::endl;
@@ -117,6 +125,8 @@ void GuiClient::PlayerDeath(std::vector<std::string> parameters)
     }
 
     std::string name = parameters[0];
+    if (name[0] == '#')
+        name.erase(0, 1);
     _serverInformations.setPlayerDead(name);
 }
 
@@ -128,6 +138,8 @@ void GuiClient::PlayerBroadcast(std::vector<std::string> parameters)
     }
 
     std::string name = parameters[0];
+    if (name[0] == '#')
+        name.erase(0, 1);
     parameters.erase(parameters.begin());
     std::string message = "";
     for (auto &it : parameters)
@@ -144,6 +156,66 @@ void GuiClient::PlayerExpulse(std::vector<std::string> parameters)
     }
 
     std::string name = parameters[0];
+    if (name[0] == '#')
+        name.erase(0, 1);
     // TODO: Verifier si le fait de le rendre mort est suffisant ou s'il faut vraiment l'expulser
     _serverInformations.setPlayerDead(name);
 }
+
+void GuiClient::PlayerFork(std::vector<std::string> parameters)
+{
+    /*
+    if (parameters.size() != 1) {
+        std::cerr << "PlayerFork: invalid number of parameters" << std::endl;
+        return;
+    }
+    std::string name = parameters[0];
+    if (name[0] == '#')
+        name.erase(0, 1);
+    _serverInformations.PlayerAddAEgg();
+     */
+}
+
+void GuiClient::EggLaying(std::vector<std::string> parameters)
+{
+    /*
+    if (parameters.size() != 4) {
+        std::cerr <<;
+        return;
+    }
+    _serverInformations.();
+*/
+     }
+
+void GuiClient::EggHatching(std::vector<std::string> parameters)
+{
+    /*
+    if (parameters.size() != 4) {
+        std::cerr <<;
+        return;
+    }
+    _serverInformations.();
+*/
+     }
+
+void GuiClient::EggConnection(std::vector<std::string> parameters)
+{
+    /*
+    if (parameters.size() != 4) {
+        std::cerr <<;
+        return;
+    }
+    _serverInformations.();
+*/
+     }
+
+void GuiClient::EggDeath(std::vector<std::string> parameters)
+{
+    /*
+    if (parameters.size() != 4) {
+        std::cerr <<;
+        return;
+    }
+    _serverInformations.();
+*/
+     }

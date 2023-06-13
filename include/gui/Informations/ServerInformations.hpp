@@ -62,7 +62,7 @@ class ServerInformations
         std::vector<Message> &getBroadCastMessage();
 
     private:
-        Mateyak::Vec2f mapSize {10, 10};
+        Mateyak::Vec2f mapSize {0, 0};
         ZappyMap map;
         std::vector<Team> teams{};
         std::vector<std::unique_ptr<Player>> players{};
