@@ -51,7 +51,6 @@ void GuiClient::parseOutput(std::string re) {
         while (ss >> token)
             parameters.push_back(token);
         if (commands.find(command) != commands.end()) {
-            std::cout << "command: " << command << std::endl;
             try {
                 std::invoke(commands[command], this, parameters);
             } catch (std::exception &e) {}

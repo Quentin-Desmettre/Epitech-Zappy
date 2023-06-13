@@ -39,6 +39,7 @@ void Message::FormatMessage(int maxLineSize)
 
 Message::Message(std::string name, std::string message, Color color) :
 _formated(false), _name(name), _message(message), _lines(), _color(color) {}
+
 void ServerInformations::updatePlayer(std::unique_ptr<Player> &player)
 {
     Player::STATE state = player->getState();
@@ -69,6 +70,10 @@ void ServerInformations::setTile(int x, int y, std::vector<int> values)
     int number_in_tile;
     int number_to_erase;
     int number_to_add;
+
+    if (y >= static_cast<int>(map.size()) || x >= static_cast<int>(map[y].size())) {
+        throw std::runtime_error("Error: setTile: x or y out of range");
+    }
 
     for (int i = 0; i < static_cast<int>(values.size()); i++) {
         number_in_tile = 0;
