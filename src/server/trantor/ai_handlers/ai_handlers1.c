@@ -17,13 +17,13 @@ ai_cmd_response_t ai_forward_handler(action_t *action UNUSED,
 
     remove_if(&tile->players, player, NULL, NULL);
     if (player->dir == NORTH)
-        player->y = (player->y - 1) % server->params.height;
+        player->y--;
     if (player->dir == SOUTH)
-        player->y = (player->y + 1) % server->params.height;
+        player->y++;
     if (player->dir == EAST)
-        player->x = (player->x + 1) % server->params.width;
+        player->x++;
     if (player->dir == WEST)
-        player->x = (player->x - 1) % server->params.width;
+        player->x--;
     tile = get_tile_by_pos(server->trantor->map, player->x, player->y);
     player->x = tile->x;
     player->y = tile->y;
@@ -42,31 +42,30 @@ ai_cmd_response_t ai_right_handler(action_t *action UNUSED,
 ai_cmd_response_t ai_left_handler(action_t *action UNUSED,
     server_t *server UNUSED, player_t *player)
 {
-    player->dir = (player->dir - 1) % 4;
+    printf("Old dir: %d\n", player->dir);
+    if (player->dir == NORTH)
+        player->dir = WEST;
+    else
+        player->dir = (player->dir - 1) % 4;
+    printf("New dir: %d\n", player->dir);
     return AI_CMD_RESPONSE_OK;
 }
 
 ai_cmd_response_t ai_look_handler(action_t *action UNUSED,
     server_t *server, player_t *player)
 {
-    char *response = my_malloc(2);
-    char *tmp = NULL;
+    char *response = my_strdup("[");
+    char *tile_content = NULL;
+    size_t len;
 
-    memset(response, 0, 2);
-    sprintf(response, "[");
     for (int i = 0; i != get_nb_tile(player->level); i++) {
-        tmp = get_tile_content(select_tile_for_look_command(server->trantor, player, i));
-        if (tmp != NULL) {
-            response = my_realloc(response, strlen(response) + strlen(tmp) + 2);
-            sprintf(response, "%s%s", response, tmp);
-        }
-        if (i != get_nb_tile(player->level) - 1) {
-            response = my_realloc(response, strlen(response) + 2);
-            sprintf(response, "%s,", response);
-        }
+        tile_content = get_tile_content(
+            select_tile_for_look_command(server->trantor, player, i));
+        response = str_concat_free(&len, 2, response, tile_content);
+        if (i != get_nb_tile(player->level) - 1)
+            str_append(&response, ", ");
     }
-    response = my_realloc(response, strlen(response) + 2);
-    sprintf(response, "%s]", response);
+    str_append(&response, "]");
     return AI_CMD_RESPONSE_TEXT(response);
 }
 

@@ -20,6 +20,7 @@ void send_to_clients_on_tile(server_t *server, char *mess, player_t *player)
         cli = clients->data;
         if (!cli->data || cli->data == player) {
             clients = clients->next;
+            printf("Skipped\n");
             continue;
         }
         if (cli->data->x == x && cli->data->y == y)

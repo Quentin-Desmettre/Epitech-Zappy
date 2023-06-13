@@ -93,14 +93,14 @@ def go_to_object(self, desired: Objects, tiles: list[list[str]] | None, loot_foo
         return False
     directions = get_object_path(desired, tiles)
     moved = []
-    if loot_food and desired is not Objects.FOOD and is_food_on_tile(tiles, moved):
-        self.send(CommandNames.TAKE, Objects.FOOD.value)
+    # if loot_food and desired is not Objects.FOOD and is_food_on_tile(tiles, moved):
+    #     self.send(CommandNames.TAKE, Objects.FOOD.value)
     for direction in directions:
         moved.append(direction)
         if self.send(direction) is None:
             return False
-        elif loot_food and desired is not Objects.FOOD and is_food_on_tile(tiles, moved):
-            self.send(CommandNames.TAKE, Objects.FOOD.value)
+        # elif loot_food and desired is not Objects.FOOD and is_food_on_tile(tiles, moved):
+        #     self.send(CommandNames.TAKE, Objects.FOOD.value)
     if len(directions) != 0 and desired != Objects.PLAYER:
         self.send(CommandNames.TAKE, desired.value)
     return len(directions) != 0

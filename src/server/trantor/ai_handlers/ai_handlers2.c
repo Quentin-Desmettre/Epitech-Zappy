@@ -24,7 +24,8 @@ ai_cmd_response_t ai_broadcast_handler(action_t *action,
             player_dest = client->data;
             direction = find_direction(player, player_dest, server->trantor);
             msg = my_asprintf("message %d, %s\n", direction, action->arg);
-            safe_write(client->fd, msg, strlen(msg));
+            printf("Sent %s to client %d\n", msg, client->fd);
+            safe_write_free(client->fd, msg);
         }
         list_client = list_client->next;
     } while (list_client != server->clients);
@@ -80,6 +81,7 @@ ai_cmd_response_t ai_eject_handler(action_t *action UNUSED,
         } else
             players = players->next;
     }
+    // TODO: delete eggs
     notify_gui(server, EXPULSION, player->id);
     return AI_CMD_RESPONSE_OK;
 }

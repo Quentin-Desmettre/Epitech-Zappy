@@ -22,7 +22,7 @@ static char *gui_mess_ai_connected(server_t *server, player_t *player)
     size_t msg_len = strlen(msg);
 
     str_append_free(&msg, &msg_len, gui_tiles_content_handler(server, "mct"));
-    str_append_free(&msg, &msg_len, my_strdup("\n"));
+    str_append(&msg, "\n");
     return msg;
 }
 
@@ -37,7 +37,7 @@ void log_ai(client_t *cli, server_t *server, const char *cmd, team_t *team)
         team->eggs--;
         str_append_free(&msg, &msg_len, get_gui_message(EGG_HATCHED,
             (int)(long)team->egg_numbers->data));
-        str_append_free(&msg, &msg_len, my_strdup("\n"));
+        str_append(&msg, "\n");
         remove_node(&team->egg_numbers, 0, free);
     } else
         team->available_slots--;

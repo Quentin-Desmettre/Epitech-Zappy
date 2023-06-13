@@ -73,15 +73,11 @@ map_tile_t *get_tile_by_pos(dim_list_t *map, int x, int y)
 
 char *get_tile_content(map_tile_t *tile)
 {
-    char *content = "";
-    char *tmp = NULL;
-    list_t *tmp_list = tile->players;
+    UNUSED size_t len;
+    char *players = get_list_players(tile->players);
 
-    tmp = get_list_players(tmp_list);
-    if (tmp != NULL)
-        content = my_asprintf("%s%s ", content, tmp);
-    tmp = get_list_ressources(tile->resources);
-    if (tmp != NULL)
-        content = my_asprintf("%s%s", content, tmp);
-    return content;
+    if (*players)
+        return str_concat_free(&len, 3, players, my_strdup(" "),
+                               get_list_ressources(tile->resources));
+    return get_list_ressources(tile->resources);
 }

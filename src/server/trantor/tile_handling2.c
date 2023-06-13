@@ -43,19 +43,15 @@ map_tile_t *select_tile_for_look_command(trantor_t *trantor, player_t *player, i
 
 char *get_list_players(list_t *players)
 {
-    char *response = NULL;
-    char *tmp = NULL;
+    char *response = my_calloc(1, 1);
     list_t *tmp_list = players;
     int count = list_size(players);
 
     for (int i = 0; i != count; i++) {
-        tmp = " player";
-        if (response != NULL) {
-            response = my_realloc(response, strlen(response) + strlen(tmp) + 1);
-        } else {
-            response = my_realloc(response, strlen(tmp) + 1);
-        }
-        sprintf(response, "%s%s", response, tmp);
+        if (*response)
+            str_append(&response, " player");
+        else
+            str_append(&response, "player");
         tmp_list = tmp_list->next;
     }
     return response;
@@ -63,11 +59,15 @@ char *get_list_players(list_t *players)
 
 char *get_list_ressources(int ressources[NB_RESOURCE])
 {
-    char *response = "";
+    char *response = my_calloc(1, 1);
+    char *tmp = NULL;
 
     for (int i = 0; i < NB_RESOURCE; i++) {
-        if (ressources[i] != 0)
-            response = my_asprintf("%s%s %d ", response, ressources_names[i], ressources[i]);
+        for (int j = 0; j < ressources[i]; j++) {
+            tmp = my_asprintf("%s%s%s", response, *response ? " " : "", ressources_names[i]);
+            my_free(response);
+            response = tmp;
+        }
     }
     return response;
 }
@@ -78,6 +78,8 @@ int find_direction(player_t *from, player_t *to, trantor_t *trantor)
     double angle;
     int dir[4] = {0, 90, 180, 270};
 
+    if (from == to)
+        return 0;
     vect[0] = (abs(from->x - to->x) > (trantor->width / 2)) ? ((from->x - to->x) - trantor->width) : (from->x - to->x);
     vect[1] = (abs(from->y - to->y) > (trantor->height / 2)) ? ((from->y - to->y) - trantor->height) : (from->y - to->y);
     angle = atan2(vect[1], vect[0]) * (180 / M_PI);

@@ -8,6 +8,8 @@ zappy_gui
 a.out
 cmake-build-debug
 .idea
+__pycache__
+out
 build
 .DS_Store
 test.sh

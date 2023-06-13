@@ -51,7 +51,8 @@ char *gui_tiles_content_handler(server_t *server, const char *cmd)
         for (int x = 0; x < server->params.width; x++) {
             tmp = get_tile_content_str(server, x, y);
             str_append_free(&answer, &len, tmp);
-            str_append_free(&answer, &len, my_strdup("\n"));
+            str_append(&answer, "\n");
+            len++;
         }
     }
     answer[len - 1] = '\0';
