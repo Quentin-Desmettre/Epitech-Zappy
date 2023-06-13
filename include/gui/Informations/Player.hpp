@@ -23,6 +23,7 @@ class Player
         ~Player() = default;
 
         std::string getName() const;
+        const Team &getTeam() const;
         void setPos(int x, int y);
         void setOrientation(Player::ORIENTATION orientation);
         void setState(STATE state);
@@ -30,6 +31,7 @@ class Player
         void setInventory(std::vector<int> inventory);
 
         STATE getState() const;
+        int getLevel() const;
 
         Venom ven;
         Mateyak::Vec2f _position;

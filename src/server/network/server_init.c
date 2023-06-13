@@ -10,27 +10,45 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include "utility/strings.h"
 
 static bool init_server_network(server_t *server, char **err)
 {
     struct sockaddr_in addr;
+    int tmp;
 
-    if ((server->fd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-        *err = perror_str("socket");
-        return false;
-    }
+    TRY_SYSCALL(server->fd, socket, AF_INET, SOCK_STREAM, 0);
     addr = (struct sockaddr_in){.sin_family = AF_INET,
         .sin_addr.s_addr = INADDR_ANY, .sin_port = htons(server->params.port)
     };
-    if (bind(server->fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-        *err = perror_str("bind");
-        return false;
-    }
-    if (listen(server->fd, 3) < 0) {
-        *err = perror_str("listen");
-        return false;
-    }
+    TRY_SYSCALL(tmp, setsockopt, server->fd, SOL_SOCKET, SO_REUSEADDR,
+                    &(int){1}, sizeof(int));
+    TRY_SYSCALL(tmp, bind, server->fd, (struct sockaddr *)&addr, sizeof(addr));
+    TRY_SYSCALL(tmp, listen, server->fd, MAX_CLIENTS);
     return true;
+}
+
+static void init_read_set(server_t *server)
+{
+    list_t *tmp = server->clients;
+
+    FD_ZERO(&server->read_fds);
+    FD_SET(server->fd, &server->read_fds);
+    if (!tmp)
+        return;
+    do {
+        FD_SET(((client_t *)tmp->data)->fd, &server->read_fds);
+        tmp = tmp->next;
+    } while (tmp != server->clients);
+}
+
+void update_next_spawn(server_t *server)
+{
+    struct timespec now;
+
+    get_time(&now);
+    server->next_spawn = get_end_time(MAP_SPAWN_FREQ,
+        server->params.freq, now);
 }
 
 server_t *init_server(int ac, char **av, char **err)
@@ -40,26 +58,24 @@ server_t *init_server(int ac, char **av, char **err)
 
     if (!get_args(ac, av, &args, err))
         return NULL;
-    server = calloc(1, sizeof(server_t));
+    server = my_calloc(1, sizeof(server_t));
     server->params = args;
-    server->trantor = init_trantor(args.width, args.height);
+    server->trantor = init_trantor(args.width,
+        args.height, args.names, args.slots);
     if (!init_server_network(server, err)) {
-        free(server);
+        destroy_server(server);
         return NULL;
     }
+    init_read_set(server);
+    update_next_spawn(server);
     return server;
-}
-
-static void destroy_clients(list_t **clients)
-{
-    free_list(clients, NULL);
 }
 
 void destroy_server(server_t *server)
 {
     close(server->fd);
-    destroy_clients(&server->clients);
+    free_list(&server->clients, NULL);
     destroy_trantor(server->trantor);
     free_str_array(server->params.names);
-    free(server);
+    my_free(server);
 }

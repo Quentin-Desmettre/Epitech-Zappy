@@ -27,10 +27,11 @@ jobs:
           ref: ${{ steps.extract_branch.outputs.branch }}
           fetch-depth: 0
 
-      - name: Install raylib
+      - name: Install raylib/boost
         run: |
-          sudo apt install build-essential git cmake
-          sudo apt install libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev
+          sudo apt install build-essential git cmake -y
+          sudo apt install libboost-all-dev -y
+          sudo apt install libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev -y
           git clone https://github.com/raysan5/raylib.git raylib
           cd raylib
           mkdir build && cd build
@@ -40,46 +41,46 @@ jobs:
           cd ../../
           rm -rf raylib
 
-#      - name: Install criterion
-#        run: |
-#            URL="https://github.com/Snaipe/Criterion/releases/download/v2.3.2"
-#            TARBALL="criterion-v2.3.2-linux-x86_64.tar.bz2"
-#            DIR="criterion-v2.3.2"
-#            DST="/usr/local/"
-#            SUDO=/usr/bin/sudo
-#
-#            if [ $UID -eq "0" ]; then
-#              SUDO=""
-#              echo "[no sudo for root]"
-#            fi
-#
-#            cd /tmp
-#            rm -f $TARBALL
-#            rm -fr $DIR
-#
-#            wget $URL/$TARBALL
-#            if [ $? != 0 ]; then
-#              echo "failled, exiting"
-#              exit 1;
-#            fi
-#
-#            echo
-#            echo "untaring $TARBALL"
-#            tar xjf $TARBALL
-#            if [ $? != 0 ]; then
-#              echo "failled, exiting"
-#              exit 1;
-#            fi
-#
-#            echo "creating custom ld.conf"
-#            $SUDO sh -c "echo "/usr/local/lib" > /etc/ld.so.conf.d/criterion.conf"
-#            echo "cp headers to $DST/include..."
-#            $SUDO cp -r $DIR/include/* $DST/include/
-#            echo "cp lib to $DST/include..."
-#            $SUDO cp -r $DIR/lib/* $DST/lib/
-#            echo "run ldconfig."
-#            $SUDO ldconfig
-#            echo "all good."
+      - name: Install criterion
+        run: |
+            URL="https://github.com/Snaipe/Criterion/releases/download/v2.3.2"
+            TARBALL="criterion-v2.3.2-linux-x86_64.tar.bz2"
+            DIR="criterion-v2.3.2"
+            DST="/usr/local/"
+            SUDO=/usr/bin/sudo
+
+            if [ $UID -eq "0" ]; then
+              SUDO=""
+              echo "[no sudo for root]"
+            fi
+
+            cd /tmp
+            rm -f $TARBALL
+            rm -fr $DIR
+
+            wget $URL/$TARBALL
+            if [ $? != 0 ]; then
+              echo "failled, exiting"
+              exit 1;
+            fi
+
+            echo
+            echo "untaring $TARBALL"
+            tar xjf $TARBALL
+            if [ $? != 0 ]; then
+              echo "failled, exiting"
+              exit 1;
+            fi
+
+            echo "creating custom ld.conf"
+            $SUDO sh -c "echo "/usr/local/lib" > /etc/ld.so.conf.d/criterion.conf"
+            echo "cp headers to $DST/include..."
+            $SUDO cp -r $DIR/include/* $DST/include/
+            echo "cp lib to $DST/include..."
+            $SUDO cp -r $DIR/lib/* $DST/lib/
+            echo "run ldconfig."
+            $SUDO ldconfig
+            echo "all good."
 
       - name: Check coding style
         run: "pip install websocket-client && python './.github/c_checker.py' --hard"
@@ -92,7 +93,7 @@ jobs:
           ls zappy_server zappy_gui zappy_ai
 
       - name: Run tests
-        run: "make tests_run"
+        run: "./tests.sh"
 
       - name: Push to Epitech
         uses: pixta-dev/repository-mirroring-action@v1

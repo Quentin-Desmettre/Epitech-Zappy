@@ -1,5 +1,7 @@
 #include "Mateyak/Window.hpp"
 
+double Mateyak::Window::timePass = 0;
+
 Font Mateyak::Window::_font = GetFontDefault();
 
 Mateyak::Window::Window(int width, int height, std::string title, int fps)
@@ -58,6 +60,7 @@ void Mateyak::Window::drawBox(float posX, float posY, float width, float height,
 
 void Mateyak::Window::startDrawing(Color color)
 {
+    timePass = GetFrameTime();
     BeginDrawing();
     ClearBackground(color);
 }

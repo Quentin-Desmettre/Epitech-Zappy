@@ -18,7 +18,7 @@ void Graphic::drawTeams()
     int x = _windowWidth - _boxSize - (numberTeams * 20);
     int y = 20;
 
-    Mateyak::Window::drawBox(x - 10, y - 10, _boxSize + numberTeams * 20, 4 * 20 + 20, {0, 0, 0, 100});
+    Mateyak::Window::drawBox(x - 10, y - 10, _boxSize + numberTeams * 20, 4 * 20 + 20, {0, 39, 97, 110});
     for (auto &it : _serverInformations.getTeams()) {
         Mateyak::Window::draw(it.getName(), x, y, 15, it.getColor());
         if (y == 80) {
@@ -26,6 +26,41 @@ void Graphic::drawTeams()
             y = 20;
         } else
             y += 20;
+    }
+}
+
+void Graphic::drawBroadCastMessage(Mateyak::Window &win)
+{
+    float boxPosY = _windowHeight - _windowHeight / 3 - 30;
+    float boxWidth = _windowWidth / 3 - 20;
+    float boxHeight = _windowHeight / 3 + 20;
+
+    Mateyak::Window::drawBox(10, boxPosY, boxWidth, boxHeight, {0, 39, 97, 94});
+
+    if (_charSize.x == 0 && _charSize.y == 0)
+        _charSize = MeasureTextEx(win._font, "Z", 15, 1);
+
+    int maxCharInLine;
+    float maxLineNumber = (boxHeight) / (_charSize.y + 5);
+    float yStart = _windowHeight - 30;
+    std::vector<Message> &mes = _serverInformations.getBroadCastMessage();
+    for (int index = mes.size() - 1; index >= 0; index--) {
+        if (!mes[index]._formated) {
+            maxCharInLine = boxWidth / _charSize.x;
+            mes[index].FormatMessage(maxCharInLine);
+        }
+        for (int i = mes[index]._lines.size() - 1; i >= 0; i--) {
+            if (i == 0) {
+                Mateyak::Window::draw(mes[index]._name + ":", 20, yStart, 15, mes[index]._color);
+                Mateyak::Window::draw(mes[index]._lines[i], 20 + ((mes[index]._name.size() + 1) * _charSize.x), yStart, 15, {255, 255, 255, 255});
+            } else {
+                Mateyak::Window::draw(mes[index]._lines[i], 20, yStart, 15, {255, 255, 255, 255});
+            }
+            yStart -= 20;
+            maxLineNumber--;
+            if (maxLineNumber <= 0)
+                return;
+        }
     }
 }
 
@@ -45,13 +80,12 @@ void Graphic::getTeamsPlace(Mateyak::Window &win)
 
 void Graphic::loop(Mateyak::Vec2f mapSize)
 {
-    _windowWidth = 1920 / 2;
-    _windowHeight = 1080 / 2;
+    _windowWidth = 1920 / 1.3;
+    _windowHeight = 1080 / 1.3;
     Mateyak::Window win(_windowWidth, _windowHeight, "Zappy", 400);
     int seed = rand();
     Mateyak::Camera cam({5.0f, 5.0f, 5.0f}, {0.0f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, 45.0f);
     Map map(mapSize * 10, 0.5);
-    Venom ven({0, 0});
     Mateyak::Model3D flat(GenMeshPoly(10, 10000.0f), Mateyak::Vec3f{-500, -1, -500}, 1.0f, BLACK);
     Mateyak::Shaders shader("src/gui/shader/base_lighting.vs", "src/gui/shader/test.fs");
 
@@ -78,14 +112,12 @@ void Graphic::loop(Mateyak::Vec2f mapSize)
             drawGrid = !drawGrid;
         }
         shader.setUniform(viewPos, cam._position);
-        ven.move_ven(cam.getRayCam());
         cam.Update();
         win.startDrawing();
         ClearBackground(Color{255 / 10, 255 / 20, 255 / 20, 255});
         win.begin3D(cam);
         Mateyak::Window::draw(map);
         Mateyak::Window::draw(flat);
-        ven.draw_ven(seed, cam);
         Venom::fpsHandler();
         _serverInformations.startComputing();
         map.update(_serverInformations);
@@ -96,12 +128,10 @@ void Graphic::loop(Mateyak::Vec2f mapSize)
         if (drawGrid) {
             Utils::drawGrid(mapSize, 10 / 3.F, {0, 0, 0});
         }
-        _serverInformations.endComputing();
-        if (drawGrid)
-            Utils::drawGrid(mapSize, 10/3.f, {0, 0, 0});
         win.end3D();
         DrawFPS(10, 10);
         drawTeams();
+        drawBroadCastMessage(win);
         _serverInformations.endComputing();
         win.endDrawing();
     }

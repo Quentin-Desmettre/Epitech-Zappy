@@ -32,7 +32,12 @@ void Player::setPos(int x, int y)
 {
     Mateyak::Vec3f pos = {static_cast<float>(x), static_cast<float>(y), 0};
 
-    ven.setPos(pos);
+    ven.setNextPos(pos);
+}
+
+const Team &Player::getTeam() const
+{
+    return _team;
 }
 
 void Player::setOrientation(Player::ORIENTATION orientation)
@@ -59,4 +64,8 @@ void Player::setInventory(std::vector<int> inventory)
 Player::STATE Player::getState() const
 {
     return _state;
+}
+
+int Player::getLevel() const {
+    return _level;
 }

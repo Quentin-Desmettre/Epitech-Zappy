@@ -10,6 +10,8 @@
 int Venom::nbLegs = 5;
 int Venom::circlePerLeg = 30;
 int Venom::pointPerCircle = 4;
+bool Venom::usePerlin = true;
+double Venom::time = 0;
 std::vector<Mateyak::Vec3f> Venom::pos_feet;
 
 Venom::Venom(Mateyak::Vec2f pos, Mateyak::Vec2f mapSize, Color clr): mapSize(mapSize),
@@ -18,6 +20,7 @@ Venom::Venom(Mateyak::Vec2f pos, Mateyak::Vec2f mapSize, Color clr): mapSize(map
     rnd = {rand() % 100 / 100.f - 0.5f, 0, rand() % 100 / 100.f - 0.5f};
     _pos = {(pos.x * 10 + 5) / 3.F, 0.75, (pos.y * 10 + 5) / 3.F};
     _nextPosition = _pos;
+    level = 1;
 }
 
 Venom::~Venom()
@@ -45,7 +48,7 @@ void Venom::Draw_leg(Mateyak::Vec3f leg, int seed)
     Mateyak::Vec3f tmp = _pos;
     for (int i = 0; i <= nb; i++) {
         tmp += vec;
-        tmp.y = sinf((i / FLOAT_NB * PI * 4 + PI) / 5.0f);
+        tmp.y = sinf((i / FLOAT_NB * PI * 4 + PI) / 5.0f);// * time;
 
         center.push_back(tmp);
         angles.push_back(tmp - last);
@@ -63,9 +66,12 @@ void Venom::Draw_leg(Mateyak::Vec3f leg, int seed)
         Mateyak::Vec3f noise = {0, 0, 0};
 
         for (size_t i = 0; i < center.size(); i++) {
-            noise.x = Perlin::Noise2D(seed * h, i / (FLOAT_NB / 12.5), seed, 1) * ((i / FLOAT_NB + 0.5) / 2.0) / 2;
-            noise.z = Perlin::Noise2D(seed * h * 2, i / (FLOAT_NB / 12.5), seed, 1) * ((i / FLOAT_NB + 0.5) / 2.0) / 2;
-            Utils::generateCirclePoints(center[i] + noise, angles[i], ((nb - i) / FLOAT_NB) / ((h - 1) * 3), pointPerCircle, points);
+            if (usePerlin) {
+                noise.x = Perlin::Noise2D(seed * h, i / (FLOAT_NB / 12.5), seed, 1) * ((i / FLOAT_NB + 0.5) / 2.0) / 2;
+                noise.z = Perlin::Noise2D(seed * h * 2, i / (FLOAT_NB / 12.5), seed, 1) * ((i / FLOAT_NB + 0.5) / 2.0) / 2;
+            }
+            float raylevel = level / 8.0 + 0.5;
+            Utils::generateCirclePoints(center[i] + noise, angles[i], ((nb - i) / FLOAT_NB) / ((h - 1) * 3) * raylevel, pointPerCircle, points);
         }
         std::vector<Mateyak::Triangle> triangles = Utils::connectPointsWithTriangles(points, pointPerCircle);
         if (triangles.empty())
@@ -85,7 +91,7 @@ void Venom::move_ven(Camera camera)
     if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_RIGHT)) {
         vec = {camera.position.x - camera.target.x, 0, camera.position.z - camera.target.z};
         vec = vec.Normalize();
-        vec = vec / 10.0;
+        vec = vec * Mateyak::Window::timePass * 10.0;
     }
     if (IsKeyDown(KEY_UP)) {
         _pos.x -= vec.x;
@@ -163,12 +169,29 @@ Mateyak::Vec3f &Venom::getPosition()
     return _pos;
 }
 
-void Venom::setPos(const Mateyak::Vec3f &pos)
-{
+void Venom::setNextPos(const Mateyak::Vec3f &pos) {
+    _pos = _nextPosition;
     _nextPosition = {(pos.x * 10 + 5) / 3.F, _pos.y, (pos.y * 10 + 5) / 3.F};
 }
 
+void Venom::setPos(const Mateyak::Vec3f &pos)
+{
+    _pos = {(pos.x * 10 + 5) / 3.F, _pos.y, (pos.y * 10 + 5) / 3.F};
+}
+double EaseInOut(double t)
+{
+    return 0.5 * (1.0 - cos(t * PI));
+}
+
 void Venom::fpsHandler() {
+
+    time = GetTime();
+    time *= 3.0;
+    time = time - (int)time;
+    if (time < 0.5) {
+        time = 1 - time;
+    }
+    time = EaseInOut(time) + 0.5;
     int fps = GetFPS();
     if (fps < 60) {
         if (nbLegs > 1) {
@@ -177,10 +200,14 @@ void Venom::fpsHandler() {
             pointPerCircle--;
         } else if (circlePerLeg > 6) {
             circlePerLeg--;
+        } else if (usePerlin) {
+            usePerlin = false;
         }
     }
     if (fps > 60) {
-        if (circlePerLeg < 15) {
+        if (!usePerlin) {
+            usePerlin = true;
+        } else if (circlePerLeg < 15) {
             circlePerLeg++;
         } else if (nbLegs < 3) {
             nbLegs++;
@@ -192,4 +219,13 @@ void Venom::fpsHandler() {
             nbLegs++;
         }
     }
+}
+
+int Venom::getLevel() const {
+    return level;
+}
+
+void Venom::setLevel(int level)
+{
+    this->level = level;
 }
