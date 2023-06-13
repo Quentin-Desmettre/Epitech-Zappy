@@ -35,6 +35,11 @@ void Player::setPos(int x, int y)
     ven.setPos(pos);
 }
 
+const Team &Player::getTeam() const
+{
+    return _team;
+}
+
 void Player::setOrientation(Player::ORIENTATION orientation)
 {
     _orientation = orientation;

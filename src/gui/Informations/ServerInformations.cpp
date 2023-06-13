@@ -6,7 +6,39 @@
 */
 
 #include "Informations/ServerInformations.hpp"
+#include <iostream>
 
+void Message::FormatMessage(int maxLineSize)
+{
+    std::string line;
+    int i = 0;
+
+    line.insert(0, _name + ": ");
+
+    while (i < static_cast<int>(_message.size())) {
+        if (i % maxLineSize == 0 && i != 0) {
+            if (!_formated) {
+                line.erase(0, _name.size() + 2);
+                i -= _name.size() - 1;
+            }
+            _lines.push_back(line);
+            line.clear();
+            _formated = true;
+        }
+        line += _message[i];
+        i++;
+    }
+    if (!_formated)
+        line.erase(0, _name.size() + 2);
+    _lines.push_back(line);
+    _formated = true;
+
+    for (auto &it : _lines)
+        std::cout << it << std::endl;
+}
+
+Message::Message(std::string name, std::string message, Color color) :
+_formated(false), _name(name), _message(message), _lines(), _color(color) {}
 void ServerInformations::updatePlayer(std::unique_ptr<Player> &player)
 {
     Player::STATE state = player->getState();
@@ -145,6 +177,15 @@ void ServerInformations::setPlayerDead(std::string name)
     }
 }
 
+void ServerInformations::addBroadCastMessage(std::string name, std::string message)
+{
+    for (auto &it : players) {
+        if (it->getName() == name) {
+            broadCastMessage.emplace_back(name, message, it->getTeam().getColor());
+            return;
+        }
+    }
+}
 
 Mateyak::Vec2f ServerInformations::getMapSize() const
 {
@@ -161,6 +202,11 @@ std::vector<Team> ServerInformations::getTeams() const
 std::vector<std::unique_ptr<Player>> &ServerInformations::getPlayers()
 {
     return players;
+}
+
+std::vector<Message> &ServerInformations::getBroadCastMessage()
+{
+    return broadCastMessage;
 }
 
 void ServerInformations::startComputing()

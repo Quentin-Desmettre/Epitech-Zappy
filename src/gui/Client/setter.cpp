@@ -120,3 +120,19 @@ void GuiClient::PlayerDeath(std::vector<std::string> parameters)
     std::string name = parameters[0];
     _serverInformations.setPlayerDead(name);
 }
+
+void GuiClient::PlayerBroadcast(std::vector<std::string> parameters)
+{
+    if (parameters.size() < 2) {
+        std::cerr << "PlayerBroadcast: invalid number of parameters" << std::endl;
+        return;
+    }
+
+    std::string name = parameters[0];
+    parameters.erase(parameters.begin());
+    std::string message = "";
+    for (auto &it : parameters)
+        message += it + " ";
+
+    _serverInformations.addBroadCastMessage(name, message);
+}

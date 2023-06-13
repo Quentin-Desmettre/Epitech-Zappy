@@ -23,6 +23,7 @@ class Player
         ~Player() = default;
 
         std::string getName() const;
+        const Team &getTeam() const;
         void setPos(int x, int y);
         void setOrientation(Player::ORIENTATION orientation);
         void setState(STATE state);

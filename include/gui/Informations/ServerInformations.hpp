@@ -19,6 +19,19 @@
 #include <memory>
 typedef std::vector<std::vector<std::vector<Ressource>>> ZappyMap;
 
+
+class Message {
+    public:
+        Message(std::string name, std::string message, Color color);
+        void FormatMessage(int maxLineSize);
+        ~Message() = default;
+        bool _formated;
+        std::string _name;
+        std::string _message;
+        std::vector<std::string> _lines;
+        Color _color;
+};
+
 class ServerInformations
 {
     public:
@@ -40,16 +53,19 @@ class ServerInformations
         void setPlayerInventory(std::string name, std::vector<int> inventory);
         void removePlayer(std::string name);
         void setPlayerDead(std::string name);
+        void addBroadCastMessage(std::string name, std::string message);
 
         Mateyak::Vec2f getMapSize() const;
         ZappyMap getMap() const;
         std::vector<Team> getTeams() const;
         std::vector<std::unique_ptr<Player>> &getPlayers();
+        std::vector<Message> &getBroadCastMessage();
 
     private:
         Mateyak::Vec2f mapSize;
         ZappyMap map;
         std::vector<Team> teams;
         std::vector<std::unique_ptr<Player>> players;
+        std::vector<Message> broadCastMessage;
         std::mutex mutex;
 };

@@ -22,11 +22,11 @@ find_package(raylib QUIET)
 include_directories(${RAYLIB_INCLUDE_DIRS})
 
 if (NOT Boost_FOUND)
-    message(FATAL_ERROR "Please install boost!\nOn Ubuntu: sudo apt install libboost-all-dev\nOn Mac OS X: brew install boost\nOn Windows: https://www.boost.org/doc/libs/1_75_0/more/getting_started/windows.html")
+    message(FATAL_ERROR "Please install boost!\nsudo apt install build-essential git cmake -y\nsudo apt install libboost-all-dev -y")
 endif ()
 
 if (NOT raylib_FOUND)
-    message(FATAL_ERROR "Please install raylib!\nOn Ubuntu: sudo apt install libraylib-dev\nOn Mac OS X: brew install raylib\nOn Windows:")
+    message(FATAL_ERROR "Please install raylib!\nsudo apt install libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev -y\ngit clone https://github.com/raysan5/raylib.git raylib\ncd raylib\nmkdir build && cd build\ncmake -DBUILD_SHARED_LIBS=ON ..\nmake\nsudo make install\ncd ../../\nrm -rf raylib")
 endif ()
 
 add_executable(zappy_gui
