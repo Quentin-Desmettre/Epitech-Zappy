@@ -19,13 +19,19 @@ Map::Map(Mateyak::Vec2f size, float zoom):
     clr(size),
     _rock("assets/rock.obj", Mateyak::Vec3f{0, 0, 0}, 0.3f, WHITE),
     _ground(),
-    _food("assets/ham.obj", Mateyak::Vec3f{0, 0, 0}, 0.01f, WHITE),
     _zoom(zoom)
 {
+    std::string tmp = "assets/meat";
+    for (int i = 0; i < 3; i++) {
+        _foods.emplace_back(new Mateyak::Model3D(tmp + std::to_string(i + 1) + ".obj", Mateyak::Vec3f{0, 0, 0}, 1.f, WHITE));
+        _foods[i]->setColor({120, 10, 10, 255});
+        _foods[i]->setPos({0, 0, 0});
+    }
+
     srand(time(NULL));
     generate();
     generateColor();
-    _food.setTexture({"assets/ham_text.png"});
+//    _food.setTexture({"assets/ham_text.png"});
 
     _ground = GenMeshHeightmap(map, (Vector3){_size.x / 3, 1, _size.y / 3});
     _ground.setPos({0, -0.5, 0});
@@ -130,7 +136,8 @@ const Mateyak::Model3D &Map::getGround() const
 void Map::setShader(const Mateyak::Shaders &shader) {
     _ground.setShader(shader);
     _rock.setShader(shader);
-    _food.setShader(shader);
+    for (auto &_food : _foods)
+        _food->setShader(shader);
 }
 
 void Map::update(const ServerInformations &infos) {
@@ -140,8 +147,8 @@ void Map::update(const ServerInformations &infos) {
         for (auto &pos : col) {
             for (auto &obj : pos) {
                 if (obj.type == 0) {
-                    _food.setPos({obj.pos.x * 10 / 3.f, 0, obj.pos.y * 10 / 3.f});
-                    Mateyak::Window::draw(_food);
+                    _foods[int(obj.pos.x * 10) % 3]->setPos({obj.pos.x * 10 / 3.f, 0, obj.pos.y * 10 / 3.f});
+                    Mateyak::Window::draw(*_foods[int(obj.pos.x * 10) % 3]);
                     continue;
                 }
                 _rock.setColor(obj.color);

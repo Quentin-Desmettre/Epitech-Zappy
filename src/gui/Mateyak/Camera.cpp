@@ -8,6 +8,7 @@
 #include "Mateyak/Camera.hpp"
 #include <raymath.h>
 #include <iostream>
+#include "Mateyak/Window.hpp"
 
 Mateyak::Camera::Camera(Vec3f position, Vec3f target, Vec3f up, float fov, int mode) : _position(position), _target(target), _up(up), _fov(fov), _type(mode)
 {
@@ -77,20 +78,23 @@ void Mateyak::Camera::RecalculateCamPos()
 {
     Vec3f forward = _target;
     _target -= _position;
+    Mateyak::Vec3f dir = (forward - _position).Normalize() * Mateyak::Window::timePass * 10.0;
+    Mateyak::Vec3f right = (dir).CrossProduct(_up).Normalize() * Mateyak::Window::timePass * 10.0;
+
     if (IsKeyDown(KEY_W))
-        _position += (forward - _position).Normalize() * 0.1;
+        _position += dir;
     if (IsKeyDown(KEY_S)) {
-        _position -= (forward - _position).Normalize() * 0.1;
+        _position -= dir;
     }
     if (IsKeyDown(KEY_D)) {
-        _position += (forward - _position).CrossProduct(_up).Normalize() * 0.1;
+        _position += right;
     }
     if (IsKeyDown(KEY_A))
-        _position -= (forward - _position).CrossProduct(_up).Normalize() * 0.1;
+        _position -= right;
     if (IsKeyDown(KEY_SPACE))
-        _position += _up * 0.1;
+        _position += _up * Mateyak::Window::timePass * 10.0;
     if (IsKeyDown(KEY_LEFT_SHIFT))
-        _position -= _up * 0.1;
+        _position -= _up * Mateyak::Window::timePass * 10.0;
     
     _target += _position;
     _cam.target = _target;

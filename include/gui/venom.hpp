@@ -19,11 +19,16 @@ private:
     Mateyak::Vec2f mapSize;
     Color _clr;
     Mateyak::Vec3f rnd;
-
-public:
+    int level;
     static int nbLegs;
     static int circlePerLeg;
     static int pointPerCircle;
+    static bool usePerlin;
+    static double time;
+
+public:
+    void setLevel(int level);
+    int getLevel() const;
     static void fpsHandler();
     static std::vector<Mateyak::Vec3f> pos_feet;
     Venom(Mateyak::Vec2f pos = {0, 0}, Mateyak::Vec2f mapSize = {10, 10}, Color clr = WHITE);
@@ -35,6 +40,7 @@ public:
     Mateyak::Vec3f getPos() const;
     Mateyak::Vec3f &getPosition();
     void setPos(const Mateyak::Vec3f &pos);
+    void setNextPos(const Mateyak::Vec3f &pos);
 };
 
 #endif

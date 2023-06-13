@@ -45,6 +45,6 @@ class Map {
         Mateyak::Sprite clr;
         Mateyak::Model3D _rock;
         Mateyak::Model3D _ground;
-        Mateyak::Model3D _food;
+        std::vector<Mateyak::Model3D *> _foods;
         float _zoom;
 };

@@ -54,6 +54,10 @@ namespace Mateyak
             return Vec2f{static_cast<float>(GetMouseX()), static_cast<float>(GetMouseY())};
         }
 
+
+        static double time;
+        static double timePass;
+
     private:
     };
 }
