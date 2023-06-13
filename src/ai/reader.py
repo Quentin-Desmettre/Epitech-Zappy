@@ -36,9 +36,7 @@ class Reader:
                     self.parse_data()
                     self.mtx.release()
         except Exception as e:
-            my_print(e)
-            kill(getpid(), SIGINT)
-            exit(0)
+            self.queue.put("dead")
 
     def parse_data(self) -> None:
         index = self.buffer.index("\n")
@@ -47,7 +45,7 @@ class Reader:
             raise Exception("You died")
         if match(PossibleResponsesRegex.MESSAGE.value[0], msg):
             if msg.count(self.team) == 0 and randint(0, 3) != 0:
-                return # à remplacer pour les renvoyer aux autres
+                return
             if msg.count("incantation") > 0:
                 self.clean_broadcast_queue()
             self.broadcast_queue.put([msg, time()])
@@ -69,8 +67,12 @@ class Reader:
     def get_next_match(self, type: CommandNames) -> str:
         """Gets the next message that matches the regex."""
         msg = self.queue.get()
+        if msg == "dead":
+            raise Exception("You died")
         while not self.check_matches(msg, type):
             msg = self.queue.get()
+            if msg == "dead":
+                raise Exception("You died")
         return msg
 
     def send(self, type: CommandNames, arg: str | None = None):
