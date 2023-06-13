@@ -63,11 +63,11 @@ class ServerInformations
         std::vector<std::unique_ptr<Player>> &getPlayers();
 
     private:
-        Mateyak::Vec2f mapSize;
+        Mateyak::Vec2f mapSize {10, 10};
         ZappyMap map;
-        std::vector<Team> teams;
-        std::vector<std::unique_ptr<Player>> players;
-        std::vector<Message> broadCastMessage;
+        std::vector<Team> teams{};
+        std::vector<std::unique_ptr<Player>> players{};
+        std::vector<Message> broadCastMessage{};
         std::mutex mutex;
         std::vector<std::tuple<short, std::vector<std::tuple<int, int, std::unique_ptr<Mateyak::Audio>>>>> audioAction;
 };

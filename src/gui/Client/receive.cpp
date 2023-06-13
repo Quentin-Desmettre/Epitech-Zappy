@@ -22,18 +22,20 @@ std::string GuiClient::getInformations()
     return buf;
 }
 
-std::vector<std::string> GuiClient::splitStrings(std::string str, std::string delimiter)
+std::vector<std::string> GuiClient::splitStrings(std::string toParse, std::string delimiter)
 {
     size_t pos;
     std::string token;
     std::vector<std::string> res;
+    std::string str = _buffer + toParse;
 
     while ((pos = str.find(delimiter)) != std::string::npos) {
         token = str.substr(0, pos);
         res.push_back(token);
         str.erase(0, pos + delimiter.length());
     }
+    _buffer.clear();
     if (str.length() > 0)
-        res.push_back(str);
+        _buffer += str;
     return res;
 }

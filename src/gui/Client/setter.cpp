@@ -33,7 +33,6 @@ void GuiClient::setMapTiles(std::vector<std::string> parameters)
     for (int i = 2; i < 8; i++)
         res.push_back(std::stoi(parameters[i]));
     _serverInformations.setTile(x, y, res);
-    std::cout << "setTile: " << "x: " << parameters[0] << " y: " << parameters[1] << std::endl;
 }
 
 void GuiClient::setTeamNames(std::vector<std::string> parameters)

@@ -39,6 +39,7 @@ void Message::FormatMessage(int maxLineSize)
 
 Message::Message(std::string name, std::string message, Color color) :
 _formated(false), _name(name), _message(message), _lines(), _color(color) {}
+
 void ServerInformations::updatePlayer(std::unique_ptr<Player> &player)
 {
     Player::STATE state = player->getState();
@@ -69,6 +70,10 @@ void ServerInformations::setTile(int x, int y, std::vector<int> values)
     int number_in_tile;
     int number_to_erase;
     int number_to_add;
+
+    if (y >= static_cast<int>(map.size()) || x >= static_cast<int>(map[y].size())) {
+        throw std::runtime_error("Error: setTile: x or y out of range");
+    }
 
     for (int i = 0; i < static_cast<int>(values.size()); i++) {
         number_in_tile = 0;
@@ -107,12 +112,17 @@ void ServerInformations::addTeam(std::string team)
 void ServerInformations::addPlayer(std::string name, int x, int y, Player::ORIENTATION orientation, int level, std::string team)
 {
     std::unique_ptr<Player> player;
+    bool team_exist = false;
+
     for (size_t i = 0; i < teams.size(); i++) {
         if (teams[i].getName() == team) {
             player = std::make_unique<Player>(name, x, y, orientation, level, teams[i], mapSize);
+            team_exist = true;
             break;
         }
     }
+    if (!team_exist)
+        throw std::runtime_error("Team doesn't exist");
     players.push_back(std::move(player));
 }
 
@@ -125,6 +135,7 @@ void ServerInformations::movePlayer(std::string name, int x, int y, Player::ORIE
             return;
         }
     }
+    throw std::runtime_error("Player doesn't exist");
 }
 
 void ServerInformations::setPlayerState(std::string name, Player::STATE state)
@@ -135,6 +146,7 @@ void ServerInformations::setPlayerState(std::string name, Player::STATE state)
             return;
         }
     }
+    throw std::runtime_error("Player doesn't exist");
 }
 
 void ServerInformations::setPlayerLevel(std::string name, int level)
@@ -145,6 +157,7 @@ void ServerInformations::setPlayerLevel(std::string name, int level)
             return;
         }
     }
+    throw std::runtime_error("Player doesn't exist");
 }
 
 void ServerInformations::setPlayerInventory(std::string name,
@@ -156,6 +169,7 @@ void ServerInformations::setPlayerInventory(std::string name,
             return;
         }
     }
+    throw std::runtime_error("Player doesn't exist");
 }
 
 void ServerInformations::removePlayer(std::string name)
@@ -166,6 +180,7 @@ void ServerInformations::removePlayer(std::string name)
             return;
         }
     }
+    throw std::runtime_error("Player doesn't exist");
 }
 
 void ServerInformations::setPlayerDead(std::string name)
@@ -176,6 +191,7 @@ void ServerInformations::setPlayerDead(std::string name)
             return;
         }
     }
+    throw std::runtime_error("Player doesn't exist");
 }
 
 void ServerInformations::addBroadCastMessage(std::string name, std::string message)
@@ -186,6 +202,7 @@ void ServerInformations::addBroadCastMessage(std::string name, std::string messa
             return;
         }
     }
+    throw std::runtime_error("Player doesn't exist");
 }
 
 Mateyak::Vec2f ServerInformations::getMapSize() const
