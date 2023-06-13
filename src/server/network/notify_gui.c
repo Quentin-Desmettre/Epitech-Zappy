@@ -24,10 +24,10 @@ const gui_event_t GUI_EVENTS[] = {
         {EGG_DEAD, "edi %d\n"},
         {END_OF_GAME, "seg %s\n"},
         {SERVER_MESSAGE, "smg %s\n"},
-        {TILE_CONTENT, "plv %d %d %d %d %d %d %d %d %d\n"},
+        {TILE_CONTENT, "bct %d %d %d %d %d %d %d %d %d\n"},
         {PLAYER_LVL_UP, "plv %d %d\n"},
-        {PLAYER_POS, "plv %d %d %d %d\n"},
-        {PLAYER_INVENTORY, "plv %d %d %d %d %d %d %d %d %d %d\n"},
+        {PLAYER_POS, "ppo %d %d %d %d\n"},
+        {PLAYER_INVENTORY, "pin %d %d %d %d %d %d %d %d %d %d\n"},
         {TIME_UNIT_CHANGED, "sst %d\n"},
         {NUM_GUI_EVENTS, NULL}
 };
