@@ -18,10 +18,10 @@ void GuiClient::parseOutput(std::string re) {
             {"pin", &GuiClient::PlayerInventory},
             {"pdi", &GuiClient::PlayerDeath},
             {"pic", &GuiClient::PlayerIncantation},
-            {"pbc", &GuiClient::PlayerBroadcast},
-            {"pex", &GuiClient::PlayerExpulse},
-            /*{"pic", &GuiClient::PlayerIncantation},
             {"pie", &GuiClient::PlayerIncantationEnd},
+            {"pbc", &GuiClient::PlayerBroadcast},
+            {"pex", &GuiClient::PlayerExpulse}
+            /*,
             {"pfk", &GuiClient::PlayerFork},
             {"pdr", &GuiClient::PlayerDropRessource},
             {"pgt", &GuiClient::PlayerTakeRessource},

@@ -56,6 +56,8 @@ class ServerInformations
         void removePlayer(std::string name);
         void setPlayerDead(std::string name);
         void updateAudioAction(std::tuple<int, int> pos, enum Mateyak::action_type type);
+        void addBroadCastMessage(std::string name, std::string message);
+        std::vector<Message> &getBroadCastMessage();
 
         Mateyak::Vec2f getMapSize() const;
         ZappyMap getMap() const;
@@ -69,5 +71,5 @@ class ServerInformations
         std::vector<std::unique_ptr<Player>> players{};
         std::vector<Message> broadCastMessage{};
         std::mutex mutex;
-        std::vector<std::tuple<short, std::vector<std::tuple<int, int, std::unique_ptr<Mateyak::Audio>>>>> audioAction;
+        std::vector<std::tuple<short, std::vector<std::tuple<int, int, std::shared_ptr<Mateyak::Audio>>>>> audioAction;
 };

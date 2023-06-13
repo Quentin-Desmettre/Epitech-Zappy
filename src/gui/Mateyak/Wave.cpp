@@ -18,7 +18,6 @@ Mateyak::AudioWave::AudioWave(const std::string& path)
 
 Mateyak::AudioWave::~AudioWave()
 {
-    UnloadWave(_wave);
 }
 
 Wave Mateyak::AudioWave::getWave() const

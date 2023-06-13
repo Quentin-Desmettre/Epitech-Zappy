@@ -120,6 +120,34 @@ void GuiClient::PlayerDeath(std::vector<std::string> parameters)
     _serverInformations.setPlayerDead(name);
 }
 
+void GuiClient::PlayerExpulse(std::vector<std::string> parameters)
+{
+    if (parameters.size() != 1) {
+        std::cerr << "PlayerExpulse: invalid number of parameters" << std::endl;
+        return;
+    }
+
+    std::string name = parameters[0];
+    // TODO: Verifier si le fait de le rendre mort est suffisant ou s'il faut vraiment l'expulser
+    _serverInformations.setPlayerDead(name);
+}
+
+void GuiClient::PlayerBroadcast(std::vector<std::string> parameters)
+{
+    if (parameters.size() < 2) {
+        std::cerr << "PlayerBroadcast: invalid number of parameters" << std::endl;
+        return;
+    }
+
+    std::string name = parameters[0];
+    parameters.erase(parameters.begin());
+    std::string message = "";
+    for (auto &it : parameters)
+        message += it + " ";
+
+    _serverInformations.addBroadCastMessage(name, message);
+}
+
 void GuiClient::PlayerIncantation(std::vector<std::string> parameters)
 {
     _serverInformations.updateAudioAction(std::make_tuple(std::stoi(parameters[0]), std::stoi(parameters[1])), Mateyak::ELEVATIONSTART);
