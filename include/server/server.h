@@ -24,7 +24,11 @@
     #define ERR_NO_TEAM "ko: No such team\n"
     #define ERR_NO_CMD "ko: No such command\n"
     #define AI_MAX_COMMANDS 10
-    #define MAX_CLIENTS 1000
+
+// In case you want to open other file descriptors
+    #define MAX_CLIENTS (FD_SETSIZE - 20)
+
+
     #define WELCOME_MESSAGE "WELCOME\n"
     #define UNUSED __attribute__((unused))
     #define MAP_SPAWN_FREQ 20

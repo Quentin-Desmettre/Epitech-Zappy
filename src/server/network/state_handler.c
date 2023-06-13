@@ -25,7 +25,7 @@ static char *get_gui_connected_answer(server_t *server)
 {
     size_t len;
     char *answer =
-    str_concat_free(&len, 6, gui_map_size_handler(server, "msz"),
+    str_concat_free(&len, 7, gui_map_size_handler(server, "msz"),
     my_strdup("\n"), gui_time_request_handler(server, "sgt"), my_strdup("\n"),
     gui_tiles_content_handler(server, "mct"), my_strdup("\n"),
     gui_team_names_handler(server, "tna"));

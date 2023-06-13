@@ -49,7 +49,7 @@ static void *try_write(int fd, const void *data, size_t size)
     set_socket_blocking(fd, true);
     if (res < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
         perror("write");
-        exit(84);
+        return NULL;
     }
     res = NULL_IF_NEG(res);
     if ((size_t)res != size)

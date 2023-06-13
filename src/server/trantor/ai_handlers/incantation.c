@@ -36,11 +36,12 @@ static bool can_level_up(player_t *player, map_tile_t *tile)
     return true;
 }
 
-void notify_incant_start(map_tile_t *tile, player_t *base_player, server_t *server)
+void notify_incant_start(map_tile_t *tile,
+    player_t *base_player, server_t *server)
 {
     player_t *player = tile->players->data;
     char *message = my_asprintf("pic %d %d %d", tile->x,
-                                tile->y, player->level);
+        tile->y, player->level);
     list_t *players = tile->players;
     size_t len = strlen(message);
 

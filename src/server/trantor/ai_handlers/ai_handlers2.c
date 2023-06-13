@@ -69,7 +69,6 @@ ai_cmd_response_t ai_eject_handler(action_t *action UNUSED,
         player->x, player->y);
     list_t *players = tile->players;
     player_t *pl;
-
     while (list_size(tile->players) > 1) {
         if (players->data != player) {
             pl = players->data;
@@ -78,11 +77,12 @@ ai_cmd_response_t ai_eject_handler(action_t *action UNUSED,
             ai_forward_handler(NULL, server, pl);
             pl->dir = save_direct;
             players = tile->players;
+            notify_gui(server, EXPULSION, pl->id);
         } else
             players = players->next;
     }
-    // TODO: delete eggs
-    notify_gui(server, EXPULSION, player->id);
+    while (tile->eggs)
+        notify_gui(server, EGG_DEAD, (int)(long)tile->eggs->data);
     return AI_CMD_RESPONSE_OK;
 }
 

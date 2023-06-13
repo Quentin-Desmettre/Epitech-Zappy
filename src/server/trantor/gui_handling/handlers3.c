@@ -20,7 +20,6 @@ char *gui_team_names_handler(server_t *server, const char *cmd)
         str_append_free(&answer, &len,
             my_asprintf("tna %s\n", server->params.names[i]));
     }
-    answer[len - 2] = '\0';
     return answer;
 }
 
