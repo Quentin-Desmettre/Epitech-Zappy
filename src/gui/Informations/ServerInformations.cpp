@@ -206,6 +206,54 @@ void ServerInformations::addBroadCastMessage(std::string name, std::string messa
     throw std::runtime_error("Player doesn't exist");
 }
 
+void ServerInformations::PlayerForkEgg(std::string name)
+{
+    for (auto &it : players) {
+        if (it->getName() == name) {
+            std::unique_ptr<Player> tmp = std::make_unique<Player>(it->getName(), it->ven.getPos().x, it->ven.getPos().y, Player::ORIENTATION::NORTH, 1, it->getTeam(), mapSize);
+            tmp->setState(Player::STATE::EGGFORKED);
+            players.push_back(std::move(tmp));
+            return;
+        }
+    }
+    throw std::runtime_error("Player doesn't exist");
+}
+
+void ServerInformations::PlayerLayEgg(std::string name, std::string eggName, int posX, int posY)
+{
+    auto x = static_cast<float>(posX);
+    auto y = static_cast<float>(posY);
+
+    for (auto &it : players) {
+        if (it->getName() == name && it->getState() == Player::STATE::EGGFORKED) {
+            if (it->ven.getPos().x == x && it->ven.getPos().y == y) {
+                it->setEggName(eggName);
+                it->setState(Player::STATE::EGGLAYING);
+                return;
+            }
+        }
+    }
+    throw std::runtime_error("Player egg doesn't exist");
+}
+
+void ServerInformations::EggConnection(std::string eggName)
+{
+    for (auto &it : players) {
+        if (it->getEggName() == eggName) {
+            it->setState(Player::STATE::EGGHATCHING);
+            return;
+        }
+    }
+    throw std::runtime_error("Egg doesn't exist");
+}
+
+void ServerInformations::EggDeath(std::string eggName)
+{
+    players.erase(std::remove_if(players.begin(), players.end(), [eggName](std::unique_ptr<Player> &player) {
+    return player->getEggName() == eggName;
+    }), players.end());
+}
+
 Mateyak::Vec2f ServerInformations::getMapSize() const
 {
     return mapSize;

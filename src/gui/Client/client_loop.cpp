@@ -21,7 +21,6 @@ void GuiClient::parseOutput(std::string re) {
             {"pex", &GuiClient::PlayerExpulse},
             {"pfk", &GuiClient::PlayerFork},
             {"enw", &GuiClient::EggLaying},
-            {"eht", &GuiClient::EggHatching},
             {"ebo", &GuiClient::EggConnection},
             {"edi", &GuiClient::EggDeath},
             /*{"pic", &GuiClient::PlayerIncantation},

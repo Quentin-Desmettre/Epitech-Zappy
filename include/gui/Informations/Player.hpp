@@ -23,10 +23,12 @@ class Player
         ~Player() = default;
 
         std::string getName() const;
+        std::string getEggName() const;
         const Team &getTeam() const;
         void setPos(int x, int y);
         void setOrientation(Player::ORIENTATION orientation);
-        void setState(STATE state);
+        void setState(Player::STATE state);
+        void setEggName(const std::string &name);
         void setLevel(int level);
         void setInventory(std::vector<int> inventory);
 
@@ -44,5 +46,6 @@ class Player
         std::string _name;
         STATE _state;
         int _eggTime;
+        std::string _eggName;
         std::string _broadcastMessage;
 };

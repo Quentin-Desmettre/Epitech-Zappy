@@ -54,6 +54,10 @@ class ServerInformations
         void removePlayer(std::string name);
         void setPlayerDead(std::string name);
         void addBroadCastMessage(std::string name, std::string message);
+        void PlayerForkEgg(std::string name);
+        void PlayerLayEgg(std::string name, std::string eggName, int x, int y);
+        void EggConnection(std::string eggName);
+        void EggDeath(std::string eggName);
 
         Mateyak::Vec2f getMapSize() const;
         ZappyMap getMap() const;

@@ -164,7 +164,6 @@ void GuiClient::PlayerExpulse(std::vector<std::string> parameters)
 
 void GuiClient::PlayerFork(std::vector<std::string> parameters)
 {
-    /*
     if (parameters.size() != 1) {
         std::cerr << "PlayerFork: invalid number of parameters" << std::endl;
         return;
@@ -172,50 +171,41 @@ void GuiClient::PlayerFork(std::vector<std::string> parameters)
     std::string name = parameters[0];
     if (name[0] == '#')
         name.erase(0, 1);
-    _serverInformations.PlayerAddAEgg();
-     */
+    _serverInformations.PlayerForkEgg(name);
 }
 
 void GuiClient::EggLaying(std::vector<std::string> parameters)
 {
-    /*
     if (parameters.size() != 4) {
-        std::cerr <<;
+        std::cerr << "EggLaying: invalid number of parameters" << std::endl;
         return;
     }
-    _serverInformations.();
-*/
-     }
+    std::string eggName = parameters[0];
+    std::string name = parameters[1];
+    if (name[0] == '#')
+        name.erase(0, 1);
+    int x = std::stoi(parameters[2]);
+    int y = std::stoi(parameters[3]);
 
-void GuiClient::EggHatching(std::vector<std::string> parameters)
-{
-    /*
-    if (parameters.size() != 4) {
-        std::cerr <<;
-        return;
-    }
-    _serverInformations.();
-*/
-     }
+    _serverInformations.PlayerLayEgg(name, eggName, x, y);
+}
 
 void GuiClient::EggConnection(std::vector<std::string> parameters)
 {
-    /*
-    if (parameters.size() != 4) {
-        std::cerr <<;
+    if (parameters.size() != 1) {
+        std::cerr << "EggConnection: invalid number of parameters" << std::endl;
         return;
     }
-    _serverInformations.();
-*/
-     }
+    std::string eggName = parameters[0];
+    _serverInformations.EggConnection(eggName);
+}
 
 void GuiClient::EggDeath(std::vector<std::string> parameters)
 {
-    /*
     if (parameters.size() != 4) {
-        std::cerr <<;
+        std::cerr << "EggDeath: invalid number of parameters" << std::endl;
         return;
     }
-    _serverInformations.();
-*/
-     }
+    std::string eggName = parameters[0];
+    _serverInformations.EggDeath(eggName);
+}
