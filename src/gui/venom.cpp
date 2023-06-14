@@ -152,10 +152,12 @@ void Venom::draw_ven(int seed, const Mateyak::Camera& camera)
 {
     c_pos = camera._position;
     if (state == Player::STATE::EGGFORKED || state == Player::STATE::EGGHATCHING || state == Player::STATE::EGGLAYING) {
-        DrawSphere(_pos + rnd, state == Player::STATE::EGGHATCHING ? 1 + time : 1, state == Player::STATE::EGGFORKED ? Color{120, 120, 120, 255} : _clr);
+        Mateyak::Vec3f egg_pos = _pos + rnd;
+        _pos.y = 0.5;
+        DrawSphere(egg_pos, state == Player::STATE::EGGHATCHING ? time / 2.0 : 0.5, state == Player::STATE::EGGFORKED ? Color{120, 120, 120, 255} : _clr);
         return;
     }
-    _pos = _pos - rnd;
+    _pos = _pos + rnd;
     for (int i = 0; i < 5000; i++) {
         if ((_pos - pos_feet[i]).len() < DIS && (c_pos - pos_feet[i]).len() < 100) {
             if (Utils::differenceAngle((c_pos - camera._target).Normalize(), (c_pos - pos_feet[i]).Normalize()) > 45)
@@ -163,7 +165,7 @@ void Venom::draw_ven(int seed, const Mateyak::Camera& camera)
             Draw_leg(pos_feet[i], seed + i * 1000);
         }
     }
-    _pos = _pos + rnd;
+    _pos = _pos - rnd;
 }
 
 Mateyak::Vec3f Venom::getPos() const
