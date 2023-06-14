@@ -21,10 +21,12 @@ private:
     int level;
     int state;
     static int nbLegs;
+    static int nbBigLegs;
     static int circlePerLeg;
     static int pointPerCircle;
     static bool usePerlin;
     static double time;
+    std::vector<Mateyak::Vec3f> pos_feet;
 
 public:
     void setLevel(int level);
@@ -32,7 +34,7 @@ public:
     void setState(int state);
     [[nodiscard]] int getState() const;
     static void fpsHandler();
-    static std::vector<Mateyak::Vec3f> pos_feet;
+    static std::vector<std::vector<std::vector<Mateyak::Vec3f>>> feet_pos;
     Venom(Mateyak::Vec2f pos = {0, 0}, Mateyak::Vec2f mapSize = {10, 10}, Color clr = WHITE);
     ~Venom();
     void Draw_leg(Mateyak::Vec3f pos, int seed);

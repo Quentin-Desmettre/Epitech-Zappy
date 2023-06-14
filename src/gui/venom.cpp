@@ -12,7 +12,7 @@ int Venom::circlePerLeg = 30;
 int Venom::pointPerCircle = 4;
 bool Venom::usePerlin = true;
 double Venom::time = 0;
-std::vector<Mateyak::Vec3f> Venom::pos_feet;
+std::vector<std::vector<std::vector<Mateyak::Vec3f>>> Venom::feet_pos;
 
 Venom::Venom(Mateyak::Vec2f pos, Mateyak::Vec2f mapSize, Color clr): mapSize(mapSize),
     _clr(clr)
@@ -157,15 +157,21 @@ void Venom::draw_ven(int seed, const Mateyak::Camera& camera)
         DrawSphere(egg_pos, state == Player::STATE::EGGHATCHING ? time / 2.0 : 0.5, state == Player::STATE::EGGFORKED ? Color{120, 120, 120, 255} : _clr);
         return;
     }
-    _pos = _pos + rnd;
-    for (int i = 0; i < 5000; i++) {
-        if ((_pos - pos_feet[i]).len() < DIS && (c_pos - pos_feet[i]).len() < 100) {
-            if (Utils::differenceAngle((c_pos - camera._target).Normalize(), (c_pos - pos_feet[i]).Normalize()) > 45)
-                continue;
-            Draw_leg(pos_feet[i], seed + i * 1000);
+    _pos = _pos - rnd;
+    int x = _pos.x / (10 / 3.f);
+    int y = _pos.z / (10 / 3.f);
+    int minY = (y - 1 > 0 ? y - 1 : 0);
+    int maxY = (y + 1 < mapSize.y ? y + 1 : mapSize.y);
+    int minX = (x - 1 > 0 ? x - 1 : 0);
+    int maxX = (x + 1 < mapSize.x ? x + 1 : mapSize.x);
+
+    for (int i = minY; i <= maxY; i++) {
+        for (int j = minX; j <= maxX; j++) {
+            for (auto &it : feet_pos[i][j])
+               Draw_leg(it, seed + i * 1000);
         }
     }
-    _pos = _pos - rnd;
+    _pos = _pos + rnd;
 }
 
 Mateyak::Vec3f Venom::getPos() const

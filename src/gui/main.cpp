@@ -125,6 +125,7 @@ void Graphic::loop(Mateyak::Vec2f mapSize)
     _windowHeight = 1080 / 1.3;
     Mateyak::Window win(_windowWidth, _windowHeight, "Zappy", 400);
     int seed = rand();
+    Venom ven = Venom();
     Mateyak::Camera cam({5.0f, 5.0f, 5.0f}, {0.0f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, 45.0f);
     Map map(mapSize * 10, 0.5);
     Mateyak::Model3D flat(GenMeshPoly(10, 10000.0f), Mateyak::Vec3f{-500, -1, -500}, 1.0f, BLACK);
@@ -160,6 +161,8 @@ void Graphic::loop(Mateyak::Vec2f mapSize)
         Mateyak::Window::draw(map);
         Mateyak::Window::draw(flat);
         Venom::fpsHandler();
+        ven.move_ven(cam._cam);
+        ven.draw_ven(seed, cam);
         _serverInformations.startComputing();
         map.update(_serverInformations);
         for (auto &it : _serverInformations.getPlayers()) {
