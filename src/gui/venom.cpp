@@ -74,7 +74,7 @@ void Venom::Draw_leg(Mateyak::Vec3f leg, int seed)
                 noise.z = Perlin::Noise2D(seed * h * 2, i / (FLOAT_NB / 12.5), seed, 1) * ((i / FLOAT_NB + 0.5) / 2.0) / 2;
             }
             float raylevel = level / 8.0 + 0.5;
-            Utils::generateCirclePoints(center[i] + noise, angles[i], ((nb - i) / FLOAT_NB) / ((h - 1) * 4) * raylevel, pointPerCircle, points);
+            Utils::generateCirclePoints(center[i] + noise, angles[i], ((nb - i) / FLOAT_NB) / ((h - 1) * 6) * raylevel, pointPerCircle, points);
         }
         std::vector<Mateyak::Triangle> triangles = Utils::connectPointsWithTriangles(points, pointPerCircle);
         if (triangles.empty())
@@ -114,6 +114,9 @@ void Venom::move_ven(Camera camera)
     }
     if (IsKeyPressed(KEY_KP_ADD)) {
         state = (state + 1) % 6;
+    }
+    if (IsKeyPressed(KEY_KP_SUBTRACT)) {
+        level = (level + 1 % 9);
     }
 }
 
