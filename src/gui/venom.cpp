@@ -21,6 +21,7 @@ Venom::Venom(Mateyak::Vec2f pos, Mateyak::Vec2f mapSize, Color clr): mapSize(map
     _pos = {(pos.x * 10 + 5) / 3.F, 0.75, (pos.y * 10 + 5) / 3.F};
     _nextPosition = _pos;
     level = 1;
+    state = Player::STATE::NONE;
 }
 
 Venom::~Venom()
@@ -49,6 +50,8 @@ void Venom::Draw_leg(Mateyak::Vec3f leg, int seed)
     for (int i = 0; i <= nb; i++) {
         tmp += vec;
         tmp.y = sinf((i / FLOAT_NB * PI * 4 + PI) / 5.0f);// * time;
+        if (state == Player::STATE::INCANTING)
+            tmp.y *= time;
 
         center.push_back(tmp);
         angles.push_back(tmp - last);
@@ -79,7 +82,7 @@ void Venom::Draw_leg(Mateyak::Vec3f leg, int seed)
         for (size_t i = 0; i < triangles.size(); i++) {
             Mateyak::Triangle tr = triangles[i];
             float clr_mul = 1 - (float)i / (float)triangles.size();
-            Mateyak::Window::draw(tr, Color{u_char(_clr.a * clr_mul), u_char(_clr.g * clr_mul), u_char(_clr.b * clr_mul), (unsigned char)(2.55 * len)});
+            Mateyak::Window::draw(tr, Color{u_char(_clr.r * clr_mul), u_char(_clr.g * clr_mul), u_char(_clr.b * clr_mul), (unsigned char)(2.55 * len)});
         }
     }
 }
@@ -148,6 +151,10 @@ void Venom::move_ven()
 void Venom::draw_ven(int seed, const Mateyak::Camera& camera)
 {
     c_pos = camera._position;
+    if (state == Player::STATE::EGGFORKED || state == Player::STATE::EGGHATCHING || state == Player::STATE::EGGLAYING) {
+        DrawSphere(_pos + rnd, state == Player::STATE::EGGHATCHING ? 1 + time : 1, state == Player::STATE::EGGFORKED ? Color{120, 120, 120, 255} : _clr);
+        return;
+    }
     _pos = _pos - rnd;
     for (int i = 0; i < 5000; i++) {
         if ((_pos - pos_feet[i]).len() < DIS && (c_pos - pos_feet[i]).len() < 100) {
@@ -228,4 +235,12 @@ int Venom::getLevel() const {
 void Venom::setLevel(int level)
 {
     this->level = level;
+}
+
+void Venom::setState(int state) {
+    this->state = state;
+}
+
+int Venom::getState() const {
+    return state;
 }
