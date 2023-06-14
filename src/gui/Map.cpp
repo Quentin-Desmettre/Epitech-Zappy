@@ -151,13 +151,17 @@ void Map::setShader(const Mateyak::Shaders &shader) {
 
 void Map::update(const ServerInformations &infos) {
     ZappyMap zpMap = infos.getMap();
-
+    int food_nb = 0;
     for (auto &col : zpMap) {
         for (auto &pos : col) {
+            food_nb = 0;
             for (auto &obj : pos) {
                 if (obj.type == 0) {
+                    if (food_nb != 0)
+                        continue;
                     _foods[int(obj.pos.x * 10) % 3]->setPos({obj.pos.x * 10 / 3.f, 0, obj.pos.y * 10 / 3.f});
                     Mateyak::Window::draw(*_foods[int(obj.pos.x * 10) % 3]);
+                    food_nb++;
                     continue;
                 }
                 _rock.setColor(obj.color);

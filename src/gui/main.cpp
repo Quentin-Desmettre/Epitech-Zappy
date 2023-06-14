@@ -116,10 +116,13 @@ void Graphic::drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam)
     std::vector<std::unique_ptr<Player>> &players = _serverInformations.getPlayers();
     Mateyak::Vec3f dir = cam._lastClickDir.Normalize();
     Mateyak::Vec3f camPos = cam._position;
+    Mateyak::Vec3f playerPos;
 
     for (int i = 0; i < players.size(); i++) {
-        diff = ((players[i]->ven.getPos() - camPos).Normalize() - dir).len();
-        len = (players[i]->ven.getPos() - camPos).len();
+        playerPos = players[i]->ven.getPos();
+        playerPos.y = 0.3;
+        diff = ((playerPos - camPos).Normalize() - dir).len();
+        len = (playerPos - camPos).len();
         std::cout << diff * len << std::endl;
         if (diff * len < min) {
             min = diff;
@@ -127,9 +130,12 @@ void Graphic::drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam)
         }
     }
     if (playerSelected == -1) {
+//        if (players.size() > 0)
+//            players[0]->ven.setState(Player::STATE::NONE);
         std::cout << "No player selected" << std::endl;
         return;
     }
+//    players[playerSelected]->ven.setState(Player::STATE::EGGHATCHING);
     std::cout << "Player selected: " << playerSelected << std::endl;
 }
 
