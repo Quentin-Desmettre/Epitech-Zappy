@@ -95,12 +95,14 @@ void Graphic::drawTileInformation(Mateyak::Window &win, Mateyak::Camera &cam)
         tileResources[Ressource::resourceName[it.type]].second = it.type;
     }
 
-    Mateyak::Window::draw("Tile: [x = " + std::to_string((int)tileX) + " -- y =" + std::to_string((int)tileY) + "]", boxPosX + 20, boxPosY + 20, 25, {255, 255, 255, 255});
+    Mateyak::Window::draw("Tile: (" + std::to_string((int)tileX) + ", " + std::to_string((int)tileY) + ")", boxPosX + 20, boxPosY + 20, 25, {255, 255, 255, 255});
 
     boxPosY += 30;
     for (auto &it : tileResources) {
         std::string str = it.first + ": " + std::to_string(it.second.first);
-        Mateyak::Window::draw(str, boxPosX + 20, boxPosY + 20, 25, Ressource::clr[it.second.second]);
+        Color tmp = Ressource::clr[it.second.second];
+        tmp.a = 255;
+        Mateyak::Window::draw(str, boxPosX + 20, boxPosY + 20, 25, tmp);
         boxPosY += 30;
     }
 }

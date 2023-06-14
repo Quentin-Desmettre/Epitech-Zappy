@@ -37,17 +37,17 @@ Map::Map(Mateyak::Vec2f size, float zoom):
     _ground.setPos({0, -0.5, 0});
     _ground.setTexture(clr);
 
-    Venom::feet_pos.resize(size.y + 1);
-    for (int i = 0; i <= size.y; i++) {
-        Venom::feet_pos[i].resize(size.x + 1);
+    Venom::feet_pos.resize(size.y);
+    for (int i = 0; i < size.y; i++) {
+        Venom::feet_pos[i].resize(size.x);
     }
 
-    for (int i = 0; i <= size.y; i++) {
-        for (int j = 0; j <= size.x; j++) {
-            for (int nb = 0; nb < 5; nb++) {
+    for (int i = 0; i < size.y; i++) {
+        for (int j = 0; j < size.x; j++) {
+            for (int nb = 0; nb < 8; nb++) {
                 Mateyak::Vec3f ps;
-                float x = GetRandomValue(0, 100) / 100.0;
-                float y = GetRandomValue(0, 100) / 100.0;
+                float x = GetRandomValue((nb < 4) ? 0 : 50, (nb < 4) ? 50 : 100) / 100.0;
+                float y = GetRandomValue((nb % 2) ? 0 : 50, (nb % 2) ? 50 : 100) / 100.0;
                 ps.x = (x + i) * 10 / 3.f;
                 ps.z = (y + j) * 10 / 3.f;
                 ps.y = 0;
