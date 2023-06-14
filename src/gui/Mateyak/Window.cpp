@@ -7,6 +7,7 @@ Font Mateyak::Window::_font = GetFontDefault();
 Mateyak::Window::Window(int width, int height, std::string title, int fps)
 {
     InitWindow(width, height, title.c_str());
+    InitAudioDevice();
     SetTargetFPS(fps);
     Mateyak::Window::_font = LoadFont("assets/arial.ttf");
     if (!_font.texture.id) {
