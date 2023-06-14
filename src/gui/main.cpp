@@ -64,7 +64,7 @@ void Graphic::drawBroadCastMessage(Mateyak::Window &win)
     }
 }
 
-void Graphic::drawTileInformation(Mateyak::Window &win)
+void Graphic::drawTileInformation(Mateyak::Window &win, Mateyak::Camera &cam)
 {
     float boxPosY = _windowHeight - _windowHeight / 3 - 30;
     float boxPosX = _windowWidth - (_windowWidth / 3 - 20) - 20;
@@ -74,11 +74,11 @@ void Graphic::drawTileInformation(Mateyak::Window &win)
     if (_charSize.x == 0 && _charSize.y == 0)
         _charSize = MeasureTextEx(win._font, "Z", 15, 1);
 
-    float tileY = 5;
-    float tileX = 0;
+    float tileY = cam._lastClickPos.y;
+    float tileX = cam._lastClickPos.x;
     Mateyak::Vec2f mapSize = _serverInformations.getMapSize();
 
-    if (tileY >= mapSize.y || tileX >= mapSize.x)
+    if (tileY >= mapSize.y || tileX >= mapSize.x || tileY < 0 || tileX < 0)
         return;
 
     Mateyak::Window::drawBox(boxPosX, boxPosY, boxWidth, boxHeight, {0, 39, 97, 94});
@@ -95,6 +95,9 @@ void Graphic::drawTileInformation(Mateyak::Window &win)
         tileResources[Ressource::resourceName[it.type]].second = it.type;
     }
 
+    Mateyak::Window::draw("Tile: [x = " + std::to_string((int)tileX) + " -- y =" + std::to_string((int)tileY) + "]", boxPosX + 20, boxPosY + 20, 25, {255, 255, 255, 255});
+
+    boxPosY += 30;
     for (auto &it : tileResources) {
         std::string str = it.first + ": " + std::to_string(it.second.first);
         Mateyak::Window::draw(str, boxPosX + 20, boxPosY + 20, 25, Ressource::clr[it.second.second]);
@@ -170,7 +173,7 @@ void Graphic::loop(Mateyak::Vec2f mapSize)
         DrawFPS(10, 10);
         drawTeams();
         drawBroadCastMessage(win);
-        drawTileInformation(win);
+        drawTileInformation(win, cam);
         _serverInformations.endComputing();
         win.endDrawing();
     }

@@ -105,5 +105,5 @@ void Mateyak::Camera::findClickPos(const Mateyak::Vec3f &dir)
     float t = -_position.y / norm.y;
     posInPlane = _position + norm * t;
     posInPlane = posInPlane / (10.0 / 3.0);
-    std::cout << (int)posInPlane.x << " " << (int)posInPlane.z << std::endl;
+    _lastClickPos = {posInPlane.x, posInPlane.z};
 }

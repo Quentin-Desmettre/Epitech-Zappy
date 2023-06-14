@@ -17,7 +17,7 @@ class Graphic {
         void drawTeams();
         void getTeamsPlace(Mateyak::Window &win);
         void drawBroadCastMessage(Mateyak::Window &win);
-        void drawTileInformation(Mateyak::Window &win);
+        void drawTileInformation(Mateyak::Window &win, Mateyak::Camera &cam);
 
     private:
         ServerInformations _serverInformations;
