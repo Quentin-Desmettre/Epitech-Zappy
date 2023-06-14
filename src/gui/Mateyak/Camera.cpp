@@ -31,11 +31,11 @@ Matrix ConvertVectorToMatrix(const Vector3& vector) {
 }
 
 void Mateyak::Camera::RecalculateCamTarget(Mateyak::Vec2f mouseOffset) {
-    Mat4 rotateY = Mat4::rotate3D('y', -mouseOffset.x * 0.009);
+    Mat4 rotateY = Mat4::rotate3D('y', -mouseOffset.x * 0.010);
     Mateyak::Vec3f trget = _target - _position;
     trget = rotateY * trget;
     trget = trget.Normalize();
-    trget.y += -mouseOffset.y * 0.011;
+    trget.y += -mouseOffset.y * 0.010;
     if (trget.y > 0.99)
         trget.y = 0.99;
     if (trget.y < -0.99)
@@ -54,7 +54,7 @@ void Mateyak::Camera::Update()
     mouseOffset = mouseOffset * mouseSensitivity;
     mouseOffset = {-mouseOffset.x, -mouseOffset.y};
 
-    if (GetGestureDetected() == GESTURE_DRAG) {
+    if (GetGestureDetected() == GESTURE_DRAG && IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
         RecalculateCamTarget(mouseOffset);
     }
     Mateyak::Vec3f dir = GetMouseRay(GetMousePosition(), _cam).direction;
@@ -97,7 +97,7 @@ void Mateyak::Camera::RecalculateCamPos()
 
 void Mateyak::Camera::findClickPos(const Mateyak::Vec3f &dir)
 {
-    if (GetGestureDetected() != GESTURE_TAP)
+    if (GetGestureDetected() != GESTURE_TAP || !IsMouseButtonDown(MOUSE_LEFT_BUTTON))
         return;
     Mateyak::Vec3f norm = (dir).Normalize();
     Mateyak::Vec3f posInPlane;
