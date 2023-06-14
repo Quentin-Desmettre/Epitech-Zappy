@@ -21,13 +21,14 @@ void GuiClient::parseOutput(std::string re) {
             {"pex", &GuiClient::PlayerExpulse},
             {"pic", &GuiClient::PlayerIncantation},
             {"pie", &GuiClient::PlayerIncantationEnd},
-            /*{"pfk", &GuiClient::PlayerFork},
-            {"pdr", &GuiClient::PlayerDropRessource},
-            {"pgt", &GuiClient::PlayerTakeRessource},
+            {"pfk", &GuiClient::PlayerFork},
             {"enw", &GuiClient::EggLaying},
-            {"eht", &GuiClient::EggHatching},
             {"ebo", &GuiClient::EggConnection},
             {"edi", &GuiClient::EggDeath},
+            /*
+            {"pdr", &GuiClient::PlayerDropRessource},
+            {"pgt", &GuiClient::PlayerTakeRessource},
+            {"eht", &GuiClient::EggHatching},
             {"sgt", &GuiClient::ServerTimeUnit},
             {"seg", &GuiClient::ServerEndGame},
             {"smg", &GuiClient::ServerMessage},
@@ -51,7 +52,6 @@ void GuiClient::parseOutput(std::string re) {
         while (ss >> token)
             parameters.push_back(token);
         if (commands.find(command) != commands.end()) {
-            std::cout << "command: " << command << std::endl;
             try {
                 std::invoke(commands[command], this, parameters);
             } catch (std::exception &e) {}

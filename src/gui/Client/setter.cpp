@@ -33,7 +33,6 @@ void GuiClient::setMapTiles(std::vector<std::string> parameters)
     for (int i = 2; i < 8; i++)
         res.push_back(std::stoi(parameters[i]));
     _serverInformations.setTile(x, y, res);
-    std::cout << "setTile: " << "x: " << parameters[0] << " y: " << parameters[1] << std::endl;
 }
 
 void GuiClient::setTeamNames(std::vector<std::string> parameters)
@@ -54,6 +53,8 @@ void GuiClient::NewPlayer(std::vector<std::string> parameters)
         return;
     }
     std::string name = parameters[0];
+    if (name[0] == '#')
+        name.erase(0, 1);
     int x = std::stoi(parameters[1]);
     int y = std::stoi(parameters[2]);
     Player::ORIENTATION orientation = static_cast<Player::ORIENTATION>(std::stoi(parameters[3]));
@@ -71,6 +72,8 @@ void GuiClient::MovePlayer(std::vector<std::string> parameters)
     }
 
     std::string name = parameters[0];
+    if (name[0] == '#')
+        name.erase(0, 1);
     int x = std::stoi(parameters[1]);
     int y = std::stoi(parameters[2]);
     Player::ORIENTATION orientation = static_cast<Player::ORIENTATION>(std::stoi(parameters[3]));
@@ -86,6 +89,8 @@ void GuiClient::PlayerLevel(std::vector<std::string> parameters)
     }
 
     std::string name = parameters[0];
+    if (name[0] == '#')
+        name.erase(0, 1);
     int level = std::stoi(parameters[1]);
 
     _serverInformations.setPlayerLevel(name, level);
@@ -99,6 +104,8 @@ void GuiClient::PlayerInventory(std::vector<std::string> parameters)
     }
 
     std::string name = parameters[0];
+    if (name[0] == '#')
+        name.erase(0, 1);
     int x = std::stoi(parameters[1]);
     int y = std::stoi(parameters[2]);
     std::cerr << "PlayerInventory: " << name << " " << x << " " << y << std::endl;
@@ -118,6 +125,8 @@ void GuiClient::PlayerDeath(std::vector<std::string> parameters)
     }
 
     std::string name = parameters[0];
+    if (name[0] == '#')
+        name.erase(0, 1);
     _serverInformations.setPlayerDead(name);
 }
 
@@ -129,6 +138,8 @@ void GuiClient::PlayerBroadcast(std::vector<std::string> parameters)
     }
 
     std::string name = parameters[0];
+    if (name[0] == '#')
+        name.erase(0, 1);
     parameters.erase(parameters.begin());
     std::string message = "";
     for (auto &it : parameters)
@@ -145,8 +156,58 @@ void GuiClient::PlayerExpulse(std::vector<std::string> parameters)
     }
 
     std::string name = parameters[0];
+    if (name[0] == '#')
+        name.erase(0, 1);
     // TODO: Verifier si le fait de le rendre mort est suffisant ou s'il faut vraiment l'expulser
     _serverInformations.setPlayerDead(name);
+}
+
+void GuiClient::PlayerFork(std::vector<std::string> parameters)
+{
+    if (parameters.size() != 1) {
+        std::cerr << "PlayerFork: invalid number of parameters" << std::endl;
+        return;
+    }
+    std::string name = parameters[0];
+    if (name[0] == '#')
+        name.erase(0, 1);
+    _serverInformations.PlayerForkEgg(name);
+}
+
+void GuiClient::EggLaying(std::vector<std::string> parameters)
+{
+    if (parameters.size() != 4) {
+        std::cerr << "EggLaying: invalid number of parameters" << std::endl;
+        return;
+    }
+    std::string eggName = parameters[0];
+    std::string name = parameters[1];
+    if (name[0] == '#')
+        name.erase(0, 1);
+    int x = std::stoi(parameters[2]);
+    int y = std::stoi(parameters[3]);
+
+    _serverInformations.PlayerLayEgg(name, eggName, x, y);
+}
+
+void GuiClient::EggConnection(std::vector<std::string> parameters)
+{
+    if (parameters.size() != 1) {
+        std::cerr << "EggConnection: invalid number of parameters" << std::endl;
+        return;
+    }
+    std::string eggName = parameters[0];
+    _serverInformations.EggConnection(eggName);
+}
+
+void GuiClient::EggDeath(std::vector<std::string> parameters)
+{
+    if (parameters.size() != 4) {
+        std::cerr << "EggDeath: invalid number of parameters" << std::endl;
+        return;
+    }
+    std::string eggName = parameters[0];
+    _serverInformations.EggDeath(eggName);
 }
 
 void GuiClient::PlayerIncantation(std::vector<std::string> parameters)
@@ -162,6 +223,8 @@ void GuiClient::PlayerIncantation(std::vector<std::string> parameters)
 
     for (size_t i = 3; i < parameters.size(); i++) {
         std::string name = parameters[i];
+        if (name[0] == '#')
+            name.erase(0, 1);
 
         auto it = std::find_if(_serverInformations.getPlayers().begin(), _serverInformations.getPlayers().end(), [name](std::unique_ptr<Player> &player) {
             return (*player).getName() == name;

@@ -39,6 +39,7 @@ void Message::FormatMessage(int maxLineSize)
 
 Message::Message(std::string name, std::string message, Color color) :
 _formated(false), _name(name), _message(message), _lines(), _color(color) {}
+
 void ServerInformations::updatePlayer(std::unique_ptr<Player> &player)
 {
     Player::STATE state = player->getState();
@@ -50,8 +51,10 @@ void ServerInformations::updatePlayer(std::unique_ptr<Player> &player)
         player->ven.getPosition().y += 0.01;
     if (player->ven.getPos().y > 3.0) {
         removePlayer(player->getName());
+        return;
     }
     player->ven.setLevel(player->getLevel());
+    player->ven.setState(player->getState());
 }
 
 void ServerInformations::setMapSize(int x, int y)
@@ -69,6 +72,10 @@ void ServerInformations::setTile(int x, int y, std::vector<int> values)
     int number_in_tile;
     int number_to_erase;
     int number_to_add;
+
+    if (y >= static_cast<int>(map.size()) || x >= static_cast<int>(map[y].size())) {
+        throw std::runtime_error("Error: setTile: x or y out of range");
+    }
 
     for (int i = 0; i < static_cast<int>(values.size()); i++) {
         number_in_tile = 0;
@@ -107,12 +114,24 @@ void ServerInformations::addTeam(std::string team)
 void ServerInformations::addPlayer(std::string name, int x, int y, Player::ORIENTATION orientation, int level, std::string team)
 {
     std::unique_ptr<Player> player;
+    bool team_exist = false;
+
     for (size_t i = 0; i < teams.size(); i++) {
         if (teams[i].getName() == team) {
             player = std::make_unique<Player>(name, x, y, orientation, level, teams[i], mapSize);
+            team_exist = true;
             break;
         }
     }
+
+    for (auto &it : players) {
+        if (it->ven.getPos().x == x && it->ven.getPos().y == y && it->getState() == Player::STATE::EGGHATCHING) {
+            std::remove(players.begin(), players.end(), it), players.end();
+            break;
+        }
+    }
+    if (!team_exist)
+        throw std::runtime_error("Team doesn't exist");
     players.push_back(std::move(player));
 }
 
@@ -125,6 +144,7 @@ void ServerInformations::movePlayer(std::string name, int x, int y, Player::ORIE
             return;
         }
     }
+    throw std::runtime_error("Player doesn't exist");
 }
 
 void ServerInformations::setPlayerState(std::string name, Player::STATE state)
@@ -135,6 +155,7 @@ void ServerInformations::setPlayerState(std::string name, Player::STATE state)
             return;
         }
     }
+    throw std::runtime_error("Player doesn't exist");
 }
 
 void ServerInformations::setPlayerLevel(std::string name, int level)
@@ -145,6 +166,7 @@ void ServerInformations::setPlayerLevel(std::string name, int level)
             return;
         }
     }
+    throw std::runtime_error("Player doesn't exist");
 }
 
 void ServerInformations::setPlayerInventory(std::string name,
@@ -156,6 +178,7 @@ void ServerInformations::setPlayerInventory(std::string name,
             return;
         }
     }
+    throw std::runtime_error("Player doesn't exist");
 }
 
 void ServerInformations::removePlayer(std::string name)
@@ -166,6 +189,7 @@ void ServerInformations::removePlayer(std::string name)
             return;
         }
     }
+    throw std::runtime_error("Player doesn't exist");
 }
 
 void ServerInformations::setPlayerDead(std::string name)
@@ -176,6 +200,7 @@ void ServerInformations::setPlayerDead(std::string name)
             return;
         }
     }
+    throw std::runtime_error("Player doesn't exist");
 }
 
 void ServerInformations::addBroadCastMessage(std::string name, std::string message)
@@ -186,6 +211,55 @@ void ServerInformations::addBroadCastMessage(std::string name, std::string messa
             return;
         }
     }
+    throw std::runtime_error("Player doesn't exist");
+}
+
+void ServerInformations::PlayerForkEgg(std::string name)
+{
+    for (auto &it : players) {
+        if (it->getName() == name) {
+            std::unique_ptr<Player> tmp = std::make_unique<Player>(it->getName(), it->ven.getPos().x, it->ven.getPos().y, Player::ORIENTATION::NORTH, 1, it->getTeam(), mapSize);
+            tmp->setState(Player::STATE::EGGFORKED);
+            players.push_back(std::move(tmp));
+            return;
+        }
+    }
+    throw std::runtime_error("Player doesn't exist");
+}
+
+void ServerInformations::PlayerLayEgg(std::string name, std::string eggName, int posX, int posY)
+{
+    auto x = static_cast<float>(posX);
+    auto y = static_cast<float>(posY);
+
+    for (auto &it : players) {
+        if (it->getName() == name && it->getState() == Player::STATE::EGGFORKED) {
+            if (it->ven.getPos().x == x && it->ven.getPos().y == y) {
+                it->setEggName(eggName);
+                it->setState(Player::STATE::EGGLAYING);
+                return;
+            }
+        }
+    }
+    throw std::runtime_error("Player egg doesn't exist");
+}
+
+void ServerInformations::EggConnection(std::string eggName)
+{
+    for (auto &it : players) {
+        if (it->getEggName() == eggName) {
+            it->setState(Player::STATE::EGGHATCHING);
+            return;
+        }
+    }
+    throw std::runtime_error("Egg doesn't exist");
+}
+
+void ServerInformations::EggDeath(std::string eggName)
+{
+    players.erase(std::remove_if(players.begin(), players.end(), [eggName](std::unique_ptr<Player> &player) {
+    return player->getEggName() == eggName;
+    }), players.end());
 }
 
 Mateyak::Vec2f ServerInformations::getMapSize() const

@@ -20,6 +20,7 @@ namespace Mateyak
 
             void Update();
             Camera3D getRayCam() const;
+            void findClickPos(const Mateyak::Vec3f &dir);
             void RecalculateCamTarget(Mateyak::Vec2f mouseOffset);
             void RecalculateCamPos();
 

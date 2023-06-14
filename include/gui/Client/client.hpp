@@ -38,6 +38,11 @@ class GuiClient
         void PlayerExpulse(std::vector<std::string> parameters);
         void PlayerIncantation(std::vector<std::string> parameters);
         void PlayerIncantationEnd(std::vector<std::string> parameters);
+        void PlayerFork(std::vector<std::string> parameters);
+        void EggLaying(std::vector<std::string> parameters);
+        void EggHatching(std::vector<std::string> parameters);
+        void EggConnection(std::vector<std::string> parameters);
+        void EggDeath(std::vector<std::string> parameters);
 
     private:
         boost::asio::io_context _io_context;
@@ -46,4 +51,5 @@ class GuiClient
         boost::asio::ip::tcp::socket _socket;
         ServerInformations &_serverInformations;
         bool _loop = true;
+        std::string _buffer;
 };
