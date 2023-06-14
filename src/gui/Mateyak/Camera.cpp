@@ -59,6 +59,8 @@ void Mateyak::Camera::Update()
     }
     Mateyak::Vec3f dir = GetMouseRay(GetMousePosition(), _cam).direction;
     findClickPos(dir);
+    if (GetGestureDetected() == GESTURE_TAP || IsMouseButtonDown(MOUSE_MIDDLE_BUTTON))
+        _lastClickDir = dir;
     RecalculateCamPos();
     _oldCamPos = _camPos;
 }

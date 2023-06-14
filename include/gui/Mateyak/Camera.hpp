@@ -32,6 +32,7 @@ namespace Mateyak
             Camera3D _cam;
             int _state;
             Vec2f _lastClickPos {-1, -1};
+            Vec3f _lastClickDir {-1, -1, -1};
 
         private:
             Vec2f _oldCamPos;

@@ -107,6 +107,33 @@ void Graphic::drawTileInformation(Mateyak::Window &win, Mateyak::Camera &cam)
     }
 }
 
+void Graphic::drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam)
+{
+    int playerSelected = -1;
+    float min = 0.5f;
+    float diff;
+    float len = 0;
+    std::vector<std::unique_ptr<Player>> &players = _serverInformations.getPlayers();
+    Mateyak::Vec3f dir = cam._lastClickDir.Normalize();
+    Mateyak::Vec3f camPos = cam._position;
+
+    for (int i = 0; i < players.size(); i++) {
+        diff = ((players[i]->ven.getPos() - camPos).Normalize() - dir).len();
+        len = (players[i]->ven.getPos() - camPos).len();
+        std::cout << diff * len << std::endl;
+        if (diff * len < min) {
+            min = diff;
+            playerSelected = i;
+        }
+    }
+    if (playerSelected == -1) {
+        std::cout << "No player selected" << std::endl;
+        return;
+    }
+    std::cout << "Player selected: " << playerSelected << std::endl;
+}
+
+
 void Graphic::getTeamsPlace(Mateyak::Window &win)
 {
     for (auto &it : _serverInformations.getTeams()) {
@@ -179,6 +206,7 @@ void Graphic::loop(Mateyak::Vec2f mapSize)
         drawTeams();
         drawBroadCastMessage(win);
         drawTileInformation(win, cam);
+        drawPlayerInformation(win, cam);
         _serverInformations.endComputing();
         win.endDrawing();
     }
@@ -260,7 +288,7 @@ int main(int ac, char **av)
             return 84;
         Mateyak::Vec2f mapSize = graphic.getServerInformations().getMapSize();
 
-       std::thread t(&GuiClient::compute, &client);
+        std::thread t(&GuiClient::compute, &client);
         graphic.loop(mapSize);
         client.stop();
         t.join();
