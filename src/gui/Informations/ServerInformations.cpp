@@ -54,6 +54,7 @@ void ServerInformations::updatePlayer(std::unique_ptr<Player> &player)
         return;
     }
     player->ven.setLevel(player->getLevel());
+    player->ven.setState(player->getState());
 }
 
 void ServerInformations::setMapSize(int x, int y)
