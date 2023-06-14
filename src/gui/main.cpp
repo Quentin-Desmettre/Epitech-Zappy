@@ -64,6 +64,44 @@ void Graphic::drawBroadCastMessage(Mateyak::Window &win)
     }
 }
 
+void Graphic::drawTileInformation(Mateyak::Window &win)
+{
+    float boxPosY = _windowHeight - _windowHeight / 3 - 30;
+    float boxPosX = _windowWidth - (_windowWidth / 3 - 20) - 20;
+    float boxWidth = _windowWidth / 3 - 10;
+    float boxHeight = _windowHeight / 3 + 20;
+
+    if (_charSize.x == 0 && _charSize.y == 0)
+        _charSize = MeasureTextEx(win._font, "Z", 15, 1);
+
+    float tileY = 5;
+    float tileX = 0;
+    Mateyak::Vec2f mapSize = _serverInformations.getMapSize();
+
+    if (tileY >= mapSize.y || tileX >= mapSize.x)
+        return;
+
+    Mateyak::Window::drawBox(boxPosX, boxPosY, boxWidth, boxHeight, {0, 39, 97, 94});
+    ZappyMap map = _serverInformations.getMap();
+    std::vector<Ressource> tileInfo = map[tileY][tileX];
+
+    std::map<std::string, std::pair<int, int>> tileResources;
+
+    for (auto &it : tileInfo) {
+        if (tileResources.find(Ressource::resourceName[it.type]) == tileResources.end())
+            tileResources[Ressource::resourceName[it.type]].first = 1;
+        else
+            tileResources[Ressource::resourceName[it.type]].first += 1;
+        tileResources[Ressource::resourceName[it.type]].second = it.type;
+    }
+
+    for (auto &it : tileResources) {
+        std::string str = it.first + ": " + std::to_string(it.second.first);
+        Mateyak::Window::draw(str, boxPosX + 20, boxPosY + 20, 25, Ressource::clr[it.second.second]);
+        boxPosY += 30;
+    }
+}
+
 void Graphic::getTeamsPlace(Mateyak::Window &win)
 {
     for (auto &it : _serverInformations.getTeams()) {
@@ -132,6 +170,7 @@ void Graphic::loop(Mateyak::Vec2f mapSize)
         DrawFPS(10, 10);
         drawTeams();
         drawBroadCastMessage(win);
+        drawTileInformation(win);
         _serverInformations.endComputing();
         win.endDrawing();
     }
