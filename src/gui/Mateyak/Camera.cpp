@@ -20,7 +20,6 @@ Mateyak::Camera::Camera(Vec3f position, Vec3f target, Vec3f up, float fov, int m
     _state = 1;
 
     _oldCamPos = {static_cast<float>(GetMouseX()), static_cast<float>(GetMouseY())};
-    DisableCursor();
 }
 
 Matrix ConvertVectorToMatrix(const Vector3& vector) {
@@ -32,11 +31,11 @@ Matrix ConvertVectorToMatrix(const Vector3& vector) {
 }
 
 void Mateyak::Camera::RecalculateCamTarget(Mateyak::Vec2f mouseOffset) {
-    Mat4 rotateY = Mat4::rotate3D('y', -mouseOffset.x * 0.01);
+    Mat4 rotateY = Mat4::rotate3D('y', -mouseOffset.x * 0.010);
     Mateyak::Vec3f trget = _target - _position;
     trget = rotateY * trget;
     trget = trget.Normalize();
-    trget.y += -mouseOffset.y * 0.01;
+    trget.y += -mouseOffset.y * 0.010;
     if (trget.y > 0.99)
         trget.y = 0.99;
     if (trget.y < -0.99)
@@ -48,24 +47,21 @@ void Mateyak::Camera::RecalculateCamTarget(Mateyak::Vec2f mouseOffset) {
 
 void Mateyak::Camera::Update()
 {
-    if (IsKeyPressed(KEY_F3)) {
-        _state = !_state;
-        if (_state == 1)
-            DisableCursor();
-        else
-            EnableCursor();
-    }
-
     Vector2 tmp = GetMousePosition();
     _camPos = {tmp.x, tmp.y};
     Vec2f mouseOffset = _camPos - _oldCamPos;
     const float mouseSensitivity = 0.1f;
     mouseOffset = mouseOffset * mouseSensitivity;
+    mouseOffset = {-mouseOffset.x, -mouseOffset.y};
 
-    if (_state == 1) {
+    if (GetGestureDetected() == GESTURE_DRAG && IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
         RecalculateCamTarget(mouseOffset);
-        RecalculateCamPos();
     }
+    Mateyak::Vec3f dir = GetMouseRay(GetMousePosition(), _cam).direction;
+    findClickPos(dir);
+    if (GetGestureDetected() == GESTURE_TAP || IsMouseButtonDown(MOUSE_MIDDLE_BUTTON))
+        _lastClickDir = dir;
+    RecalculateCamPos();
     _oldCamPos = _camPos;
 }
 
@@ -99,4 +95,17 @@ void Mateyak::Camera::RecalculateCamPos()
     _target += _position;
     _cam.target = _target;
     _cam.position = _position;
+}
+
+void Mateyak::Camera::findClickPos(const Mateyak::Vec3f &dir)
+{
+    if (GetGestureDetected() != GESTURE_TAP || !IsMouseButtonDown(MOUSE_LEFT_BUTTON))
+        return;
+    Mateyak::Vec3f norm = (dir).Normalize();
+    Mateyak::Vec3f posInPlane;
+
+    float t = -_position.y / norm.y;
+    posInPlane = _position + norm * t;
+    posInPlane = posInPlane / (10.0 / 3.0);
+    _lastClickPos = {posInPlane.x, posInPlane.z};
 }

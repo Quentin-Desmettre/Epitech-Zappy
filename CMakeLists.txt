@@ -16,8 +16,10 @@ include_directories(include/gui)
 include_directories(include/server)
 include_directories(/usr/local/include)
 
+find_package(Boost QUIET)
+include_directories(${Boost_INCLUDE_DIR})
+
 find_package(raylib QUIET)
-find_package(Boost COMPONENTS system filesystem QUIET)
 include_directories(${RAYLIB_INCLUDE_DIRS})
 
 if (NOT Boost_FOUND)
@@ -51,14 +53,15 @@ add_executable(zappy_gui
         src/gui/Map.cpp
         src/gui/Utils3d.cpp
         src/gui/venom.cpp
-        src/gui/Informations/Player.cpp src/gui/Informations/ServerInformations.cpp src/gui/Client/setter.cpp include/gui/Informations/Player.hpp include/gui/Informations/ServerInformations.hpp src/gui/Mateyak/Model3D.cpp include/gui/Graphic.hpp src/gui/Informations/Team.cpp include/gui/Informations/Team.hpp include/gui/Mateyak/Audio.hpp src/gui/Mateyak/Audio.cpp)
+        src/gui/Informations/Player.cpp src/gui/Informations/ServerInformations.cpp src/gui/Client/setter.cpp include/gui/Informations/Player.hpp include/gui/Informations/ServerInformations.hpp src/gui/Mateyak/Model3D.cpp include/gui/Graphic.hpp src/gui/Informations/Team.cpp include/gui/Informations/Team.hpp src/gui/Graphic/Display.cpp src/gui/Graphic/Compute.cpp src/gui/ErrorHandling/ErrorHandling.cpp include/gui/ErrorHandling.hpp
+        include/gui/Mateyak/Audio.hpp src/gui/Mateyak/Audio.cpp)
 
 target_link_libraries(zappy_gui ${raylib_LIBRARY} ${Boost_LIBRARY} ${FMOD_LIBRARIES})
 set_target_properties(zappy_gui PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 add_custom_command(TARGET zappy_gui POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/${PAULIIINNN} ${CMAKE_SOURCE_DIR}/zappy_ai
-        )
+)
 
 add_executable(zappy_server
         src/server/network/notify_gui.c

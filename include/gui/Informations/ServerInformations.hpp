@@ -55,23 +55,30 @@ class ServerInformations
         void setPlayerInventory(std::string name, std::vector<int> inventory);
         void removePlayer(std::string name);
         void setPlayerDead(std::string name);
-        void updateAudioAction(std::tuple<int, int> pos, enum Mateyak::action_type type);
         void addBroadCastMessage(std::string name, std::string message);
-        std::vector<Message> &getBroadCastMessage();
+        void setIncantationLevel(std::string name, int level);
+        void PlayerForkEgg(std::string name);
+        void PlayerLayEgg(std::string name, std::string eggName, int x, int y);
+        void EggConnection(std::string eggName);
+        void EggDeath(std::string eggName);
+
+        void updateAudioAction(std::tuple<int, int> pos, enum Mateyak::action_type type);
         void audioActionsHandler(Mateyak::Camera &camera);
 
-        Mateyak::Vec2f getMapSize() const;
+    Mateyak::Vec2f getMapSize() const;
         ZappyMap getMap() const;
         std::vector<Team> getTeams() const;
         std::vector<std::unique_ptr<Player>> &getPlayers();
+        std::vector<Message> &getBroadCastMessage();
 
     private:
         FMOD::System *_systemAudio;
-        Mateyak::Vec2f mapSize {10, 10};
+        Mateyak::Vec2f mapSize {0, 0};
         ZappyMap map;
         std::vector<Team> teams{};
         std::vector<std::unique_ptr<Player>> players{};
         std::vector<Message> broadCastMessage{};
         std::mutex mutex;
+        bool _serverRunning = true;
         std::vector<std::tuple<short, std::vector<std::tuple<int, int, std::shared_ptr<Mateyak::Audio>>>>> audioAction;
 };

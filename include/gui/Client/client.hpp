@@ -18,7 +18,7 @@ class GuiClient
 {
     public:
         GuiClient(ServerInformations &_serverInformations, std::string ip, std::string port);
-        bool CheckValidServer();
+        void CheckValidServer();
         std::string getInformations();
         std::vector<std::string> splitStrings(std::string str, std::string delimiter);
         void compute();
@@ -38,6 +38,12 @@ class GuiClient
         void PlayerIncantationEnd(std::vector<std::string> parameters);
         void PlayerBroadcast(std::vector<std::string> parameters);
         void PlayerExpulse(std::vector<std::string> parameters);
+        void PlayerFork(std::vector<std::string> parameters);
+        void EggLaying(std::vector<std::string> parameters);
+        void EggHatching(std::vector<std::string> parameters);
+        void EggConnection(std::vector<std::string> parameters);
+        void EggDeath(std::vector<std::string> parameters);
+
     private:
         boost::asio::io_context _io_context;
         boost::asio::ip::tcp::resolver _resolver;

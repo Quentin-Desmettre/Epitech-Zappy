@@ -6,7 +6,6 @@
 */
 
 #include "Informations/ServerInformations.hpp"
-#include <iostream>
 
 void Message::FormatMessage(int maxLineSize)
 {
@@ -32,9 +31,6 @@ void Message::FormatMessage(int maxLineSize)
         line.erase(0, _name.size() + 2);
     _lines.push_back(line);
     _formated = true;
-
-    for (auto &it : _lines)
-        std::cout << it << std::endl;
 }
 
 Message::Message(std::string name, std::string message, Color color) :
@@ -51,8 +47,10 @@ void ServerInformations::updatePlayer(std::unique_ptr<Player> &player)
         player->ven.getPosition().y += 0.01;
     if (player->ven.getPos().y > 3.0) {
         removePlayer(player->getName());
+        return;
     }
     player->ven.setLevel(player->getLevel());
+    player->ven.setState(player->getState());
 }
 
 void ServerInformations::setMapSize(int x, int y)
@@ -118,6 +116,13 @@ void ServerInformations::addPlayer(std::string name, int x, int y, Player::ORIEN
         if (teams[i].getName() == team) {
             player = std::make_unique<Player>(name, x, y, orientation, level, teams[i], mapSize);
             team_exist = true;
+            break;
+        }
+    }
+
+    for (auto &it : players) {
+        if (it->ven.getPos().x == x && it->ven.getPos().y == y && it->getState() == Player::STATE::EGGHATCHING) {
+            std::remove(players.begin(), players.end(), it), players.end();
             break;
         }
     }
@@ -205,6 +210,54 @@ void ServerInformations::addBroadCastMessage(std::string name, std::string messa
     throw std::runtime_error("Player doesn't exist");
 }
 
+void ServerInformations::PlayerForkEgg(std::string name)
+{
+    for (auto &it : players) {
+        if (it->getName() == name) {
+            std::unique_ptr<Player> tmp = std::make_unique<Player>(it->getName(), it->ven.getPos().x, it->ven.getPos().y, Player::ORIENTATION::NORTH, 1, it->getTeam(), mapSize);
+            tmp->setState(Player::STATE::EGGFORKED);
+            players.push_back(std::move(tmp));
+            return;
+        }
+    }
+    throw std::runtime_error("Player doesn't exist");
+}
+
+void ServerInformations::PlayerLayEgg(std::string name, std::string eggName, int posX, int posY)
+{
+    auto x = static_cast<float>(posX);
+    auto y = static_cast<float>(posY);
+
+    for (auto &it : players) {
+        if (it->getName() == name && it->getState() == Player::STATE::EGGFORKED) {
+            if (it->ven.getPos().x == x && it->ven.getPos().y == y) {
+                it->setEggName(eggName);
+                it->setState(Player::STATE::EGGLAYING);
+                return;
+            }
+        }
+    }
+    throw std::runtime_error("Player egg doesn't exist");
+}
+
+void ServerInformations::EggConnection(std::string eggName)
+{
+    for (auto &it : players) {
+        if (it->getEggName() == eggName) {
+            it->setState(Player::STATE::EGGHATCHING);
+            return;
+        }
+    }
+    throw std::runtime_error("Egg doesn't exist");
+}
+
+void ServerInformations::EggDeath(std::string eggName)
+{
+    players.erase(std::remove_if(players.begin(), players.end(), [eggName](std::unique_ptr<Player> &player) {
+    return player->getEggName() == eggName;
+    }), players.end());
+}
+
 Mateyak::Vec2f ServerInformations::getMapSize() const
 {
     return mapSize;
@@ -256,7 +309,6 @@ void ServerInformations::audioActionsHandler(Mateyak::Camera &camera)
         for (auto &audio: std::get<1>(action)) {
             if (!std::get<2>(audio)->_beingPlayed) {
                 std::get<2>(audio)->playSound();
-                std::cout << "--------------------------------------------------------------play sound----------------------------------------------------------------------" << std::endl;
                 std::get<2>(audio)->_beingPlayed = true;
                 std::get<2>(audio)->computeStereoAndVolume(camera._position, std::make_tuple(std::get<0>(audio), std::get<1>(audio)), (camera._target - camera._position).Normalize());
             } else {
@@ -293,4 +345,14 @@ ServerInformations::ServerInformations()
     result = _systemAudio->createSound("assets/sounds/level_up.wav", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::LEVELUP]);
     if (result != FMOD_OK)
         throw std::runtime_error("FMOD error! (" + std::to_string(result) + ") " + FMOD_ErrorString(result));
+}
+
+void ServerInformations::setIncantationLevel(std::string name, int level)
+{
+    for (auto &it : players) {
+        if (it->getName() == name) {
+            it->incantationLevel = level;
+            return;
+        }
+    }
 }
