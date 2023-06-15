@@ -228,7 +228,7 @@ void unfreeze_players(server_t *server, map_tile_t *tile, player_t *player);
 void check_resource_spawn(server_t *server);
 void spawn_resources(server_t *server);
 char *get_winning_team(trantor_t *trantor);
-static void accept_client(server_t *server);
+void accept_client(server_t *server);
 void do_level_up(map_tile_t *tile, player_t *player, server_t *server);
 
 UNUSED static const int requirements_for_level[8][7] = {
