@@ -39,8 +39,9 @@ void Graphic::drawBroadCastMessage(Mateyak::Window &win)
     int maxCharInLine;
     float maxLineNumber = (boxHeight) / (_charSize.y + 5);
     float yStart = _windowHeight - 30;
+    int index;
     std::vector<Message> &mes = _serverInformations.getBroadCastMessage();
-    for (int index = mes.size() - 1; index >= 0; index--) {
+    for (index = mes.size() - 1; index >= 0; index--) {
         if (!mes[index]._formated) {
             maxCharInLine = boxWidth / _charSize.x;
             mes[index].FormatMessage(maxCharInLine);
@@ -54,10 +55,13 @@ void Graphic::drawBroadCastMessage(Mateyak::Window &win)
             }
             yStart -= 20;
             maxLineNumber--;
-            if (maxLineNumber <= 0)
+            if (maxLineNumber <= 0) {
+                if (index > 0) mes.erase(mes.begin(), mes.begin() + index);
                 return;
+            }
         }
     }
+
 }
 
 void Graphic::drawTileInformation(Mateyak::Window &win, Mateyak::Camera &cam)
@@ -119,7 +123,6 @@ void Graphic::drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam)
         playerPos.y = 0.3;
         diff = ((playerPos - camPos).Normalize() - dir).len();
         len = (playerPos - camPos).len();
-        std::cout << diff * len << std::endl;
         if (diff * len < min) {
             min = diff;
             playerSelected = i;

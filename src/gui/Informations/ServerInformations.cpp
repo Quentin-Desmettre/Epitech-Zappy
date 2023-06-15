@@ -6,7 +6,6 @@
 */
 
 #include "Informations/ServerInformations.hpp"
-#include <iostream>
 
 void Message::FormatMessage(int maxLineSize)
 {
@@ -32,9 +31,6 @@ void Message::FormatMessage(int maxLineSize)
         line.erase(0, _name.size() + 2);
     _lines.push_back(line);
     _formated = true;
-
-    for (auto &it : _lines)
-        std::cout << it << std::endl;
 }
 
 Message::Message(std::string name, std::string message, Color color) :
