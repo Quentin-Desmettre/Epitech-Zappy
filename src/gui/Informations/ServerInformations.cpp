@@ -357,3 +357,18 @@ void ServerInformations::setIncantationLevel(std::string name, int level)
         }
     }
 }
+
+ServerInformations::~ServerInformations()
+{
+    for (auto &action: audioAction) {
+        for (auto &audio: std::get<1>(action)) {
+            std::get<2>(audio)->stopSound();
+        }
+    }
+    Mateyak::audios[Mateyak::action_type::BROADCAST]->release();
+    Mateyak::audios[Mateyak::action_type::ELEVATIONSTART]->release();
+    Mateyak::audios[Mateyak::action_type::ELEVATIONEND]->release();
+    Mateyak::audios[Mateyak::action_type::LEVELUP]->release();
+    _systemAudio->close();
+    _systemAudio->release();
+}

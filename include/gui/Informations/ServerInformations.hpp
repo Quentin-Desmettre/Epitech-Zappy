@@ -38,7 +38,7 @@ class ServerInformations
 {
     public:
         ServerInformations();
-        ~ServerInformations() = default;
+        ~ServerInformations();
 
         void startComputing();
         void endComputing();
