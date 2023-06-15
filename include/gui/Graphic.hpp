@@ -9,11 +9,13 @@
 #define EPITECH_ZAPPY_GRAPHIC_HPP
 
 #include "Informations/ServerInformations.hpp"
+#include "Mateyak/Window.hpp"
 
 class Graphic {
     public:
-        void loop(Mateyak::Vec2f mapSize);
-        ServerInformations &getServerInformations() { return _serverInformations; }
+        Graphic(Mateyak::Vec2f mapSize, Mateyak::Vec2f windowSize, ServerInformations &serverInformations);
+        ~Graphic() = default;
+        void loop();
         void drawTeams();
         void getTeamsPlace(Mateyak::Window &win);
         void drawBroadCastMessage(Mateyak::Window &win);
@@ -21,13 +23,19 @@ class Graphic {
         void drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam);
 
     private:
-        ServerInformations _serverInformations;
+        ServerInformations &_serverInformations;
         float _windowWidth;
         float _windowHeight;
         int _boxSize = 50;
         int _maxSize = 0;
         int _teamNumber = 0;
+        Mateyak::Vec2f _mapSize;
         Vector2 _charSize{0, 0};
+        Mateyak::Window _win;
+        Mateyak::Camera _cam;
+        Map _map;
+        Mateyak::Model3D _flat;
+        Mateyak::Shaders _shader;
 };
 
 #endif //EPITECH_ZAPPY_GRAPHIC_HPP

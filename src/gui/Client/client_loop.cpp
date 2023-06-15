@@ -70,10 +70,17 @@ void GuiClient::compute()
 {
     std::string resp;
 
-    while (_loop) {
-        if (_socket.available() > 0) {
-            resp = getInformations();
-            parseOutput(resp);
+    try {
+        while (_loop) {
+            if (!_socket.is_open()) {
+                std::cout << "Socket closed" << std::endl;
+            }
+            if (_socket.available() > 0) {
+                resp = getInformations();
+                parseOutput(resp);
+            }
         }
+    } catch (std::exception &e) {
+        std::cout << e.what() << std::endl;
     }
 }

@@ -73,4 +73,5 @@ class ServerInformations
         std::vector<std::unique_ptr<Player>> players{};
         std::vector<Message> broadCastMessage{};
         std::mutex mutex;
+        bool _serverRunning = true;
 };

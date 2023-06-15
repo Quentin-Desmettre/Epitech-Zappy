@@ -18,7 +18,7 @@ class GuiClient
 {
     public:
         GuiClient(ServerInformations &_serverInformations, std::string ip, std::string port);
-        bool CheckValidServer();
+        void CheckValidServer();
         std::string getInformations();
         std::vector<std::string> splitStrings(std::string str, std::string delimiter);
         void compute();

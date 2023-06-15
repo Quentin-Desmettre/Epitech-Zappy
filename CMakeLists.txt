@@ -45,7 +45,7 @@ add_executable(zappy_gui
         src/gui/Map.cpp
         src/gui/Utils3d.cpp
         src/gui/venom.cpp
-        src/gui/Informations/Player.cpp src/gui/Informations/ServerInformations.cpp src/gui/Client/setter.cpp include/gui/Informations/Player.hpp include/gui/Informations/ServerInformations.hpp src/gui/Mateyak/Model3D.cpp include/gui/Graphic.hpp src/gui/Informations/Team.cpp include/gui/Informations/Team.hpp)
+        src/gui/Informations/Player.cpp src/gui/Informations/ServerInformations.cpp src/gui/Client/setter.cpp include/gui/Informations/Player.hpp include/gui/Informations/ServerInformations.hpp src/gui/Mateyak/Model3D.cpp include/gui/Graphic.hpp src/gui/Informations/Team.cpp include/gui/Informations/Team.hpp src/gui/Graphic/Display.cpp src/gui/Graphic/Compute.cpp src/gui/ErrorHandling/ErrorHandling.cpp include/gui/ErrorHandling.hpp)
 
 target_link_libraries(zappy_gui ${raylib_LIBRARY} ${Boost_LIBRARY})
 set_target_properties(zappy_gui PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
