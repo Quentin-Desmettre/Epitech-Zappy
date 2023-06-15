@@ -45,8 +45,6 @@ def elevate(self, send_cmd: bool = True, msg: str = None):
         my_print("Elevated to level %d !!!" % self.level)
         if self.level == 8:
             my_print("Congratulations, you won !!!")
-        if self.level == 2:
-            self.send(CommandNames.FORK)
     else:
         my_print("Error: could not elevate")
 
@@ -57,18 +55,21 @@ def can_evolve(self, inventory: dict[str, int], tiles = None):
     return has_stones(merge_dicts(tmp, self.shared_inventory), self.level)
 
 
-def drop_elevation_stones(self, inventory = None):
-    """Drops all the stones needed to evolve and returns whether the player can evolve or not."""
+def drop_elevation_stones(self, inventory = None, to_not_send: Objects = None):
+    """Drops all the stones needed to evolve."""
     if inventory is None:
         inventory = self.send(CommandNames.INVENTORY)
     if inventory is None:
         return
     for stone in inventory:
         while inventory[stone] > 0 and stone != Objects.FOOD.value:
+            inventory[stone] -= 1
             if self.send(CommandNames.SET, stone) != None:
-                self.send(CommandNames.BROADCAST, "dropped:" + self.team + ":" + stone)
-                inventory[stone] -= 1
-                sleep(self.delta * 7)
+                if to_not_send != None and stone == to_not_send.value:
+                    to_not_send = None
+                else:
+                    self.send(CommandNames.BROADCAST, "droppedø§" + self.team + "ø§" + stone)
+                    sleep(self.delta)
     my_print("Dropped all stones needed to evolve.")
 
 
@@ -82,7 +83,7 @@ def check_requirements(self, inventory = None, tiles = None) -> bool:
     if len(self.get_needed_stones(total)) != 0:
         my_print("Not enough stones to evolve.")
         return False
-    if ground[Objects.PLAYER.value] < 6 and self.level > 1: # temporary fix to ensure that all 6 players are on the same tile (original: get_elevation_needs(self.level)[Objects.PLAYER])
+    if ground[Objects.PLAYER.value] < 6: # temporary fix to ensure that all 6 players are on the same tile (original: get_elevation_needs(self.level)[Objects.PLAYER])
         my_print("Not enough players to evolve.")
         return False
     return True

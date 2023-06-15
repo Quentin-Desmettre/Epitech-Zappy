@@ -37,9 +37,9 @@ def parse_message(self, msg: str, inventory = None, tiles: list[list[str]] = Non
         self.send(CommandNames.BROADCAST, msg)
         return
     if msg.startswith("looted"):
-        add_to_shared_inventory(self, msg.split(':')[2], 1)
+        add_to_shared_inventory(self, msg.split('ø§')[2], 1)
     elif msg.startswith("dropped"):
-        add_to_shared_inventory(self, msg.split(':')[2], -1)
+        add_to_shared_inventory(self, msg.split('ø§')[2], -1)
     elif msg.startswith("moved"):
         self.can_send = True
     elif msg.startswith("incantation"):

@@ -15,16 +15,6 @@ class Ai:
         self.delta = 0
         self.can_send = True
         self.reader = Reader(server, team)
-        self.calibrate()
-
-    def calibrate(self):
-        print("Calibrating...")
-        current_time = time()
-        self.send(CommandNames.INVENTORY)
-        self.delta = time() - current_time
-        self.send(CommandNames.INVENTORY)
-        self.delta = (time() - current_time - self.delta) / 2
-        print("Calibration done !")
 
     def send(self, cmd: CommandNames, arg: str | None = None):
         """Sends a command to the server."""
@@ -52,11 +42,12 @@ class Ai:
         sucess = False
         needed = self.get_needed_stones(inventory)
         loot_food = False
-        if Objects.FOOD.value in inventory and inventory[Objects.FOOD.value] < 50:
+        if Objects.FOOD.value in inventory and inventory[Objects.FOOD.value] < 80:
             loot_food = True
         while len(needed) > 0:
             stone = needed.pop()
             if self.loot_object(stone, False, tiles, loot_food):
+                tiles = self.send(CommandNames.LOOK)
                 sucess = True
                 break
         if not sucess:
@@ -67,11 +58,10 @@ class Ai:
             inventory[stone.value] = 0
         inventory[stone.value] += 1
         if self.can_evolve(inventory, tiles):
-            inventory[stone.value] -= 1
-            self.drop_elevation_stones(inventory)
+            self.drop_elevation_stones(inventory, stone)
         else:
-            self.send(CommandNames.BROADCAST, "looted:" + self.team + ":" + stone.value)
-            sleep(self.delta * 7)
+            self.send(CommandNames.BROADCAST, "lootedø§" + self.team + "ø§" + stone.value)
+            sleep(self.delta)
 
     def handle_broadcast(self, msg, inventory: dict[str, int], tiles: list[list[str]]):
         if msg[0].count("incantation") == 0\
@@ -79,8 +69,8 @@ class Ai:
             my_print("Analyzing broadcast %s" % msg[0])
             self.parse_message(msg[0], inventory, tiles)
         if msg[0].count("incantation") > 0:
-            self.send(CommandNames.BROADCAST, "moved:" + self.team)
-            sleep(self.delta * 7)
+            self.send(CommandNames.BROADCAST, "movedø§" + self.team)
+            sleep(self.delta)
 
     def handle_evolve(self, inventory: dict[str, int], tiles = None):
         my_print("Trying to evolve to level %d" % (self.level + 1))
@@ -88,8 +78,8 @@ class Ai:
             self.drop_elevation_stones()
             self.elevate()
         elif self.can_send:
-            self.send(CommandNames.BROADCAST, "incantation:" + self.team + ":" + str(self.level + 1))
-            sleep(self.delta * 7)
+            self.send(CommandNames.BROADCAST, "incantationø§" + self.team + "ø§" + str(self.level + 1))
+            sleep(self.delta)
             self.can_send = False
         else:
             my_print("Cannot send broadcast (cooldown)")
@@ -98,7 +88,9 @@ class Ai:
         """Takes a decision based on the current state of the game."""
         set_color(None)
         my_print("Making decision")
+        current_time = time()
         inventory = self.send(CommandNames.INVENTORY)
+        self.delta = time() - current_time
         tiles = self.send(CommandNames.LOOK)
         if inventory is None or tiles is None:
             return
