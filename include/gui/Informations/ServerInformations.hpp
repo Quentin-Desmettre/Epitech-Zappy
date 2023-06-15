@@ -37,7 +37,7 @@ class Message {
 class ServerInformations
 {
     public:
-        ServerInformations() = default;
+        ServerInformations();
         ~ServerInformations() = default;
 
         void startComputing();
@@ -58,6 +58,7 @@ class ServerInformations
         void updateAudioAction(std::tuple<int, int> pos, enum Mateyak::action_type type);
         void addBroadCastMessage(std::string name, std::string message);
         std::vector<Message> &getBroadCastMessage();
+        void audioActionsHandler(Mateyak::Camera &camera);
 
         Mateyak::Vec2f getMapSize() const;
         ZappyMap getMap() const;
@@ -65,6 +66,7 @@ class ServerInformations
         std::vector<std::unique_ptr<Player>> &getPlayers();
 
     private:
+        FMOD::System *_systemAudio;
         Mateyak::Vec2f mapSize {10, 10};
         ZappyMap map;
         std::vector<Team> teams{};

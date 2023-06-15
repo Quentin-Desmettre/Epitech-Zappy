@@ -28,6 +28,13 @@ if (NOT raylib_FOUND)
     message(FATAL_ERROR "Please install raylib!\nsudo apt install libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev -y\ngit clone https://github.com/raysan5/raylib.git raylib\ncd raylib\nmkdir build && cd build\ncmake -DBUILD_SHARED_LIBS=ON ..\nmake\nsudo make install\ncd ../../\nrm -rf raylib")
 endif ()
 
+set(FMOD_INCLUDE_DIR "/usr/local/include")
+set(FMOD_LIBRARY "/usr/local/lib")
+set(FMOD_LIBRARIES "-lfmod")
+
+include_directories(${FMOD_INCLUDE_DIR})
+link_directories(${FMOD_LIBRARY})
+
 add_executable(zappy_gui
         src/gui/Client/client.cpp
         src/gui/Client/client_loop.cpp
@@ -44,9 +51,9 @@ add_executable(zappy_gui
         src/gui/Map.cpp
         src/gui/Utils3d.cpp
         src/gui/venom.cpp
-        src/gui/Informations/Player.cpp src/gui/Informations/ServerInformations.cpp src/gui/Client/setter.cpp include/gui/Informations/Player.hpp include/gui/Informations/ServerInformations.hpp src/gui/Mateyak/Model3D.cpp include/gui/Graphic.hpp src/gui/Informations/Team.cpp include/gui/Informations/Team.hpp include/gui/Mateyak/Audio.hpp src/gui/Mateyak/Audio.cpp include/gui/Mateyak/Wave.hpp src/gui/Mateyak/Wave.cpp)
+        src/gui/Informations/Player.cpp src/gui/Informations/ServerInformations.cpp src/gui/Client/setter.cpp include/gui/Informations/Player.hpp include/gui/Informations/ServerInformations.hpp src/gui/Mateyak/Model3D.cpp include/gui/Graphic.hpp src/gui/Informations/Team.cpp include/gui/Informations/Team.hpp include/gui/Mateyak/Audio.hpp src/gui/Mateyak/Audio.cpp)
 
-target_link_libraries(zappy_gui ${raylib_LIBRARY} ${Boost_LIBRARY})
+target_link_libraries(zappy_gui ${raylib_LIBRARY} ${Boost_LIBRARY} ${FMOD_LIBRARIES})
 set_target_properties(zappy_gui PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 add_custom_command(TARGET zappy_gui POST_BUILD

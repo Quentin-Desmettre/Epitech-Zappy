@@ -4,27 +4,43 @@
 
 #pragma once
 
-#include <raylib.h>
+#include <fmod.hpp>
+#include <fmod_errors.h>
 #include <string>
 #include <memory>
+#include <map>
 #include "Wave.hpp"
+#include "Mateyak/Vector.hpp"
 
 namespace Mateyak
 {
+    enum action_type {
+        BROADCAST,
+        ELEVATIONSTART,
+        ELEVATIONEND,
+        LEVELUP
+    };
+
     class Audio {
         public:
-            explicit Audio(AudioWave wave);
+            explicit Audio(Mateyak::action_type actionType, FMOD::System &system);
             ~Audio();
 
             void playSound();
-            void stopSound();
-            void pauseSound();
-            void setVolume(float volume);
-            void setStereo(float pan);
+            void stopSound() const;
+            void pauseSound() const;
+            void setVolume(float volume) const;
+            void setStereo(float pan) const;
             bool getState();
-        private:
-            Sound _sound{};
+            void computeStereoAndVolume(Mateyak::Vec3<float> camPos, std::tuple<float, float> pos, Mateyak::Vec3<float> camRot);
+
+            bool _beingPlayed = false;
+            FMOD::Channel* _channel;
+            Mateyak::action_type _actionType;
+            FMOD::System* _system;
     };
+
+    extern std::map<Mateyak::action_type, FMOD::Sound *> audios;
 }
 
 

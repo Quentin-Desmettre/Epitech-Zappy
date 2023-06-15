@@ -129,6 +129,7 @@ void Graphic::loop(Mateyak::Vec2f mapSize)
             Utils::drawGrid(mapSize, 10 / 3.F, {0, 0, 0});
         }
         win.end3D();
+        _serverInformations.audioActionsHandler(cam);
         DrawFPS(10, 10);
         drawTeams();
         drawBroadCastMessage(win);
