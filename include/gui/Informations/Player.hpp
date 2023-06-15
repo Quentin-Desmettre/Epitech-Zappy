@@ -34,6 +34,7 @@ class Player
 
         STATE getState() const;
         int getLevel() const;
+        std::array<int, 7> getInventory() const;
 
         Venom ven;
         Mateyak::Vec2f _position;
