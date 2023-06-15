@@ -100,9 +100,9 @@ void Graphic::drawTileInformation(Mateyak::Window &win, Mateyak::Camera &cam)
     boxPosY += 30;
     for (auto &it : tileResources) {
         std::string str = it.first + ": " + std::to_string(it.second.first);
-        Color tmp = Ressource::clr[it.second.second];
-        tmp.a = 255;
-        Mateyak::Window::draw(str, boxPosX + 20, boxPosY + 20, 25, tmp);
+        Color color = Ressource::clr[it.second.second];
+        color.a = 255;
+        Mateyak::Window::draw(str, boxPosX + 20, boxPosY + 20, 25, color);
         boxPosY += 30;
     }
 }
@@ -135,5 +135,35 @@ void Graphic::drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam)
         return;
     }
 //    players[playerSelected]->ven.setState(Player::STATE::EGGHATCHING);
-    std::cout << "Player selected: " << playerSelected << std::endl;
+
+    // Display player information
+    float boxPosY = _windowHeight - _windowHeight / 3 - 30;
+    float boxPosX = _windowWidth - (_windowWidth / 3 - 20) - 20;
+    float boxWidth = _windowWidth / 3 - 10;
+    float boxHeight = _windowHeight / 3 + 20;
+    const Color white = {255, 255, 255, 255};
+
+
+    Mateyak::Window::drawBox(boxPosX, boxPosY, boxWidth, boxHeight, {0, 39, 97, 94});
+    Mateyak::Vec2f position = _serverInformations.getPlayers()[playerSelected]->_position;
+
+    // Name
+    Mateyak::Window::draw("Player: " + _serverInformations.getPlayers()[playerSelected]->getName() + " on tile (" + std::to_string((int)position.x) + ", " + std::to_string((int)position.y) + ")", boxPosX + 20, boxPosY + 20, 25, white);
+
+    // Team
+    Mateyak::Window::draw("Team: " + _serverInformations.getPlayers()[playerSelected]->getTeam().getName(), boxPosX + 20, boxPosY + 50, 25, white);
+
+    // Level
+    Mateyak::Window::draw("Level: " + std::to_string(_serverInformations.getPlayers()[playerSelected]->getLevel()), boxPosX + 20, boxPosY + 80, 25, white);
+
+    // Inventory
+    std::array<int, 7> inventory = _serverInformations.getPlayers()[playerSelected]->getInventory();
+    boxPosY += 130;
+    for (int i = 0; i < inventory.size(); i++) {
+        Color color = Ressource::clr[i];
+        color.a = 255;
+
+        Mateyak::Window::draw(Ressource::resourceName[i] + ": " + std::to_string(inventory[i]), boxPosX + 20, boxPosY, 15, color);
+        boxPosY += 20;
+    }
 }
