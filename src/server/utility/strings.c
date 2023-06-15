@@ -85,11 +85,3 @@ void str_append(char **str, char *append)
     *str = my_realloc(*str, len + append_len + 1);
     memcpy(*str + len, append, append_len + 1);
 }
-
-void *memdup(const void *src, size_t size)
-{
-    void *dst = my_calloc(1, size);
-
-    memcpy(dst, src, size);
-    return (dst);
-}

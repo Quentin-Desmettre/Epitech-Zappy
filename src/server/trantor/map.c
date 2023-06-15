@@ -34,7 +34,8 @@ static void fetch_resource_to_spawn(trantor_t *trantor,
         to_spawn[i] = (int)(RESOURCE_FREQ[i] * (float)map_dim) - resources[i];
 }
 
-static void spawn_resource(trantor_t *trantor, resource_t resource, server_t *server)
+static void spawn_resource(trantor_t *trantor,
+                            resource_t resource, server_t *server)
 {
     int rand_x = random() % trantor->width;
     int rand_y = random() % trantor->height;

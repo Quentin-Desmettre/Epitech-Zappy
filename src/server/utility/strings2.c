@@ -35,3 +35,11 @@ char *my_asprintf(const char *format, ...)
     free(str);
     return dup;
 }
+
+void *memdup(const void *src, size_t size)
+{
+    void *dst = my_calloc(1, size);
+
+    memcpy(dst, src, size);
+    return (dst);
+}

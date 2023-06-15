@@ -78,6 +78,6 @@ char *get_tile_content(map_tile_t *tile)
 
     if (*players)
         return str_concat_free(&len, 3, players, my_strdup(" "),
-                               get_list_ressources(tile->resources));
+                get_list_ressources(tile->resources));
     return get_list_ressources(tile->resources);
 }
