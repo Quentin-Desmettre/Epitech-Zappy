@@ -105,7 +105,7 @@ add_executable(zappy_server
         src/server/utility/safe_write/my_write.c
         src/server/utility/garbage_collector/garbage_handling.c
         src/server/utility/garbage_collector/my_malloc.c
-        src/server/utility/strings.c)
+        src/server/utility/strings.c src/server/network/server_run_utils.c src/server/trantor/ai_handlers/incantation_utils.c)
 
 find_library(MATH_LIBRARY m)
 

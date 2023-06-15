@@ -14,7 +14,8 @@ bool cmp_cli_food(void *cli, void *food)
 }
 
 void delete_ai_from_server(server_t *server, client_t *cli,
-                            bool has_disconnect) {
+                            bool has_disconnect)
+{
     player_t *player = cli->data;
 
     if (!has_disconnect)

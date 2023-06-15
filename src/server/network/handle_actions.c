@@ -37,7 +37,8 @@ void put_action_in_waitlist(server_t *server, action_t *action)
     insert_action(server, start, action);
 }
 
-static void clear_action(server_t *server, action_t *action, client_t *cli, int *i)
+static void clear_action(server_t *server, action_t *action,
+                            client_t *cli, int *i)
 {
     action_t *new_action;
     struct timespec now;
@@ -59,21 +60,19 @@ static void clear_action(server_t *server, action_t *action, client_t *cli, int 
 
 void handle_actions(server_t *server)
 {
-    action_t *action;
     struct timespec now;
     client_t *cli;
     int i = 0;
 
     get_time(&now);
     while (server->action_count && i < server->action_count) {
-        action = server->actions[0];
-        cli = action->cli;
+        cli = server->actions[0]->cli;
         i++;
-        if (!is_action_finished(action, &now))
+        if (!is_action_finished(server->actions[0], &now))
             break;
         if (cli->data->is_freezed)
             continue;
-        clear_action(server, action, cli, &i);
+        clear_action(server, server->actions[0], cli, &i);
         if (!cli->data->buffered_actions)
             continue;
         cli->data->current_action = cli->data->buffered_actions->data;

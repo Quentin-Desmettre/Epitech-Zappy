@@ -164,7 +164,8 @@ void link_layers(dim_list_t *map);
 map_tile_t *get_tile_by_pos(dim_list_t *map, int x, int y);
 team_t *create_team(const char *name, int max_players);
 void destroy_team(void *team);
-map_tile_t *select_tile_for_look_command(trantor_t *trantor, player_t *player, int nb);
+map_tile_t *select_tile_for_look_command(trantor_t *trantor,
+                player_t *player, int nb);
 int get_nb_tile(int level);
 char *get_tile_content(map_tile_t *tile);
 
@@ -173,5 +174,6 @@ char *get_list_players(list_t *players);
 
 int find_direction(player_t *from, player_t *to, trantor_t *trantor);
 int get_direct_from_angle(double angle);
-
+int count_same_level(player_t *player, map_tile_t *tile);
+bool can_level_up(player_t *player, map_tile_t *tile);
 #endif //EPITECH_ZAPPY_TRANTOR_H

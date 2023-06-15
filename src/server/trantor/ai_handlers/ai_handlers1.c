@@ -28,7 +28,8 @@ ai_cmd_response_t ai_forward_handler(action_t *action UNUSED,
     player->x = tile->x;
     player->y = tile->y;
     append_node(&tile->players, player);
-    notify_gui(server, PLAYER_POS, player->id, player->x, player->y, player->dir);
+    notify_gui(server, PLAYER_POS, player->id,
+        player->x, player->y, player->dir);
     return AI_CMD_RESPONSE_OK;
 }
 
@@ -42,12 +43,10 @@ ai_cmd_response_t ai_right_handler(action_t *action UNUSED,
 ai_cmd_response_t ai_left_handler(action_t *action UNUSED,
     server_t *server UNUSED, player_t *player)
 {
-    printf("Old dir: %d\n", player->dir);
     if (player->dir == NORTH)
         player->dir = WEST;
     else
         player->dir = (player->dir - 1) % 4;
-    printf("New dir: %d\n", player->dir);
     return AI_CMD_RESPONSE_OK;
 }
 
@@ -72,9 +71,12 @@ ai_cmd_response_t ai_look_handler(action_t *action UNUSED,
 ai_cmd_response_t ai_inventory_handler(action_t *action UNUSED,
     server_t *server UNUSED, player_t *player)
 {
-    char *response = my_asprintf("[food %d, linemate %d, deraumere %d, sibur %d, mendiane %d, phiras %d, thystame %d]",
-        player->inventory[FOOD], player->inventory[LINEMATE], player->inventory[DERAUMERE],
-        player->inventory[SIBUR], player->inventory[MENDIANE], player->inventory[PHIRAS],
-        player->inventory[THYSTAME]);
+    resource_t *inventory = player->inventory;
+    char *response = my_asprintf("[food %d, linemate %d, deraumere %d, "
+        "sibur %d, mendiane %d, phiras %d, thystame %d]",
+        inventory[FOOD], inventory[LINEMATE], inventory[DERAUMERE],
+        inventory[SIBUR], inventory[MENDIANE], inventory[PHIRAS],
+        inventory[THYSTAME]);
+
     return AI_CMD_RESPONSE_TEXT(response);
 }

@@ -38,7 +38,7 @@ void log_ai(client_t *cli, server_t *server, const char *cmd, team_t *team)
         str_append_free(&msg, &msg_len, get_gui_message(EGG_HATCHED,
             (int)(long)team->egg_numbers->data));
         str_append(&msg, "\n");
-        remove_node(&team->egg_numbers, 0, free);
+        remove_node(&team->egg_numbers, 0, NULL);
     } else
         team->available_slots--;
     player = cli->data;
