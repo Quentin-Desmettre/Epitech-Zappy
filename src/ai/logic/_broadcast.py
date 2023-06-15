@@ -28,6 +28,13 @@ def walk_and_loot(self, direction: Directions, tiles: list[list[str]] = None) ->
         self.send(CommandNames.TAKE, Objects.FOOD.value)
 
 
+def add_to_list(self, uuid):
+    """Adds a message to the list of messages."""
+    if len(self.messages_uuids) > 1000:
+        self.messages_uuids.pop(0)
+    self.messages_uuids.append(uuid)
+
+
 def parse_message(self, msg: str, inventory = None, tiles: list[list[str]] = None) -> None:
     """Parses a broadcast response."""
     splitted = msg.split(', ')
@@ -36,6 +43,11 @@ def parse_message(self, msg: str, inventory = None, tiles: list[list[str]] = Non
     if msg.count(self.team) == 0:
         self.send(CommandNames.BROADCAST, msg)
         return
+    uuid = msg.split('§ø')
+    if self.messages_uuids.count(uuid[0]) > 0:
+        return
+    msg = uuid[1]
+    self.add_to_list(uuid[0])
     if msg.startswith("looted"):
         add_to_shared_inventory(self, msg.split('ø§')[2], 1)
     elif msg.startswith("dropped"):

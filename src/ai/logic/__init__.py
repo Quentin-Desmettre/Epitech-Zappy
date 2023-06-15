@@ -1,5 +1,6 @@
 from time import time, sleep
 from socket import socket
+from uuid import uuid4
 from src.ai.commands import CommandNames, Objects
 from src.ai.utils import my_print, set_color, Colors
 from src.ai.reader import Reader
@@ -13,15 +14,18 @@ class Ai:
         self.level = 1
         self.last_movement = time()
         self.delta = 0
+        self.messages_uuids = []
         self.can_send = True
         self.reader = Reader(server, team)
 
     def send(self, cmd: CommandNames, arg: str | None = None):
         """Sends a command to the server."""
+        if cmd == CommandNames.BROADCAST:
+            arg = str(uuid4()) + "§ø" + arg
         return self.reader.send(cmd, arg)
 
     from ._finding import loot_object, go_to_object
-    from ._broadcast import parse_message, walk_and_loot
+    from ._broadcast import parse_message, walk_and_loot, add_to_list
     from ._movement import move_randomly, go_to_direction
     from ._evolve import get_needed_stones, can_evolve, elevate, drop_elevation_stones, check_requirements, get_items_on_ground
 
