@@ -240,7 +240,7 @@ void GuiClient::PlayerIncantation(std::vector<std::string> parameters)
 
         _serverInformations.setIncantationLevel(name, level);
         _serverInformations.setPlayerState(name, Player::STATE::INCANTING);
-        _serverInformations.updateAudioAction(std::make_tuple(std::stoi(parameters[0]), std::stoi(parameters[1])), Mateyak::ELEVATIONSTART);
+        //_serverInformations.updateAudioAction(std::make_tuple(std::stoi(parameters[0]), std::stoi(parameters[1])), Mateyak::ELEVATIONSTART);
 
     }
 }
@@ -269,6 +269,6 @@ void GuiClient::PlayerIncantationEnd(std::vector<std::string> parameters)
             _serverInformations.setIncantationLevel((*it).getName(), -1);
         }
     }
-    _serverInformations.updateAudioAction(std::make_tuple(std::stoi(parameters[0]), std::stoi(parameters[1])), Mateyak::ELEVATIONEND);
+    //_serverInformations.updateAudioAction(std::make_tuple(std::stoi(parameters[0]), std::stoi(parameters[1])), Mateyak::ELEVATIONEND);
 
 }

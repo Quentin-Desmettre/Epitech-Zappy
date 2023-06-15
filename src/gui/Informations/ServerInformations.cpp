@@ -5,6 +5,7 @@
 ** ServerInformations.cpp
 */
 
+#include <iostream>
 #include "Informations/ServerInformations.hpp"
 
 void Message::FormatMessage(int maxLineSize)
@@ -312,14 +313,14 @@ void ServerInformations::audioActionsHandler(Mateyak::Camera &camera)
                 std::get<2>(audio)->_beingPlayed = true;
                 std::get<2>(audio)->computeStereoAndVolume(camera._position, std::make_tuple(std::get<0>(audio), std::get<1>(audio)), (camera._target - camera._position).Normalize());
             } else {
-                if (!std::get<2>(audio)->getState())
-                   std::get<1>(action).erase(std::get<1>(action).begin());
+                if (!std::get<2>(audio)->getState()) {
+                    std::get<1>(action).erase(std::get<1>(action).begin());
+                }
                 else
                     std::get<2>(audio)->computeStereoAndVolume(camera._position, std::make_tuple(std::get<0>(audio), std::get<1>(audio)), (camera._target - camera._position).Normalize());
             }
         }
     }
-    audioAction.clear();
 }
 
 ServerInformations::ServerInformations()
@@ -336,7 +337,7 @@ ServerInformations::ServerInformations()
     result = _systemAudio->createSound("assets/sounds/broadcast.wav", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::BROADCAST]);
     if (result != FMOD_OK)
         throw std::runtime_error("FMOD error! (" + std::to_string(result) + ") " + FMOD_ErrorString(result));
-    result = _systemAudio->createSound("assets/sounds/elevation_start.wav", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::ELEVATIONSTART]);
+    result = _systemAudio->createSound("assets/testsound.mp3", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::ELEVATIONSTART]);
     if (result != FMOD_OK)
         throw std::runtime_error("FMOD error! (" + std::to_string(result) + ") " + FMOD_ErrorString(result));
     result = _systemAudio->createSound("assets/sounds/elevation_end.wav", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::ELEVATIONEND]);

@@ -27,6 +27,7 @@ Mateyak::Audio::Audio(Mateyak::action_type actionType, FMOD::System &system)
 
 Mateyak::Audio::~Audio()
 {
+
 }
 
 void Mateyak::Audio::playSound()
@@ -34,6 +35,7 @@ void Mateyak::Audio::playSound()
     FMOD_RESULT result = _system->playSound(audios[_actionType], nullptr, false, &_channel);
     if (result != FMOD_OK)
         std::cout << "Error while playing sound" << std::endl;
+    _beingPlayed = true;
 }
 
 void Mateyak::Audio::stopSound() const
@@ -79,13 +81,13 @@ void Mateyak::Audio::computeStereoAndVolume(Mateyak::Vec3<float> camPos,
     std::get<0>(pos) = std::get<0>(pos) * (10/3) + ((10/3) / 2);
     std::get<1>(pos) = std::get<1>(pos) * (10/3) + ((10/3) / 2);
 
-    float x = camPos.x - std::get<0>(pos);
-    float y = camPos.y - std::get<1>(pos);
+    float x = camPos.x - 0;
+    float y = camPos.z - 0;
 
-    float angle = atan2(y, x) * (180 / PI);
+    float angle = atan2(x, y) * (180 / PI);
     if (angle < 0)
         angle += 360;
-    float angle2 = atan2(camRot.y, camRot.x) * (180 / PI);
+    float angle2 = atan2(camRot.x, camRot.z) * (180 / PI);
     if (angle2 < 0)
         angle2 += 360;
     float angle3 = angle - angle2;
@@ -94,9 +96,16 @@ void Mateyak::Audio::computeStereoAndVolume(Mateyak::Vec3<float> camPos,
 
     float distance = sqrt(pow(x, 2) + pow(y, 2));
 
-    float pan = sin(angle3);
+    float pan = sin(angle3 * 0.017453292f);
+    pan *= 0.9f;
 
-
-    this->setVolume(1);
+    if (distance > 60)
+        this->setVolume(0);
+    else {
+        if (angle3 > 90 && angle3 < 270)
+            this->setVolume(1 - (distance / 60));
+        else
+            this->setVolume((1 - (distance / 60)) * 0.8f);
+    }
     this->setStereo(pan);
 }
