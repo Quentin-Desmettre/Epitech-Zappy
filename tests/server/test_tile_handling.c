@@ -25,7 +25,7 @@ Test(link_two_vertical_nodes, link_two_nodes)
     dim_list_t *node1 = my_calloc(sizeof(dim_list_t), 1);
     dim_list_t *node2 = my_calloc(sizeof(dim_list_t), 1);
 
-    node1->over = 0xdeadbeef;
+    node1->over = (void *)0xdeadbeef;
     link_two_vertical_nodes(node1, node2);
     cr_assert_eq(node2->over, 0xdeadbeef);
     cr_assert_eq(node2->under, node1);
@@ -44,7 +44,7 @@ Test(get_tile_by_pos, get_tile_at_1_1)
     map->next = list;
     list->data = tile;
     tile->next = tile2;
-    tile2->data = 0xdeadbeef;
+    tile2->data = (void *)0xdeadbeef;
     cr_assert_eq(get_tile_by_pos(map, 1, 1), 0xdeadbeef);
     my_free(map);
     my_free(list);
@@ -62,7 +62,7 @@ Test(get_tile_by_pos, get_tile_at_1_1_negative)
     map->prev = list;
     list->data = tile;
     tile->prev = tile2;
-    tile2->data = 0xdeadbeef;
+    tile2->data = (void *)0xdeadbeef;
     cr_assert_eq(get_tile_by_pos(map, -1, -1), 0xdeadbeef);
     my_free(map);
     my_free(list);
