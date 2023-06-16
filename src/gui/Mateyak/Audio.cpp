@@ -23,6 +23,27 @@ Mateyak::Audio::Audio(Mateyak::action_type actionType, FMOD::System &system)
 {
     _actionType = actionType;
     _system = &system;
+
+    FMOD_RESULT result = _system->createDSPByType(FMOD_DSP_TYPE_LOWPASS, &_dspFilter);
+    if (result != FMOD_OK)
+        std::cout << "Error while creating DSP" << std::endl;
+    result = _channel->addDSP(0, _dspFilter);
+    if (result != FMOD_OK)
+        std::cout << "Error while adding DSP" << std::endl;
+
+    result = _system->createDSPByType(FMOD_DSP_TYPE_ECHO, &_dspPhaser);
+    if (result != FMOD_OK)
+        std::cout << "Error while creating DSP" << std::endl;
+    result = _channel->addDSP(0, _dspPhaser);
+    if (result != FMOD_OK)
+        std::cout << "Error while adding DSP" << std::endl;
+
+    result = _system->createDSPByType(FMOD_DSP_TYPE_FLANGE, &_dspPhaser);
+    if (result != FMOD_OK)
+        std::cout << "Error while creating DSP" << std::endl;
+    result = _channel->addDSP(0, _dspPhaser);
+    if (result != FMOD_OK)
+        std::cout << "Error while adding DSP" << std::endl;
 }
 
 Mateyak::Audio::~Audio()
@@ -110,4 +131,8 @@ void Mateyak::Audio::computeStereoAndVolume(Mateyak::Vec3<float> camPos,
     }
 
     this->setStereo(pan);
+}
+
+void Mateyak::Audio::setEffects(float angle, float distance)
+{
 }
