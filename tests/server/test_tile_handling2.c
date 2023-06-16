@@ -144,9 +144,15 @@ Test(get_list_players, select_tile_west)
 Test(find_direction, same_position)
 {
     player_t *player = my_calloc(sizeof(player_t), 1);
+    player_t *player2 = my_calloc(sizeof(player_t), 1);
+    trantor_t *trantor = my_calloc(sizeof(trantor_t), 1);
 
+    trantor->width = 10;
+    trantor->height = 11;
     cr_assert_eq(find_direction(player, player, NULL), 0);
+    cr_assert_eq(find_direction(player, player2, trantor), 0);
     my_free(player);
+    my_free(player2);
 }
 
 Test(find_direction, around_positions)
@@ -177,8 +183,7 @@ Test(find_direction, normal_positions)
     trantor->width = 10;
     trantor->height = 10;
     cr_assert_eq(find_direction(player2, player, trantor), 3);
-    player2->x = 0;
-    cr_assert_eq(find_direction(player2, player, trantor), 7);
+    cr_assert_eq(find_direction(player, player2, trantor), 7);
     player2->x = 2;
     player2->y = 2;
     cr_assert_eq(find_direction(player2, player, trantor), 6);
