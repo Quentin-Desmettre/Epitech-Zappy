@@ -37,6 +37,7 @@ void send_to_gui(server_t *server, char *msg, bool free_msg)
     list_t *tmp = server->clients;
     client_t *cli;
 
+    debug("Sending to GUIs: %s\n", msg);
     if (!tmp)
         return;
     do {

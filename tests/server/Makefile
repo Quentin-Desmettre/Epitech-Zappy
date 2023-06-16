@@ -18,7 +18,7 @@ CC = gcc
 
 NAME = tests
 
-CFLAGS = -I ../../include/server --coverage -lcriterion -g
+CFLAGS = -I ../../include/server --coverage -lcriterion -g -lm
 
 all: $(NAME)
 

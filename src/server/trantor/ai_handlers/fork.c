@@ -29,5 +29,5 @@ ai_cmd_response_t ai_fork_pre_check(UNUSED action_t *action,
     server_t *server, player_t *player)
 {
     notify_gui(server, EGG_PLANTED, player->id);
-    return AI_CMD_RESPONSE_OK;
+    return AI_CMD_RESPONSE_TEXT(my_strdup(""));
 }

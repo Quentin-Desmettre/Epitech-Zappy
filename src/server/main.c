@@ -13,7 +13,7 @@
 void handle_sig(int sig)
 {
     (void)sig;
-    safe_write(1, "Signal received, shutting down server\n", 38);
+    debug("Signal received, shutting down server\n", 38);
     exit(0);
 }
 

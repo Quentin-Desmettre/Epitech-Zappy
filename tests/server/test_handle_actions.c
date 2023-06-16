@@ -138,7 +138,7 @@ Test(handle_action, one_action_finished, .init = redirect_all_stdout)
     CHECK_ALL_FREE;
 }
 
-Test(handle_action, one_action_finished_and_buffer_not_empty, .init = redirect_all_stdout)
+Test(handle_action, one_action_finished_and_buffer_not_empty)
 {
     struct timespec now; get_time(&now);
     client_t cli = {.fd = 1};
@@ -152,6 +152,7 @@ Test(handle_action, one_action_finished_and_buffer_not_empty, .init = redirect_a
     action_t *dup_ac2 = memdup(&ac, sizeof(ac));
     cli.data->current_action = &ac;
     cli.data->buffered_actions = NULL;
+    cli.data->is_freezed = false;
     append_node(&cli.data->buffered_actions, dup_ac2);
     server_t server = {
             .action_count = 1,
@@ -159,8 +160,9 @@ Test(handle_action, one_action_finished_and_buffer_not_empty, .init = redirect_a
     };
 
     cr_assert(server.action_count == 1);
+    printf("%p\n", server.actions[0]);
     handle_actions(&server);
-    cr_assert(server.action_count == 0);
+    cr_assert_eq(server.action_count, 0, "got %d actions left", server.action_count);
     cr_assert_stdout_eq_str("ok\nok\n");
     cr_assert(cli.data->current_action == NULL);
     cr_assert(cli.data->buffered_actions == NULL);

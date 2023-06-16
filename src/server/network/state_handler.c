@@ -65,6 +65,7 @@ void handle_connected(server_t *server, client_t *cli, const char *cmd)
     team_t *team;
 
     if (strcmp(cmd, GRAPHIC_COMMAND) == 0) {
+        debug("New GUI connected\n");
         cli->state = GUI;
         answer = get_gui_connected_answer(server);
         safe_write(cli->fd, answer, strlen(answer));
@@ -73,9 +74,11 @@ void handle_connected(server_t *server, client_t *cli, const char *cmd)
     team = get_team_by_name(server->trantor, cmd);
     if (!team || (team->available_slots + team->eggs) == 0) {
         answer = team ? ERR_NO_SLOTS : ERR_NO_TEAM;
+        debug("Refused connection for AI. Reason: %s\n", answer);
         return safe_write(cli->fd, answer, strlen(answer));
     }
     log_ai(cli, server, cmd, team);
+    debug("New AI connected\n");
 }
 
 void handle_gui(server_t *server, UNUSED client_t *cli, const char *cmd)
@@ -86,9 +89,11 @@ void handle_gui(server_t *server, UNUSED client_t *cli, const char *cmd)
     for (int i = 0; GUI_HANDLERS[i].cmd; i++) {
         if (strncmp(GUI_HANDLERS[i].cmd, cmd, 3) != 0)
             continue;
+        printf("Handling GUI command: %s\n", cmd);
         output = str_concat_free(&len, 2,
                     GUI_HANDLERS[i].handler(server, cmd), my_strdup("\n"));
         return safe_write(cli->fd, output, len);
     }
+    debug("Unknown GUI command: %s\n", cmd);
     safe_write(cli->fd, "suc\n", 4);
 }

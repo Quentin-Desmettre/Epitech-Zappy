@@ -57,7 +57,7 @@ ai_cmd_response_t ai_incantation_end_handler(UNUSED action_t *action,
     }
     do_level_up(tile, player, server);
     notify_gui(server, END_INCANTATION, player->x, player->y, 1);
-    answer = my_asprintf("Current level: %d\n", player->level);
+    answer = my_asprintf("Current level: %d", player->level);
     send_to_clients_on_tile(server, answer, player);
     return AI_CMD_RESPONSE_TEXT(answer);
 }

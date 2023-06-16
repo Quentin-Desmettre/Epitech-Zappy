@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <criterion/criterion.h>
 #include "trantor.h"
+#include "server.h"
 #include <time.h>
 
 Test(ai_handlers, inventory)
@@ -18,7 +19,7 @@ Test(ai_handlers, inventory)
     for (int i = FOOD; i < NB_RESOURCE; i++)
         player.inventory[i] = rand() % 100;
     char *expected;
-    asprintf(&expected, "[ food %d, linemate %d, deraumere %d, sibur %d, mendiane %d, phiras %d, thystame %d ]",
+    asprintf(&expected, "[food %d, linemate %d, deraumere %d, sibur %d, mendiane %d, phiras %d, thystame %d]",
             player.inventory[FOOD],
             player.inventory[LINEMATE],
             player.inventory[DERAUMERE],
@@ -38,9 +39,10 @@ Test(ai_handlers, connect_nbr_only_one_team)
     int nb_slots = rand() % 100;
     char *nb_slots_str;
     asprintf(&nb_slots_str, "%d", nb_slots);
-    player_t player = {.team_name = "team1"};
+    team_t *team = create_team("team1", nb_slots);
+    player_t player = {.team_name = "team1", .team = team};
     trantor_t trantor = {0};
-    append_node(&trantor.teams, create_team("team1", nb_slots));
+    append_node(&trantor.teams, team);
     ai_cmd_response_t resp = ai_connect_nbr_handler(NULL, &trantor, &player);
 
     cr_assert(resp.type == TEXT);
@@ -66,8 +68,11 @@ Test(ai_handlers, connect_nbr_multiple_teams)
             {.team_name = "team3"}
     };
     trantor_t trantor = {0};
-    for (int i = 0; i < 3; i++)
-        append_node(&trantor.teams, create_team(players[i].team_name, nb_slots[i]));
+    for (int i = 0; i < 3; i++) {
+        team_t *t = create_team(players[i].team_name, nb_slots[i]);
+        append_node(&trantor.teams, t);
+        players[i].team = t;
+    }
 
     for (int i = 0; i < 3; i++) {
         ai_cmd_response_t resp = ai_connect_nbr_handler(NULL, &trantor, &players[i]);

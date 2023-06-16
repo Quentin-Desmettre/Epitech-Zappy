@@ -117,7 +117,8 @@ bool do_action_pre_check(action_t *action, server_t *server, client_t *cli)
         answer = my_strdup("ok\n");
     else
         answer = str_concat(&len, 2, resp.data, "\n");
-    safe_write(cli->fd, answer, len);
+    if (strlen(answer) - 1)
+        safe_write(cli->fd, answer, len);
     my_free(resp.data);
     my_free(answer);
     return resp.type != KO;
