@@ -56,23 +56,21 @@ class Reader:
 
     def check_matches(self, msg: str, type: CommandNames) -> bool:
         """Checks if the message matches the regex."""
+        if match(PossibleResponsesRegex.INCANTATION.value[1], msg):
+            raise ElevationException(msg)
+        if match(PossibleResponsesRegex.INCANTATION.value[0], msg):
+            return True
         regexes = get_regexes(type)
         for reg in regexes:
-            if match(PossibleResponsesRegex.INCANTATION.value[1], msg):
-                raise ElevationException(msg)
             if match(reg, msg):
                 return True
         return False
 
     def get_next_match(self, type: CommandNames) -> str:
         """Gets the next message that matches the regex."""
-        msg = self.queue.get()
-        if msg == "dead":
-            raise Exception("You died")
+        msg = self.queue_pop()
         while not self.check_matches(msg, type):
-            msg = self.queue.get()
-            if msg == "dead":
-                raise Exception("You died")
+            msg = self.queue_pop()
         return msg
 
     def send(self, type: CommandNames, arg: str | None = None):
@@ -86,6 +84,13 @@ class Reader:
             my_print("Command %s failed" % type.value)
             return None
         return cmd.parse_response(msg)
+
+    def queue_pop(self) -> str:
+        """Pops a message from the queue."""
+        msg = self.queue.get()
+        if msg == "dead":
+            raise Exception("You died")
+        return msg
 
     def has_broadcast(self) -> bool:
         """Returns True if there is a broadcast in the queue."""

@@ -3,7 +3,7 @@
 from socket import AF_INET, SOCK_STREAM, socket
 from sys import argv
 from src.ai.utils import send_to_server, recv_from_server, my_print, set_color, Colors
-from src.ai.commands import ElevationException
+from src.ai.commands import ElevationException, CommandNames
 from src.ai.logic import Ai
 
 
@@ -53,24 +53,25 @@ def main():
 
     recv_from_server(server)
     send_to_server(server, name)
-    left = recv_from_server(server)
-    if left == "ko":
+
+    slots_left = recv_from_server(server)
+    if slots_left == "ko":
         print_error("Error: bad team name")
-    left = int(left)
     map_size = recv_from_server(server)
     if map_size == "ko":
         print_error("Error: too many clients")
-    map_size = map_size.split(" ")
-    map_size = (int(map_size[0]), int(map_size[1]))
-    my_print("Slots left: " + str(left) + "\nMap_size: " + str(map_size))
 
-    ai = Ai(server, name)
+    my_print("Slots left: " + slots_left + "\nMap_size: " + map_size)
+
     exception = None
-    while True:
+    ai = Ai(server, name)
+    ai.send(CommandNames.FORK)
+    while ai.level < 8:
         try:
             if exception is not None:
                 ai.elevate(False, exception.msg)
                 exception = None
+                continue
             ai.make_decision()
         except ElevationException as e:
             exception = e
