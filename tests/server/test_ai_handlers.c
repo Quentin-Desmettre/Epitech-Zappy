@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <criterion/criterion.h>
 #include "trantor.h"
+#include "server.h"
 #include <time.h>
 
 Test(ai_handlers, inventory)
@@ -18,7 +19,7 @@ Test(ai_handlers, inventory)
     for (int i = FOOD; i < NB_RESOURCE; i++)
         player.inventory[i] = rand() % 100;
     char *expected;
-    asprintf(&expected, "[ food %d, linemate %d, deraumere %d, sibur %d, mendiane %d, phiras %d, thystame %d ]",
+    asprintf(&expected, "[food %d, linemate %d, deraumere %d, sibur %d, mendiane %d, phiras %d, thystame %d]",
             player.inventory[FOOD],
             player.inventory[LINEMATE],
             player.inventory[DERAUMERE],

@@ -66,7 +66,7 @@ int create_server_fd(int *port)
     return fd;
 }
 
-void *accept_client(void *fd)
+void *test_accept_client(void *fd)
 {
     int r_fd = (long)fd;
     char buf[1024];
@@ -100,7 +100,7 @@ Test(test_safe_write, test_enormous_write)
     int port;
     int fd = create_server_fd(&port);
     pthread_t thread;
-    pthread_create(&thread, NULL, accept_client, (void *)(long)fd);
+    pthread_create(&thread, NULL, test_accept_client, (void *)(long)fd);
     int cli_fd = connect_to_server(port);
 
     char *bigstr = malloc(100000000);

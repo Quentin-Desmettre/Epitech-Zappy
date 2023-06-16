@@ -46,7 +46,7 @@ map_tile_t *select_tile_for_look_command(trantor_t *trantor,
             player->x - line, player->y - nb_on_line);
 }
 
-char *get_list_players(list_t *players)
+char *  get_list_players(list_t *players)
 {
     char *response = my_calloc(1, 1);
     list_t *tmp_list = players;

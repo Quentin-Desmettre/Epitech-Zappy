@@ -92,8 +92,8 @@ add_executable(zappy_server
         src/server/utility/str_to_word_array.c
         src/server/utility/str_array_2.c
         src/server/utility/linked_list/remove_if.c
-        src/server/utility/linked_list/multi_dimensional_linked_list/remove_if.c
-        src/server/utility/linked_list/multi_dimensional_linked_list/liked_list.c
+        src/server/utility/linked_list/multi_dimensional_linked_list/dim_remove_if.c
+        src/server/utility/linked_list/multi_dimensional_linked_list/dim_liked_list.c
         src/server/utility/linked_list/linked_list.c
         src/server/utility/safe_write/packet.c
         src/server/utility/safe_write/my_write.c
