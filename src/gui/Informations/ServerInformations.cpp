@@ -6,6 +6,7 @@
 */
 
 #include "Informations/ServerInformations.hpp"
+#include <iostream>
 
 void Message::FormatMessage(int maxLineSize)
 {
@@ -214,7 +215,9 @@ void ServerInformations::PlayerForkEgg(std::string name)
 {
     for (auto &it : players) {
         if (it->getName() == name) {
-            std::unique_ptr<Player> tmp = std::make_unique<Player>(it->getName(), it->ven.getPos().x, it->ven.getPos().y, Player::ORIENTATION::NORTH, 1, it->getTeam(), mapSize);
+            int x = it->ven.getPos().x / (10 / 3.f);
+            int y = it->ven.getPos().z / (10 / 3.f);
+            std::unique_ptr<Player> tmp = std::make_unique<Player>(it->getName(), x, y, Player::ORIENTATION::NORTH, 1, it->getTeam(), mapSize);
             tmp->setState(Player::STATE::EGGFORKED);
             players.push_back(std::move(tmp));
             return;
@@ -225,12 +228,11 @@ void ServerInformations::PlayerForkEgg(std::string name)
 
 void ServerInformations::PlayerLayEgg(std::string name, std::string eggName, int posX, int posY)
 {
-    auto x = static_cast<float>(posX);
-    auto y = static_cast<float>(posY);
-
     for (auto &it : players) {
         if (it->getName() == name && it->getState() == Player::STATE::EGGFORKED) {
-            if (it->ven.getPos().x == x && it->ven.getPos().y == y) {
+            int venX = it->ven.getPos().x / (10 / 3.f);
+            int venY = it->ven.getPos().z / (10 / 3.f);
+            if (venX == posX && venY == posY) {
                 it->setEggName(eggName);
                 it->setState(Player::STATE::EGGLAYING);
                 return;
