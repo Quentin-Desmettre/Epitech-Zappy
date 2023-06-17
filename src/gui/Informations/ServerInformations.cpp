@@ -37,6 +37,16 @@ void Message::FormatMessage(int maxLineSize)
 Message::Message(std::string name, std::string message, Color color) :
 _formated(false), _name(name), _message(message), _lines(), _color(color) {}
 
+bool ServerInformations::isRunning() const
+{
+    return _serverRunning;
+}
+
+void ServerInformations::setRunning(bool running)
+{
+    _serverRunning = running;
+}
+
 void ServerInformations::updatePlayer(std::unique_ptr<Player> &player)
 {
     Player::STATE state = player->getState();

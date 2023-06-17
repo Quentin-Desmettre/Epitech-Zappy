@@ -41,6 +41,9 @@ class ServerInformations
         void startComputing();
         void endComputing();
 
+        bool isRunning() const;
+        void setRunning(bool running);
+
         void updatePlayer(std::unique_ptr<Player> &player);
 
         void setMapSize(int x, int y);

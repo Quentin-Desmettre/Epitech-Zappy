@@ -72,15 +72,15 @@ void GuiClient::compute()
 
     try {
         while (_loop) {
-            if (!_socket.is_open()) {
-                std::cout << "Socket closed" << std::endl;
-            }
-            if (_socket.available() > 0) {
-                resp = getInformations();
-                parseOutput(resp);
-            }
+            if (!_socket.is_open())
+                break;
+            std::cout << "loop" << std::endl;
+            resp = getInformations();
+            parseOutput(resp);
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     } catch (std::exception &e) {
         std::cout << e.what() << std::endl;
     }
+    _serverInformations.setRunning(false);
 }

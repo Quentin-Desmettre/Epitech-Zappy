@@ -19,7 +19,7 @@ void Graphic::loop()
     int timeUnit = 0;
     _shader.setUniform("shaderEnabled", shaderEnabled);
 
-    while (!WindowShouldClose()) {
+    while (!WindowShouldClose() && _serverInformations.isRunning()) {
         if (IsKeyPressed(KEY_F1)) {
             shaderEnabled = !shaderEnabled;
             _shader.setUniform("shaderEnabled", shaderEnabled);
