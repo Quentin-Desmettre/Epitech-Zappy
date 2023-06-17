@@ -19,15 +19,16 @@ void GuiClient::parseOutput(std::string re) {
             {"pdi", &GuiClient::PlayerDeath},
             {"pbc", &GuiClient::PlayerBroadcast},
             {"pex", &GuiClient::PlayerExpulse},
-            /*{"pic", &GuiClient::PlayerIncantation},
+            {"pic", &GuiClient::PlayerIncantation},
             {"pie", &GuiClient::PlayerIncantationEnd},
             {"pfk", &GuiClient::PlayerFork},
-            {"pdr", &GuiClient::PlayerDropRessource},
-            {"pgt", &GuiClient::PlayerTakeRessource},
             {"enw", &GuiClient::EggLaying},
-            {"eht", &GuiClient::EggHatching},
             {"ebo", &GuiClient::EggConnection},
             {"edi", &GuiClient::EggDeath},
+            /*
+            {"pdr", &GuiClient::PlayerDropRessource},
+            {"pgt", &GuiClient::PlayerTakeRessource},
+            {"eht", &GuiClient::EggHatching},
             {"sgt", &GuiClient::ServerTimeUnit},
             {"seg", &GuiClient::ServerEndGame},
             {"smg", &GuiClient::ServerMessage},
@@ -69,10 +70,17 @@ void GuiClient::compute()
 {
     std::string resp;
 
-    while (_loop) {
-        if (_socket.available() > 0) {
-            resp = getInformations();
-            parseOutput(resp);
+    try {
+        while (_loop) {
+            if (!_socket.is_open()) {
+                std::cout << "Socket closed" << std::endl;
+            }
+            if (_socket.available() > 0) {
+                resp = getInformations();
+                parseOutput(resp);
+            }
         }
+    } catch (std::exception &e) {
+        std::cout << e.what() << std::endl;
     }
 }

@@ -54,6 +54,11 @@ class ServerInformations
         void removePlayer(std::string name);
         void setPlayerDead(std::string name);
         void addBroadCastMessage(std::string name, std::string message);
+        void setIncantationLevel(std::string name, int level);
+        void PlayerForkEgg(std::string name);
+        void PlayerLayEgg(std::string name, std::string eggName, int x, int y);
+        void EggConnection(std::string eggName);
+        void EggDeath(std::string eggName);
 
         Mateyak::Vec2f getMapSize() const;
         ZappyMap getMap() const;
@@ -62,10 +67,11 @@ class ServerInformations
         std::vector<Message> &getBroadCastMessage();
 
     private:
-        Mateyak::Vec2f mapSize {10, 10};
+        Mateyak::Vec2f mapSize {0, 0};
         ZappyMap map;
         std::vector<Team> teams{};
         std::vector<std::unique_ptr<Player>> players{};
         std::vector<Message> broadCastMessage{};
         std::mutex mutex;
+        bool _serverRunning = true;
 };

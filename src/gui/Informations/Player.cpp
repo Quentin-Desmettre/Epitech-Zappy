@@ -28,6 +28,11 @@ std::string Player::getName() const
     return _name;
 }
 
+std::string Player::getEggName() const
+{
+    return _eggName;
+}
+
 void Player::setPos(int x, int y)
 {
     Mateyak::Vec3f pos = {static_cast<float>(x), static_cast<float>(y), 0};
@@ -50,6 +55,11 @@ void Player::setState(Player::STATE state)
     _state = state;
 }
 
+void Player::setEggName(const std::string &name)
+{
+    _name = name;
+}
+
 void Player::setLevel(int level)
 {
     _level = level;
@@ -68,4 +78,9 @@ Player::STATE Player::getState() const
 
 int Player::getLevel() const {
     return _level;
+}
+
+std::array<int, 7> Player::getInventory() const
+{
+    return _inventory;
 }

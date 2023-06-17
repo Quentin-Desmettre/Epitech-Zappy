@@ -1,8 +1,8 @@
 #include <math.h>
 #include "venom.hpp"
 #define FLOAT_NB (float)circlePerLeg
-#define DIS 3.f
-#define DIS2 2.5f
+#define DIS 2.f
+#define DIS2 1.5f
 #include "Utils3d.hpp"
 #include "Mateyak/Vector.hpp"
 #include "Perlin/Perlin.hpp"
@@ -12,7 +12,7 @@ int Venom::circlePerLeg = 30;
 int Venom::pointPerCircle = 4;
 bool Venom::usePerlin = true;
 double Venom::time = 0;
-std::vector<Mateyak::Vec3f> Venom::pos_feet;
+std::vector<std::vector<std::vector<Mateyak::Vec3f>>> Venom::feet_pos;
 
 Venom::Venom(Mateyak::Vec2f pos, Mateyak::Vec2f mapSize, Color clr): mapSize(mapSize),
     _clr(clr)
@@ -21,6 +21,7 @@ Venom::Venom(Mateyak::Vec2f pos, Mateyak::Vec2f mapSize, Color clr): mapSize(map
     _pos = {(pos.x * 10 + 5) / 3.F, 0.75, (pos.y * 10 + 5) / 3.F};
     _nextPosition = _pos;
     level = 1;
+    state = Player::STATE::NONE;
 }
 
 Venom::~Venom()
@@ -48,7 +49,9 @@ void Venom::Draw_leg(Mateyak::Vec3f leg, int seed)
     Mateyak::Vec3f tmp = _pos;
     for (int i = 0; i <= nb; i++) {
         tmp += vec;
-        tmp.y = sinf((i / FLOAT_NB * PI * 4 + PI) / 5.0f);// * time;
+        tmp.y = sinf((i / FLOAT_NB * PI * 4 + PI) / 5.0f) * 0.7;
+        if (state == Player::STATE::INCANTING)
+            tmp.y *= time;
 
         center.push_back(tmp);
         angles.push_back(tmp - last);
@@ -71,7 +74,7 @@ void Venom::Draw_leg(Mateyak::Vec3f leg, int seed)
                 noise.z = Perlin::Noise2D(seed * h * 2, i / (FLOAT_NB / 12.5), seed, 1) * ((i / FLOAT_NB + 0.5) / 2.0) / 2;
             }
             float raylevel = level / 8.0 + 0.5;
-            Utils::generateCirclePoints(center[i] + noise, angles[i], ((nb - i) / FLOAT_NB) / ((h - 1) * 3) * raylevel, pointPerCircle, points);
+            Utils::generateCirclePoints(center[i] + noise, angles[i], ((nb - i) / FLOAT_NB) / ((h - 1) * 6) * raylevel, pointPerCircle, points);
         }
         std::vector<Mateyak::Triangle> triangles = Utils::connectPointsWithTriangles(points, pointPerCircle);
         if (triangles.empty())
@@ -79,7 +82,7 @@ void Venom::Draw_leg(Mateyak::Vec3f leg, int seed)
         for (size_t i = 0; i < triangles.size(); i++) {
             Mateyak::Triangle tr = triangles[i];
             float clr_mul = 1 - (float)i / (float)triangles.size();
-            Mateyak::Window::draw(tr, Color{u_char(_clr.a * clr_mul), u_char(_clr.g * clr_mul), u_char(_clr.b * clr_mul), (unsigned char)(2.55 * len)});
+            Mateyak::Window::draw(tr, Color{u_char(_clr.r * clr_mul), u_char(_clr.g * clr_mul), u_char(_clr.b * clr_mul), (unsigned char)(2.55 * len)});
         }
     }
 }
@@ -108,6 +111,12 @@ void Venom::move_ven(Camera camera)
     if (IsKeyDown(KEY_LEFT)) {
         _pos.x -= vec.z;
         _pos.z += vec.x;
+    }
+    if (IsKeyPressed(KEY_KP_ADD)) {
+        state = (state + 1) % 6;
+    }
+    if (IsKeyPressed(KEY_KP_SUBTRACT)) {
+        level = (level + 1 % 9);
     }
 }
 
@@ -148,15 +157,33 @@ void Venom::move_ven()
 void Venom::draw_ven(int seed, const Mateyak::Camera& camera)
 {
     c_pos = camera._position;
-    _pos = _pos - rnd;
-    for (int i = 0; i < 5000; i++) {
-        if ((_pos - pos_feet[i]).len() < DIS && (c_pos - pos_feet[i]).len() < 100) {
-            if (Utils::differenceAngle((c_pos - camera._target).Normalize(), (c_pos - pos_feet[i]).Normalize()) > 45)
-                continue;
-            Draw_leg(pos_feet[i], seed + i * 1000);
-        }
+    if (Utils::differenceAngle((c_pos - camera._target).Normalize(), (c_pos - _pos).Normalize()) > 45)
+        return;
+    if (state == Player::STATE::EGGFORKED || state == Player::STATE::EGGHATCHING || state == Player::STATE::EGGLAYING) {
+        Mateyak::Vec3f egg_pos = _pos + rnd;
+        _pos.y = 0.5;
+        DrawSphere(egg_pos, state == Player::STATE::EGGHATCHING ? time / 2.0 : 0.5, state == Player::STATE::EGGFORKED ? Color{120, 120, 120, 255} : _clr);
+        return;
     }
     _pos = _pos + rnd;
+    int x = _pos.x / (10 / 3.f);
+    int y = _pos.z / (10 / 3.f);
+    int minY = (y - 1 > 0 ? y - 1 : 0);
+    int maxY = (y + 1 < mapSize.y ? y + 1 : mapSize.y);
+    int minX = (x - 1 > 0 ? x - 1 : 0);
+    int maxX = (x + 1 < mapSize.x ? x + 1 : mapSize.x);
+
+    for (int i = minY; i <= maxY; i++) {
+        for (int j = minX; j <= maxX; j++) {
+            for (auto &it : feet_pos[j][i]) {
+//                DrawSphere(it, 0.2q, RED);
+                if ((it - _pos).len() < DIS) {
+                    Draw_leg(it, seed + i * 1000);
+                }
+            }
+        }
+    }
+    _pos = _pos - rnd;
 }
 
 Mateyak::Vec3f Venom::getPos() const
@@ -228,4 +255,12 @@ int Venom::getLevel() const {
 void Venom::setLevel(int level)
 {
     this->level = level;
+}
+
+void Venom::setState(int state) {
+    this->state = state;
+}
+
+int Venom::getState() const {
+    return state;
 }

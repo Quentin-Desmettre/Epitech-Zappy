@@ -15,7 +15,7 @@
 
 class Ressource {
     public:
-        Color clr[7] = {
+        static inline Color clr[7] = {
             (Color){255, 255, 255, 255},
             (Color){120, 0, 0, 100},
             (Color){100, 70, 0, 100},
@@ -39,4 +39,6 @@ class Ressource {
         Color color;
         float scale;
         int type;
+
+        static inline std::vector<std::string> resourceName = {"Food", "Linemate", "Deraumere", "Sibur", "Mendiane", "Phiras", "Thystame"};
 };
