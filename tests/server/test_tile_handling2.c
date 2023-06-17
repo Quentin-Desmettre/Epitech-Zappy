@@ -145,12 +145,9 @@ Test(find_direction, same_position)
 {
     player_t *player = my_calloc(sizeof(player_t), 1);
     player_t *player2 = my_calloc(sizeof(player_t), 1);
-    trantor_t *trantor = my_calloc(sizeof(trantor_t), 1);
 
-    trantor->width = 10;
-    trantor->height = 11;
     cr_assert_eq(find_direction(player, player, NULL), 0);
-    cr_assert_eq(find_direction(player, player2, trantor), 0);
+    cr_assert_eq(find_direction(player, player2, NULL), 0);
     my_free(player);
     my_free(player2);
 }
@@ -191,3 +188,17 @@ Test(find_direction, normal_positions)
     my_free(trantor);
 }
 
+Test(find_direction, vertical_positions)
+{
+    player_t *player = my_calloc(sizeof(player_t), 1);
+    player_t *player2 = my_calloc(sizeof(player_t), 1);
+    trantor_t *trantor = my_calloc(sizeof(trantor_t), 1);
+
+    player2->y = 8;
+    trantor->width = 10;
+    trantor->height = 10;
+    cr_assert_eq(find_direction(player2, player, trantor), 1);
+    cr_assert_eq(find_direction(player, player2, trantor), 5);
+    my_free(player);
+    my_free(trantor);
+}
