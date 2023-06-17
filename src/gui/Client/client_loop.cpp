@@ -25,13 +25,13 @@ void GuiClient::parseOutput(std::string re) {
             {"enw", &GuiClient::EggLaying},
             {"ebo", &GuiClient::EggConnection},
             {"edi", &GuiClient::EggDeath},
+            {"sgt", &GuiClient::ServerTimeUnit},
             /*
             {"pdr", &GuiClient::PlayerDropRessource},
             {"pgt", &GuiClient::PlayerTakeRessource},
             {"eht", &GuiClient::EggHatching},
-            {"sgt", &GuiClient::ServerTimeUnit},
-            {"seg", &GuiClient::ServerEndGame},
             {"smg", &GuiClient::ServerMessage},
+            {"seg", &GuiClient::ServerEndGame},
             {"suc", &GuiClient::ServerUnknownCommand},
             {"sbp", &GuiClient::ServerBadParameter},*/
     };

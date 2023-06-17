@@ -17,8 +17,9 @@ include_directories(include/server)
 include_directories(/usr/local/include)
 
 find_package(raylib QUIET)
-find_package(Boost COMPONENTS system filesystem QUIET)
 include_directories(${RAYLIB_INCLUDE_DIRS})
+find_package(Boost COMPONENTS system filesystem QUIET)
+include_directories(${Boost_INCLUDE_DIR})
 
 if (NOT Boost_FOUND)
     message(FATAL_ERROR "Please install boost!\nsudo apt install build-essential git cmake -y\nsudo apt install libboost-all-dev -y")

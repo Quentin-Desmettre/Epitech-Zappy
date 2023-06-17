@@ -8,12 +8,12 @@
 #include "utility/strings.h"
 #include <stdarg.h>
 #include "utility/safe_write.h"
+#include "trantor.h"
 
 void debug(const char *format, ...)
 {
     va_list ap;
     char *str = NULL;
-    char *dup;
 
     va_start(ap, format);
     if (vasprintf(&str, format, ap) == -1) {

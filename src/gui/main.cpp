@@ -12,11 +12,11 @@
 void Graphic::loop()
 {
     int seed = rand();
-    Venom ven = Venom();
     int viewPos = _shader.getUniformLocation("viewPos");
     _map.setShader(_shader);
     bool shaderEnabled = true;
     bool drawGrid = false;
+    int timeUnit = 0;
     _shader.setUniform("shaderEnabled", shaderEnabled);
 
     while (!WindowShouldClose()) {
@@ -35,13 +35,12 @@ void Graphic::loop()
         Mateyak::Window::draw(_map);
         Mateyak::Window::draw(_flat);
         Venom::fpsHandler();
-        ven.move_ven(_cam._cam);
-        ven.draw_ven(seed, _cam);
         _serverInformations.startComputing();
         _map.update(_serverInformations);
+        timeUnit = _serverInformations.getTimeUnit();
         for (auto &it : _serverInformations.getPlayers()) {
             if (!it) continue;
-            it->ven.draw_ven(seed, _cam);
+            it->ven.draw_ven(seed, _cam, timeUnit);
             _serverInformations.updatePlayer(it);
         }
         if (drawGrid) {

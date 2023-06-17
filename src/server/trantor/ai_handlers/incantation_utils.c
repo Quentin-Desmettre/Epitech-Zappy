@@ -6,6 +6,7 @@
 */
 
 #include "server.h"
+#include "utility/strings.h"
 
 int count_same_level(player_t *player, map_tile_t *tile)
 {

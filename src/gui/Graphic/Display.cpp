@@ -118,7 +118,7 @@ void Graphic::drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam)
     Mateyak::Vec3f camPos = cam._position;
     Mateyak::Vec3f playerPos;
 
-    for (int i = 0; i < players.size(); i++) {
+    for (size_t i = 0; i < players.size(); i++) {
         playerPos = players[i]->ven.getPos();
         playerPos.y = 0.3;
         diff = ((playerPos - camPos).Normalize() - dir).len();
@@ -159,7 +159,7 @@ void Graphic::drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam)
     // Inventory
     std::array<int, 7> inventory = _serverInformations.getPlayers()[playerSelected]->getInventory();
     boxPosY += 130;
-    for (int i = 0; i < inventory.size(); i++) {
+    for (size_t i = 0; i < inventory.size(); i++) {
         Color color = Ressource::clr[i];
         color.a = 255;
 

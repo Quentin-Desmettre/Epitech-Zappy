@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sys/ioctl.h>
+#include "utility/strings.h"
 #include <stdbool.h>
 
 struct timespec get_end_time(int ticks, int freq, struct timespec now)

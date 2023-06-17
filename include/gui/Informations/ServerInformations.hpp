@@ -59,6 +59,8 @@ class ServerInformations
         void PlayerLayEgg(std::string name, std::string eggName, int x, int y);
         void EggConnection(std::string eggName);
         void EggDeath(std::string eggName);
+        void setTimeUnit(int timeUnit);
+        int getTimeUnit() const;
 
         Mateyak::Vec2f getMapSize() const;
         ZappyMap getMap() const;
@@ -73,5 +75,6 @@ class ServerInformations
         std::vector<std::unique_ptr<Player>> players{};
         std::vector<Message> broadCastMessage{};
         std::mutex mutex;
+        int _timeUnit = 0;
         bool _serverRunning = true;
 };

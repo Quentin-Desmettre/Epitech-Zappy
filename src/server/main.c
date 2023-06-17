@@ -8,6 +8,7 @@
 #include <stddef.h>
 #include <string.h>
 #include "server.h"
+#include "utility/strings.h"
 #include <signal.h>
 
 void handle_sig(int sig)

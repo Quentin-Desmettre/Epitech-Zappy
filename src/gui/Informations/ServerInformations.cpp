@@ -260,6 +260,16 @@ void ServerInformations::EggDeath(std::string eggName)
     }), players.end());
 }
 
+void ServerInformations::setTimeUnit(int timeUnit)
+{
+    _timeUnit = timeUnit;
+}
+
+int ServerInformations::getTimeUnit() const
+{
+    return _timeUnit;
+}
+
 Mateyak::Vec2f ServerInformations::getMapSize() const
 {
     return mapSize;
