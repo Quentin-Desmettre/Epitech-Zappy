@@ -119,7 +119,7 @@ void Mateyak::Audio::computeStereoAndVolume(Mateyak::Vec3<float> camPos,
     float distance = sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
 
     float pan = sin(angle3 * 0.017453292f);
-    pan *= 0.9f;
+    pan *= 0.95f;
 
     if (distance == 0)
         this->setVolume(1);
@@ -127,6 +127,23 @@ void Mateyak::Audio::computeStereoAndVolume(Mateyak::Vec3<float> camPos,
         float volume = (100 + 50 * log10(1 / distance)) / 100;
         if (volume < 0)
             volume = 0;
+        if (angle3 >= 0 && angle3 <= 90) {
+            std::cout << "Arriere droit" << std::endl;
+            volume *= 0.50f + ((angle3) * (0.30f / 90));
+        }
+        if (angle3 <= 360 && angle3 > 270) {
+            volume *= 0.80f - ((angle3 - 270) * (0.30f / 90));
+            std::cout << "Arriere gauche" << std::endl;
+        }
+        if (angle3 > 90 && angle3 <= 180) {
+            volume *= 0.80f + ((angle3 - 90) * (0.20f / 90));
+            std::cout << "Avant droite" << std::endl;
+        }
+        if (angle3 > 180 && angle3 <= 270) {
+            volume *= 1.0f - ((angle3 - 180) * (0.20f / 90));
+            std::cout << "Avant gauche" << std::endl;
+        }
+        std::cout << "angle : " << angle3 << " volume : " << volume << std::endl;
         this->setVolume(volume);
     }
 
