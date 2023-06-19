@@ -83,7 +83,7 @@ jobs:
             echo "all good."
 
       - name: Check coding style
-        run: "pip install websocket-client && python3 './.github/c_checker.py' --hard"
+        run: "pip install websocket-client==1.5.1 && python3 './.github/c_checker.py' --hard"
 
       - name: Check if it compiles
         shell: bash
