@@ -5,6 +5,7 @@ from src.ai.commands import CommandNames, Objects
 from src.ai.utils import my_print, set_color, Colors
 from src.ai.reader import Reader
 
+
 class Ai:
     """Artificial intelligence class."""
 
@@ -69,9 +70,11 @@ class Ai:
 
     def handle_broadcast(self, msg, inventory: dict[str, int], tiles: list[list[str]]):
         if msg[0].count("incantation") == 0\
-        or (msg[1] > self.last_movement and msg[0].count(str(self.level + 1)) > 0):
+        or (msg[1] > self.last_movement and msg[0].count(str(self.level)) > 0):
             my_print("Analyzing broadcast %s" % msg[0])
             self.parse_message(msg[0], inventory, tiles)
+        else:
+            my_print("Ignoring broadcast %s" % msg[0])
 
     def handle_evolve(self, inventory: dict[str, int], tiles = None):
         my_print("Trying to evolve to level %d" % (self.level + 1))
@@ -80,7 +83,7 @@ class Ai:
             self.elevate()
         else:
             self.send(CommandNames.BROADCAST, "incantationø§" + self.team + "ø§" + str(self.level))
-            sleep(self.delta)
+            sleep(self.delta * 7)
 
     def make_decision(self):
         """Takes a decision based on the current state of the game."""

@@ -41,7 +41,7 @@ def parse_message(self, msg: str, inventory = None, tiles: list[list[str]] = Non
     direction = Directions(int(splitted[0].split(' ')[1]))
     msg = splitted[1].strip()
     if msg.count(self.team) == 0:
-        self.send(CommandNames.BROADCAST, msg)
+        self.send(CommandNames.BROADCAST, msg + "ø")
         return
     uuid = msg.split('§ø')
     if self.messages_uuids.count(uuid[0]) > 0:

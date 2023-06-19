@@ -6,7 +6,7 @@ from src.ai.utils import my_print, merge_dicts
 def has_stones(inventory: dict[Objects, int], current_level: int) -> bool:
     required = get_elevation_needs(current_level)
     for stone in required:
-        if stone != Objects.PLAYER and (stone.value not in inventory \
+        if stone != Objects.PLAYER and (stone.value not in inventory\
         or inventory[stone.value] < required[stone]):
             return False
     return True
@@ -16,7 +16,7 @@ def get_needed_stones(self, inventory: dict[Objects, int]) -> list[Objects]:
     required = get_elevation_needs(self.level)
     needed = []
     for stone in required.keys():
-        if stone != Objects.PLAYER and (stone.value not in inventory \
+        if stone != Objects.PLAYER and (stone.value not in inventory\
         or inventory[stone.value] < required[stone]):
             needed.append(stone)
     return needed

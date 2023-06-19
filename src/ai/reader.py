@@ -1,8 +1,6 @@
 from regex import match
 from threading import Lock, Thread
-from signal import SIGINT
 from random import randint
-from os import kill, getpid
 from time import time
 from queue import Queue
 from socket import socket
@@ -27,7 +25,11 @@ class Reader:
         """Starts the reading thread."""
         try:
             while True:
-                data = self.sock.recv(4096).decode()
+                data = self.sock.recv(4096)
+                try:
+                    data = data.decode("utf-8")
+                except UnicodeDecodeError:
+                    data = data.decode("ISO-8859-2")
                 if not data or data == "":
                     raise Exception("Server disconnected")
                 self.buffer += data
@@ -37,11 +39,13 @@ class Reader:
                     self.mtx.release()
         except Exception as e:
             self.queue.put("dead")
+            self.queue.put(e)
 
     def parse_data(self) -> None:
         index = self.buffer.index("\n")
         msg = self.buffer[:index]
         if msg == "dead":
+            my_print("Received: %s" % msg)
             raise Exception("You died")
         if match(PossibleResponsesRegex.MESSAGE.value[0], msg):
             if msg.count(self.team) == 0 and randint(0, 3) != 0:
@@ -98,7 +102,7 @@ class Reader:
         """Pops a message from the queue."""
         msg = self.queue.get()
         if msg == "dead":
-            raise Exception("You died")
+            raise Exception(self.queue.get())
         return msg
 
     def has_broadcast(self) -> bool:
