@@ -22,7 +22,7 @@ class Ai:
     def send(self, cmd: CommandNames, arg: str | None = None):
         """Sends a command to the server."""
         if cmd == CommandNames.BROADCAST:
-            arg = str(uuid4()) + "§ø" + arg
+            arg = str(uuid4()) + "|~" + arg
         return self.reader.send(cmd, arg)
 
     from ._finding import loot_object, go_to_object
