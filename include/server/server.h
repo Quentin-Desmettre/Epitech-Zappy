@@ -20,14 +20,13 @@
 
     #define INT64_MAX 9223372036854775807LL
     #define GRAPHIC_COMMAND "GRAPHIC"
-    #define ERR_NO_SLOTS "ko: Not enough opened slots\n"
-    #define ERR_NO_TEAM "ko: No such team\n"
-    #define ERR_NO_CMD "ko: No such command\n"
+    #define ERR_NO_SLOTS "ko\n"
+    #define ERR_NO_TEAM "ko\n"
+    #define ERR_NO_CMD "ko\n"
     #define AI_MAX_COMMANDS 10
 
 // In case you want to open other file descriptors
     #define MAX_CLIENTS (FD_SETSIZE - 20)
-
 
     #define WELCOME_MESSAGE "WELCOME\n"
     #define UNUSED __attribute__((unused))
@@ -124,7 +123,6 @@ char *gui_player_level_handler(server_t *server, const char *cmd);
 char *gui_player_inventory_handler(server_t *server, const char *cmd);
 char *gui_time_request_handler(server_t *server, const char *cmd);
 char *gui_time_change_handler(server_t *server, const char *cmd);
-char *gui_pnw_response(player_t *player);
 
 extern const gui_cmd_t GUI_HANDLERS[];
 

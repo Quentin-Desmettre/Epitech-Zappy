@@ -101,7 +101,9 @@ add_executable(zappy_server
         src/server/utility/safe_write/my_write.c
         src/server/utility/garbage_collector/garbage_handling.c
         src/server/utility/garbage_collector/my_malloc.c
-        src/server/utility/strings.c src/server/network/server_run_utils.c src/server/trantor/ai_handlers/incantation_utils.c src/server/utility/debug_print.c)
+        src/server/utility/strings.c src/server/network/server_run_utils.c src/server/trantor/ai_handlers/incantation_utils.c src/server/utility/debug_print.c
+        src/server/check_args_validity.c
+    )
 
 find_library(MATH_LIBRARY m)
 
@@ -172,7 +174,7 @@ add_executable(server_tests
         ./src/server/utility/garbage_collector/garbage_handling.c
         ./src/server/utility/garbage_collector/my_malloc.c
         ./src/server/utility/strings.c
-)
+        src/server/check_args_validity.c)
 if(MATH_LIBRARY)
     target_link_libraries(server_tests PUBLIC criterion ${MATH_LIBRARY})
 endif()
