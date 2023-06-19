@@ -102,8 +102,8 @@ void Mateyak::Audio::computeStereoAndVolume(Mateyak::Vec3<float> camPos,
     std::get<0>(pos) = std::get<0>(pos) * (10/3) + ((10/3) / 2);
     std::get<1>(pos) = std::get<1>(pos) * (10/3) + ((10/3) / 2);
 
-    float x = camPos.x - 0;
-    float y = camPos.z - 0;
+    float x = camPos.x - std::get<0>(pos);
+    float y = camPos.z - std::get<1>(pos);
     float z = camPos.y - 0;
 
     float angle = atan2(x, y) * (180 / PI);
@@ -129,18 +129,18 @@ void Mateyak::Audio::computeStereoAndVolume(Mateyak::Vec3<float> camPos,
             volume = 0;
         if (angle3 >= 0 && angle3 <= 90) {
             std::cout << "Arriere droit" << std::endl;
-            volume *= 0.50f + ((angle3) * (0.30f / 90));
+            volume *= 0.60f + ((angle3) * (0.30f / 90));
         }
         if (angle3 <= 360 && angle3 > 270) {
-            volume *= 0.80f - ((angle3 - 270) * (0.30f / 90));
+            volume *= 0.90f - ((angle3 - 270) * (0.30f / 90));
             std::cout << "Arriere gauche" << std::endl;
         }
         if (angle3 > 90 && angle3 <= 180) {
-            volume *= 0.80f + ((angle3 - 90) * (0.20f / 90));
+            volume *= 0.90f + ((angle3 - 90) * (0.10f / 90));
             std::cout << "Avant droite" << std::endl;
         }
         if (angle3 > 180 && angle3 <= 270) {
-            volume *= 1.0f - ((angle3 - 180) * (0.20f / 90));
+            volume *= 1.0f - ((angle3 - 180) * (0.10f / 90));
             std::cout << "Avant gauche" << std::endl;
         }
         if (volume > 1)

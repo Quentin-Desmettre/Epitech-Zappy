@@ -16,6 +16,7 @@ namespace Mateyak
 {
     enum action_type {
         BROADCAST,
+        NEWPLAYER,
         ELEVATIONSTART,
         ELEVATIONEND,
         LEVELUP
