@@ -97,8 +97,13 @@ jobs:
           make
           ls zappy_server zappy_gui zappy_ai
 
-      - name: Run tests
-        run: "./tests.sh"
+      - name: Run tests and annotate coverage
+        run: |
+          ./tests.sh
+          line_cov=$(  gcovr --exclude tests     | tail -n 2 | head -n 1 | sed -n 's/.* \([0-9]\+%$\)/\1/p')
+          branch_cov=$(gcovr --exclude tests -b  | tail -n 2 | head -n 1 | sed -n 's/.* \([0-9]\+%$\)/\1/p')
+          echo "::notice title='Line coverage'::$line_cov"
+          echo "::notice title='Branch coverage'::$branch_cov"
 
       - name: Push to Epitech
         uses: pixta-dev/repository-mirroring-action@v1

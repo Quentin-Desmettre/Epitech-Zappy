@@ -61,23 +61,19 @@ team_t *get_team_by_name(trantor_t *trantor, const char *team)
 
 void handle_connected(server_t *server, client_t *cli, const char *cmd)
 {
-    char *answer = NULL;
     team_t *team;
 
     if (strcmp(cmd, GRAPHIC_COMMAND) == 0) {
         debug("New GUI connected\n");
         cli->state = GUI;
-        answer = get_gui_connected_answer(server);
-        safe_write(cli->fd, answer, strlen(answer));
-        return my_free(answer);
+        return safe_write_free(cli->fd, get_gui_connected_answer(server));
     }
     team = get_team_by_name(server->trantor, cmd);
-    if (!team || (team->available_slots + team->eggs) == 0) {
-        answer = team ? ERR_NO_SLOTS : ERR_NO_TEAM;
-        debug("Refused connection for AI. Reason: %s\n", answer);
-        return safe_write(cli->fd, answer, strlen(answer));
+    if (!team || !team->eggs) {
+        debug("Refused connection for AI\n");
+        return safe_write(cli->fd, "ko", 2);
     }
-    log_ai(cli, server, cmd, team);
+    log_ai(cli, server, team);
     debug("New AI connected\n");
 }
 

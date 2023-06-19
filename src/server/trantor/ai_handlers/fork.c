@@ -7,21 +7,27 @@
 
 #include "server.h"
 
-int create_egg(team_t *team)
+egg_t *create_egg(int x, int y, bool is_forked, team_t *team)
 {
     static int egg_id = 0;
+    egg_t *egg = my_malloc(sizeof(egg_t));
 
-    append_node(&team->egg_numbers, (void *)(long)egg_id);
-    team->eggs++;
-    return egg_id++;
+    egg->x = x;
+    egg->y = y;
+    egg->is_forked = is_forked;
+    egg->id = egg_id;
+    egg->team = team;
+    egg_id++;
+    append_node(&team->eggs, egg);
+    return egg;
 }
 
 ai_cmd_response_t ai_fork_handler(UNUSED action_t *action,
     server_t *server, player_t *player)
 {
-    int egg_id = create_egg(player->team);
+    egg_t *egg = create_egg(player->x, player->y, true, player->team);
 
-    notify_gui(server, EGG_READY, egg_id, player->id, player->x, player->y);
+    notify_gui(server, EGG_READY, egg->id, egg->id, egg->x, egg->y);
     return AI_CMD_RESPONSE_OK;
 }
 

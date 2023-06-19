@@ -8,7 +8,7 @@
 #include "server.h"
 #include "utility/strings.h"
 
-int count_same_level(player_t *player, map_tile_t *tile)
+int count_same_level(player_t *player, map_tile_t *tile, bool check_incant_id)
 {
     int nb_same_level = 0;
     list_t *players = tile->players;
@@ -16,16 +16,17 @@ int count_same_level(player_t *player, map_tile_t *tile)
 
     do {
         pl = players->data;
-        if (pl->level == player->level && !pl->is_freezed)
+        if (pl->level == player->level && !pl->is_freezed &&
+        (!check_incant_id || pl->incant_id == player->incant_id))
             nb_same_level++;
         players = players->next;
     } while (players != tile->players);
     return nb_same_level;
 }
 
-bool can_level_up(player_t *player, map_tile_t *tile)
+bool can_level_up(player_t *player, map_tile_t *tile, bool check_incant_id)
 {
-    int nb_same_level = count_same_level(player, tile);
+    int nb_same_level = count_same_level(player, tile, check_incant_id);
 
     if (requirements_for_level[player->level][0] < nb_same_level)
         return false;
@@ -60,7 +61,7 @@ void do_level_up(map_tile_t *tile, player_t *player, server_t *server)
 ai_cmd_response_t ai_connect_nbr_handler(action_t *action UNUSED,
     server_t *server UNUSED, player_t *player)
 {
-    char *msg = my_asprintf("%d", player->team->available_slots);
+    char *msg = my_asprintf("%d", list_size(player->team->eggs));
 
     return AI_CMD_RESPONSE_TEXT(msg);
 }
