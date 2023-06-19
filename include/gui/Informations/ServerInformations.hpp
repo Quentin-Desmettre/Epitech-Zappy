@@ -17,6 +17,8 @@
 #include "Informations/Team.hpp"
 #include "Ressource.hpp"
 #include <memory>
+#include <queue>
+
 typedef std::vector<std::vector<std::vector<Ressource>>> ZappyMap;
 
 
@@ -66,12 +68,16 @@ class ServerInformations
         int getTimeUnit() const;
         void takeRessource(const std::string &name, int ressource);
         void dropRessource(const std::string &name, int ressource);
-
-    Mateyak::Vec2f getMapSize() const;
+        Mateyak::Vec2f getMapSize() const;
         ZappyMap getMap() const;
         std::vector<Team> getTeams() const;
         std::vector<std::unique_ptr<Player>> &getPlayers();
         std::vector<Message> &getBroadCastMessage();
+
+        std::queue<std::string> &getCommandQueue();
+        void addCommand(std::string command);
+        std::string getCommand();
+        bool hasCommand() const;
 
     private:
         Mateyak::Vec2f mapSize {0, 0};
@@ -82,4 +88,6 @@ class ServerInformations
         std::mutex mutex;
         int _timeUnit = 0;
         bool _serverRunning = true;
+
+        std::queue<std::string> _commandQueue;
 };

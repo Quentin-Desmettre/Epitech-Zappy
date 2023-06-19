@@ -108,7 +108,6 @@ void GuiClient::PlayerInventory(std::vector<std::string> parameters)
         name.erase(0, 1);
     int x = std::stoi(parameters[1]);
     int y = std::stoi(parameters[2]);
-    std::cerr << "PlayerInventory: " << name << " " << x << " " << y << std::endl;
 
     std::vector<int> res;
 

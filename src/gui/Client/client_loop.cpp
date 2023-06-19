@@ -87,12 +87,11 @@ void GuiClient::compute()
                 resp = getInformations();
                 parseOutput(resp);
             }
-            if (FD_ISSET(socket_descriptor, &write_fds)) {
-                //verify _serverInformations._commandIsEmpty == false
+            if (FD_ISSET(socket_descriptor, &write_fds) && _serverInformations.hasCommand()) {
                 _serverInformations.startComputing();
+                std::string command = _serverInformations.getCommand();
+                _socket.write_some(boost::asio::buffer(command));
                 _serverInformations.endComputing();
-                //sendCommand();
-                //_socket.write_some(boost::asio::buffer(command));
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
