@@ -27,7 +27,8 @@ ai_cmd_response_t ai_fork_handler(UNUSED action_t *action,
 {
     egg_t *egg = create_egg(player->x, player->y, true, player->team);
 
-    notify_gui(server, EGG_READY, egg->id, egg->id, egg->x, egg->y);
+    egg->player_id = player->id;
+    notify_gui(server, EGG_READY, egg->id, player->id, egg->x, egg->y);
     return AI_CMD_RESPONSE_OK;
 }
 
