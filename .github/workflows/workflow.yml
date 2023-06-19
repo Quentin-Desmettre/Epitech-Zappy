@@ -10,6 +10,9 @@
 name: "Push to remote"
 on: push
 
+env:
+  APT_DEPENDENCIES: "build-essential git cmake libboost-all-dev libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev gcovr"
+
 jobs:
   test:
     name: Run tests before pushing to remote
@@ -27,58 +30,75 @@ jobs:
           ref: ${{ steps.extract_branch.outputs.branch }}
           fetch-depth: 0
 
-#      - name: Install criterion
-#        run: |
-#            URL="https://github.com/Snaipe/Criterion/releases/download/v2.3.2"
-#            TARBALL="criterion-v2.3.2-linux-x86_64.tar.bz2"
-#            DIR="criterion-v2.3.2"
-#            DST="/usr/local/"
-#            SUDO=/usr/bin/sudo
-#
-#            if [ $UID -eq "0" ]; then
-#              SUDO=""
-#              echo "[no sudo for root]"
-#            fi
-#
-#            cd /tmp
-#            rm -f $TARBALL
-#            rm -fr $DIR
-#
-#            wget $URL/$TARBALL
-#            if [ $? != 0 ]; then
-#              echo "failled, exiting"
-#              exit 1;
-#            fi
-#
-#            echo
-#            echo "untaring $TARBALL"
-#            tar xjf $TARBALL
-#            if [ $? != 0 ]; then
-#              echo "failled, exiting"
-#              exit 1;
-#            fi
-#
-#            echo "creating custom ld.conf"
-#            $SUDO sh -c "echo "/usr/local/lib" > /etc/ld.so.conf.d/criterion.conf"
-#            echo "cp headers to $DST/include..."
-#            $SUDO cp -r $DIR/include/* $DST/include/
-#            echo "cp lib to $DST/include..."
-#            $SUDO cp -r $DIR/lib/* $DST/lib/
-#            echo "run ldconfig."
-#            $SUDO ldconfig
-#            echo "all good."
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ${{ env.APT_DEPENDENCIES }}
+
+      - name: Install raylib/boost
+        run: |
+          git clone https://github.com/raysan5/raylib.git raylib
+          cd raylib
+          mkdir build && cd build
+          cmake -DBUILD_SHARED_LIBS=ON ..
+          make
+          sudo make install
+          cd ../../
+          rm -rf raylib
+
+      - name: Install criterion
+        run: |
+            URL="https://github.com/Snaipe/Criterion/releases/download/v2.3.2"
+            TARBALL="criterion-v2.3.2-linux-x86_64.tar.bz2"
+            DIR="criterion-v2.3.2"
+            DST="/usr/local/"
+            SUDO=/usr/bin/sudo
+
+            if [ $UID -eq "0" ]; then
+              SUDO=""
+              echo "[no sudo for root]"
+            fi
+
+            cd /tmp
+            rm -f $TARBALL
+            rm -fr $DIR
+
+            wget $URL/$TARBALL
+            if [ $? != 0 ]; then
+              echo "failled, exiting"
+              exit 1;
+            fi
+
+            echo
+            echo "untaring $TARBALL"
+            tar xjf $TARBALL
+            if [ $? != 0 ]; then
+              echo "failled, exiting"
+              exit 1;
+            fi
+
+            echo "creating custom ld.conf"
+            $SUDO sh -c "echo "/usr/local/lib" > /etc/ld.so.conf.d/criterion.conf"
+            echo "cp headers to $DST/include..."
+            $SUDO cp -r $DIR/include/* $DST/include/
+            echo "cp lib to $DST/include..."
+            $SUDO cp -r $DIR/lib/* $DST/lib/
+            echo "run ldconfig."
+            $SUDO ldconfig
+            echo "all good."
 
       - name: Check coding style
-        run: "pip install websocket-client && python './.github/c_checker.py' --hard"
+        run: "pip install websocket-client==1.5.1 && python3 './.github/c_checker.py' --hard"
 
       - name: Check if it compiles
         shell: bash
         run: |
-          make zappy_server zappy_gui zappy_ai
+          cmake .
+          make
           ls zappy_server zappy_gui zappy_ai
 
       - name: Run tests
-        run: "make tests_run"
+        run: "./tests.sh"
 
       - name: Push to Epitech
         uses: pixta-dev/repository-mirroring-action@v1

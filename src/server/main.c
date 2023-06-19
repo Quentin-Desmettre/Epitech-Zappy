@@ -5,19 +5,25 @@
 ** main
 */
 
-#include <stdio.h>
 #include <stddef.h>
 #include <string.h>
 #include "server.h"
+#include <signal.h>
+#include "utility/strings.h"
 
-char *perror_str(const char *str)
+void handle_sig(int sig)
 {
-    char *err = calloc(1, strlen(str) + strlen(strerror(errno)) + 3);
+    (void)sig;
+    debug("Signal received, shutting down server\n", 38);
+    exit(0);
+}
 
-    strcat(err, str);
-    strcat(err, ": ");
-    strcat(err, strerror(errno));
-    return err;
+void handle_all_sigs(void)
+{
+    for (int i = 1; i < 32; i++) {
+        if (i != SIGSEGV && i != SIGFPE && i != SIGKILL && i != SIGSTOP)
+            signal(i, handle_sig);
+    }
 }
 
 int main(int ac, char **av)
@@ -26,19 +32,14 @@ int main(int ac, char **av)
     server_t *server = init_server(ac, av, &err);
 
     if (!server) {
-        if (err)
-            fprintf(stderr, "%s\n", err);
+        if (err) {
+            safe_write(2, err, strlen(err));
+            safe_write(2, "\n", 1);
+        }
         return 84;
     }
-    printf("Port: %d\n", server->params.port);
-    printf("Width: %d\n", server->params.width);
-    printf("Height: %d\n", server->params.height);
-    printf("Team names: ");
-    for (int i = 0; server->params.names[i]; i++)
-        printf("%s ", server->params.names[i]);
-    printf("\n");
-    printf("Slots: %d\n", server->params.slots);
-    printf("Freq: %d\n", server->params.freq);
+    srandom(time(NULL));
+    handle_all_sigs();
     run_server(server);
     destroy_server(server);
     return 0;

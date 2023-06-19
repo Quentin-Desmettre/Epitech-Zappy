@@ -6,7 +6,8 @@
 */
 
 #include "args.h"
-#include "strings.h"
+#include "utility/strings.h"
+#include "server.h"
 #include <stdbool.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -30,13 +31,13 @@ const char *DEFAULT_TEAMS[] = {
         NULL
 };
 
-static void reset_args(args_t *args)
+static void reset_args(args_t *args, bool dup_names)
 {
     free_str_array(args->names);
     args->port = DEFAULT_PORT;
     args->width = DEFAULT_WIDTH;
     args->height = DEFAULT_HEIGHT;
-    args->names = dupstrarray(DEFAULT_TEAMS);
+    args->names = dup_names ? dupstrarray(DEFAULT_TEAMS) : NULL;
     args->slots = DEFAULT_SLOTS;
     args->freq = DEFAULT_FREQ;
 }
@@ -49,27 +50,22 @@ static size_t offset_of_arg(int arg)
     return SIZE_T_MAX;
 }
 
-static bool fetch_team_names(args_t *args, int ac, char **av, char **err)
+static void fetch_team_names(args_t *args, int ac, char **av)
 {
-    if (optarg == NULL) {
-        *err = "Missing team names";
-        return false;
-    }
     free_str_array(args->names);
-    args->names = calloc(1, sizeof(char *));
+    args->names = my_calloc(1, sizeof(char *));
     optind--;
     while (optind < ac && av[optind][0] != '-') {
-        append_str_array(&args->names, strdup(av[optind]));
+        append_str_array(&args->names, my_strdup(av[optind]));
         optind++;
     }
-    return true;
 }
 
 static bool check_args(args_t *args, char **err)
 {
     if (args->port <= 0)
         *err = ERR_PORT;
-    if (args->freq <= 0)
+    if (!IS_FREQ_VALID(args->freq))
         *err = ERR_FREQ;
     if (args->width < 10 || args->width > 30)
         *err = ERR_WIDTH;
@@ -77,24 +73,35 @@ static bool check_args(args_t *args, char **err)
         *err = ERR_HEIGHT;
     if (args->slots <= 0)
         *err = ERR_SLOTS;
-    if (args->names == NULL || args->names[0] == NULL)
+    if (args->names[0] == NULL)
         *err = ERR_TEAMS;
+    if (has_duplicates(args->names))
+        *err = ERR_MULTI_TEAMS;
+    if (str_array_contains(args->names, GRAPHIC_COMMAND))
+        *err = ERR_INVALID_TEAM_NAME;
     return *err == NULL;
 }
 
 bool get_args(int ac, char **av, args_t *args, char **err)
 {
     int opt;
-
-    reset_args(args);
+    reset_args(args, true);
     *err = NULL;
     while ((opt = getopt(ac, av, ARGS_STR)) != -1) {
-        if (opt == '?')
+        if (opt == '?') {
+            reset_args(args, false);
             return false;
-        if (opt == 'n' && !fetch_team_names(args, ac, av, err))
-            return false;
-        if (opt != 'n')
-            *(int *)((char *) args + offset_of_arg(opt)) = atoi(optarg);
+        }
+        if (opt == 'v')
+            *get_is_debug() = true;
+        if (opt == 'n') {
+            fetch_team_names(args, ac, av);
+            continue;
+        }
+        *(int *)((char *) args + offset_of_arg(opt)) = atoi(optarg);
     }
-    return check_args(args, err);
+    if (check_args(args, err))
+        return true;
+    reset_args(args, false);
+    return false;
 }
