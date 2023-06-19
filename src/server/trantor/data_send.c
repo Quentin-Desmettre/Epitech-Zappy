@@ -7,22 +7,23 @@
 
 #include "server.h"
 
-void send_to_clients_on_tile(server_t *server, char *mess, player_t *player)
+void send_to_elevated_clients(server_t *server,
+    char *mess, player_t *player)
 {
     list_t *clients = server->clients;
     client_t *cli;
     int x = player->x;
     int y = player->y;
+    int level = player->level;
 
     if (!clients)
         return;
     do {
         cli = clients->data;
-        if (!cli->data || cli->data == player) {
-            clients = clients->next;
-            continue;
-        }
-        if (cli->data->x == x && cli->data->y == y)
+        if (cli->data && cli->data != player &&
+        cli->data->x == x && cli->data->y == y &&
+        cli->data->level == level && cli->data->is_freezed &&
+        cli->data->incant_id == player->incant_id)
             safe_write(cli->fd, mess, strlen(mess));
         clients = clients->next;
     } while (clients != server->clients);

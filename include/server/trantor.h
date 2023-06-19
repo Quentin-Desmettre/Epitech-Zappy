@@ -128,6 +128,7 @@ typedef struct player {
     int y;
     int id;
     direction_t dir;
+    int incant_id;
 
     /**
      * For example, to get the number of food in the inventory,
@@ -178,6 +179,7 @@ char *get_list_players(list_t *players);
 
 int find_direction(player_t *from, player_t *to, trantor_t *trantor);
 int get_direct_from_angle(double angle);
-int count_same_level(player_t *player, map_tile_t *tile);
-bool can_level_up(player_t *player, map_tile_t *tile);
+int count_same_level(player_t *player, map_tile_t *tile, bool check_incant_id);
+bool can_level_up(player_t *player, map_tile_t *tile, bool check_incant_id);
+
 #endif //EPITECH_ZAPPY_TRANTOR_H

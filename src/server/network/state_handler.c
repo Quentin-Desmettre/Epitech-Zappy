@@ -61,7 +61,6 @@ team_t *get_team_by_name(trantor_t *trantor, const char *team)
 
 void handle_connected(server_t *server, client_t *cli, const char *cmd)
 {
-    char *answer = NULL;
     team_t *team;
 
     if (strcmp(cmd, GRAPHIC_COMMAND) == 0) {
@@ -71,10 +70,10 @@ void handle_connected(server_t *server, client_t *cli, const char *cmd)
     }
     team = get_team_by_name(server->trantor, cmd);
     if (!team || !team->eggs) {
-        debug("Refused connection for AI. Reason: %s\n", answer);
+        debug("Refused connection for AI\n");
         return safe_write(cli->fd, "ko", 2);
     }
-    log_ai(cli, server, cmd, team);
+    log_ai(cli, server, team);
     debug("New AI connected\n");
 }
 

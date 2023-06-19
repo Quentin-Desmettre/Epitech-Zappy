@@ -49,7 +49,7 @@ static egg_t *select_egg_for_connection(list_t *eggs)
     return selected;
 }
 
-void log_ai(client_t *cli, server_t *server, const char *cmd, team_t *team)
+void log_ai(client_t *cli, server_t *server, team_t *team)
 {
     egg_t *egg = select_egg_for_connection(team->eggs);
     char *gui_mess = NULL;

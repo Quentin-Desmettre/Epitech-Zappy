@@ -179,7 +179,7 @@ void do_action(action_t *action, server_t *trantor);
 void handle_actions(server_t *server);
 void put_action_in_waitlist(server_t *server, action_t *action);
 void notify_gui(server_t *server, enum gui_event event, ...);
-void log_ai(client_t *cli, server_t *server, const char *cmd, team_t *team);
+void log_ai(client_t *cli, server_t *server, team_t *team);
 void check_food(server_t *server);
 void disconnect_client(server_t *server, client_t *cli, bool has_disconnect);
 void update_next_spawn(server_t *server);
@@ -218,15 +218,20 @@ ai_cmd_response_t ai_fork_pre_check(UNUSED action_t *action,
     server_t *server, player_t *player);
 int action_cmp(const void *a, const void *b);
 struct timespec timespec_add(struct timespec a, struct timeval b);
-void send_to_clients_on_tile(server_t *server, char *mess, player_t *player);
-void freeze_players(map_tile_t *tile, player_t *player);
-void unfreeze_players(server_t *server, map_tile_t *tile, player_t *player);
 void check_resource_spawn(server_t *server);
 void spawn_resources(server_t *server);
 char *get_winning_team(trantor_t *trantor);
 void accept_client(server_t *server);
 void do_level_up(map_tile_t *tile, player_t *player, server_t *server);
 bool *get_is_debug(void);
+void sort_actions(server_t *server);
+
+void unfreeze_players(server_t *server, map_tile_t *tile, player_t *player);
+
+void send_to_elevated_clients(server_t *server, char *mess, player_t *player);
+
+void freeze_player(player_t *player, int incant_id);
+void freeze_players(map_tile_t *tile, player_t *player);
 
 UNUSED static const int requirements_for_level[8][7] = {
         {}, // UNUSED
