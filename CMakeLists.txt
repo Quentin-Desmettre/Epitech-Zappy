@@ -112,7 +112,7 @@ add_executable(zappy_server
         src/server/utility/garbage_collector/my_malloc.c
         src/server/utility/strings.c src/server/network/server_run_utils.c src/server/trantor/ai_handlers/incantation_utils.c src/server/utility/debug_print.c
         src/server/check_args_validity.c
-    )
+        src/server/network/gui_connected_answer.c)
 
 find_library(MATH_LIBRARY m)
 
