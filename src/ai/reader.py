@@ -81,11 +81,18 @@ class Reader:
         if type == CommandNames.INCANTATION and msg == "ko":
             msg = self.get_next_match(type)
         while match(PossibleResponsesRegex.INCANTATION.value[0], msg):
-            msg = self.get_next_match(type)
+            msg = self.wait_end_incantation()
         if msg == "ko":
             my_print("Command %s failed" % type.value)
             return None
         return cmd.parse_response(msg)
+
+    def wait_end_incantation(self) -> str:
+        """Waits for the end of the incantation."""
+        msg = self.queue_pop()
+        while not self.check_matches(msg, CommandNames.INCANTATION):
+            msg = self.queue_pop()
+        return msg
 
     def queue_pop(self) -> str:
         """Pops a message from the queue."""

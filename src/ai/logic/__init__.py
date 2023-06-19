@@ -61,39 +61,34 @@ class Ai:
         if stone.value not in inventory:
             inventory[stone.value] = 0
         inventory[stone.value] += 1
-        self.send(CommandNames.BROADCAST, "lootedø§" + self.team + "ø§" + stone.value)
-        sleep(self.delta)
-        # if self.can_evolve(inventory, self.send(CommandNames.LOOK)):
-        #     self.drop_elevation_stones(inventory, stone)
+        if self.can_evolve(inventory, self.send(CommandNames.LOOK)):
+            self.drop_elevation_stones(inventory, stone)
+        else:
+            self.send(CommandNames.BROADCAST, "lootedø§" + self.team + "ø§" + stone.value + "ø§" + str(self.level))
+            sleep(self.delta)
 
     def handle_broadcast(self, msg, inventory: dict[str, int], tiles: list[list[str]]):
         if msg[0].count("incantation") == 0\
         or (msg[1] > self.last_movement and msg[0].count(str(self.level + 1)) > 0):
             my_print("Analyzing broadcast %s" % msg[0])
             self.parse_message(msg[0], inventory, tiles)
-        if msg[0].count("incantation") > 0:
-            self.send(CommandNames.BROADCAST, "movedø§" + self.team)
-            sleep(self.delta)
 
     def handle_evolve(self, inventory: dict[str, int], tiles = None):
         my_print("Trying to evolve to level %d" % (self.level + 1))
         if self.check_requirements(inventory, tiles):
             self.drop_elevation_stones()
             self.elevate()
-        elif self.can_send:
-            self.send(CommandNames.BROADCAST, "incantationø§" + self.team + "ø§" + str(self.level + 1))
-            sleep(self.delta)
-            self.can_send = False
         else:
-            my_print("Cannot send broadcast (cooldown)")
+            self.send(CommandNames.BROADCAST, "incantationø§" + self.team + "ø§" + str(self.level))
+            sleep(self.delta)
 
     def make_decision(self):
         """Takes a decision based on the current state of the game."""
         set_color(None)
         my_print("Making decision")
-        current_time = time()
+        start_time = time()
         inventory = self.send(CommandNames.INVENTORY)
-        self.delta = time() - current_time
+        self.delta = time() - start_time
         tiles = self.send(CommandNames.LOOK)
         if inventory is None or tiles is None:
             return
