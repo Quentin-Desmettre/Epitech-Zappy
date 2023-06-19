@@ -66,17 +66,37 @@ void GuiClient::stop()
     _loop = false;
 }
 
+void resetFds(fd_set &tmp, int socketFD)
+{
+    FD_ZERO(&tmp);
+    FD_SET(socketFD, &tmp);
+}
+
 void GuiClient::compute()
 {
     std::string resp;
+    int socket_descriptor = _socket.native_handle();
+    fd_set read_fds;
+    fd_set write_fds;
 
     try {
         while (_loop) {
             if (!_socket.is_open())
                 break;
-            std::cout << "loop" << std::endl;
-            resp = getInformations();
-            parseOutput(resp);
+            resetFds(read_fds, socket_descriptor);
+            resetFds(write_fds, socket_descriptor);
+            select(socket_descriptor + 1, &read_fds, &write_fds, NULL, NULL);
+            if (FD_ISSET(socket_descriptor, &read_fds)) {
+                resp = getInformations();
+                parseOutput(resp);
+            }
+            if (FD_ISSET(socket_descriptor, &write_fds)) {
+                //verify _serverInformations._commandIsEmpty == false
+                _serverInformations.startComputing();
+                _serverInformations.endComputing();
+                //sendCommand();
+                //_socket.write_some(boost::asio::buffer(command));
+            }
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     } catch (std::exception &e) {

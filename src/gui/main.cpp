@@ -75,6 +75,5 @@ int main(int ac, char **av)
     } catch (const std::exception& ex) {
         std::cerr << "Exception: " << ex.what() << std::endl;
     }
-
     return 0;
 }
