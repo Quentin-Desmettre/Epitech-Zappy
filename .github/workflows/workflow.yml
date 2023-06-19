@@ -10,7 +10,7 @@
 name: "Push to remote"
 on: push
 
-variables:
+env:
   APT_DEPENDENCIES: "build-essential git cmake libboost-all-dev libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev gcovr"
 
 jobs:
