@@ -51,11 +51,9 @@ UNUSED static const float RESOURCE_FREQ[NB_RESOURCE] = {
 };
 
 typedef struct team {
-    int available_slots;
-    int eggs;
     char *name;
     list_t *players;
-    list_t *egg_numbers;
+    list_t *eggs;
 } team_t;
 
 typedef enum direction {
@@ -73,9 +71,6 @@ typedef struct map_tile {
     int x;
     int y;
 } map_tile_t;
-
-typedef struct map {
-} map_t;
 
 typedef struct trantor {
     list_t *teams;
@@ -149,8 +144,17 @@ typedef struct player {
     struct timeval time_left;
 } player_t;
 
-player_t *create_player(trantor_t *trantor, team_t *team,
-                        const char *team_name);
+typedef struct egg {
+    bool is_forked;
+    int x;
+    int y;
+    int id;
+    team_t *team;
+} egg_t;
+
+egg_t *create_egg(int x, int y, bool is_forked, team_t *team);
+
+player_t *create_player(trantor_t *trantor, egg_t *egg);
 void destroy_player(trantor_t *trantor, player_t *player);
 
 // Ai request handling
@@ -162,7 +166,7 @@ action_t *create_action(const char *cmd, void *client_t, int f);
 map_tile_t *init_tile(int x, int y);
 void link_layers(dim_list_t *map);
 map_tile_t *get_tile_by_pos(dim_list_t *map, int x, int y);
-team_t *create_team(const char *name, int max_players);
+team_t *create_team(const char *name, int max_players, int width, int height);
 void destroy_team(void *team);
 map_tile_t *select_tile_for_look_command(trantor_t *trantor,
                 player_t *player, int nb);

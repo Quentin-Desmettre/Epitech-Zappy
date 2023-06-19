@@ -60,7 +60,7 @@ void do_level_up(map_tile_t *tile, player_t *player, server_t *server)
 ai_cmd_response_t ai_connect_nbr_handler(action_t *action UNUSED,
     server_t *server UNUSED, player_t *player)
 {
-    char *msg = my_asprintf("%d", player->team->available_slots);
+    char *msg = my_asprintf("%d", list_size(player->team->eggs));
 
     return AI_CMD_RESPONSE_TEXT(msg);
 }

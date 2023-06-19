@@ -20,12 +20,10 @@
 
     #define INT64_MAX 9223372036854775807LL
     #define GRAPHIC_COMMAND "GRAPHIC"
-    #define ERR_NO_SLOTS "ko\n"
-    #define ERR_NO_TEAM "ko\n"
     #define ERR_NO_CMD "ko\n"
     #define AI_MAX_COMMANDS 10
 
-// In case you want to open other file descriptors
+// -20 In case you want to open other file descriptors
     #define MAX_CLIENTS (FD_SETSIZE - 20)
 
     #define WELCOME_MESSAGE "WELCOME\n"
@@ -229,7 +227,6 @@ char *get_winning_team(trantor_t *trantor);
 void accept_client(server_t *server);
 void do_level_up(map_tile_t *tile, player_t *player, server_t *server);
 bool *get_is_debug(void);
-int create_egg(team_t *team);
 
 UNUSED static const int requirements_for_level[8][7] = {
         {}, // UNUSED
