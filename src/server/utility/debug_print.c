@@ -8,6 +8,8 @@
 #include "server.h"
 #include "utility/strings.h"
 #include <stdarg.h>
+#include "utility/safe_write.h"
+#include "trantor.h"
 
 bool *get_is_debug(void)
 {
