@@ -44,8 +44,10 @@ class GuiClient
         void EggConnection(std::vector<std::string> parameters);
         void EggDeath(std::vector<std::string> parameters);
         void ServerTimeUnit(std::vector<std::string> parameters);
+        void PlayerTakeRessource(std::vector<std::string> parameters);
+        void PlayerDropRessource(std::vector<std::string> parameters);
 
-    private:
+private:
         boost::asio::io_context _io_context;
         boost::asio::ip::tcp::resolver _resolver;
         boost::asio::ip::tcp::resolver::results_type _endpoints;

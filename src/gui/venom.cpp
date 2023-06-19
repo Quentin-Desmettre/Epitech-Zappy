@@ -156,7 +156,6 @@ void Venom::move_ven()
 
 void Venom::draw_ven(int seed, const Mateyak::Camera& camera, int timeUnit)
 {
-//    std::cout << "timeUnit:" << timeUnit << std::endl;
     c_pos = camera._position;
     if (Utils::differenceAngle((c_pos - camera._target).Normalize(), (c_pos - _pos).Normalize()) > 45)
         return;

@@ -57,7 +57,7 @@ void Player::setState(Player::STATE state)
 
 void Player::setEggName(const std::string &name)
 {
-    _name = name;
+    _eggName = name;
 }
 
 void Player::setLevel(int level)

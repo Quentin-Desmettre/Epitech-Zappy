@@ -26,9 +26,9 @@ void GuiClient::parseOutput(std::string re) {
             {"ebo", &GuiClient::EggConnection},
             {"edi", &GuiClient::EggDeath},
             {"sgt", &GuiClient::ServerTimeUnit},
-            /*
-            {"pdr", &GuiClient::PlayerDropRessource},
             {"pgt", &GuiClient::PlayerTakeRessource},
+            {"pdr", &GuiClient::PlayerDropRessource},
+            /*
             {"eht", &GuiClient::EggHatching},
             {"smg", &GuiClient::ServerMessage},
             {"seg", &GuiClient::ServerEndGame},
