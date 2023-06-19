@@ -36,13 +36,13 @@ namespace Mateyak
             void setEffects(float angle) const;
 
             bool _beingPlayed = false;
-            FMOD::Channel* _channel;
+            FMOD::Channel* _channel{};
             Mateyak::action_type _actionType;
             FMOD::System* _system;
-            FMOD::DSP* _dspFilter;
-            FMOD::DSP* _dspPhaser;
-            FMOD::DSP* _dspReverb;
-            FMOD::DSPConnection* _dspConnection;
+            FMOD::DSP* _dspFilter{};
+            FMOD::DSP* _dspPhaser{};
+            FMOD::DSP* _dspReverb{};
+            FMOD::DSPConnection* _dspConnection{};
     };
 
     extern std::map<Mateyak::action_type, FMOD::Sound *> audios;

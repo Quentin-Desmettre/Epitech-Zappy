@@ -23,32 +23,11 @@ Mateyak::Audio::Audio(Mateyak::action_type actionType, FMOD::System &system)
 {
     _actionType = actionType;
     _system = &system;
-
-    FMOD_RESULT result = _system->createDSPByType(FMOD_DSP_TYPE_LOWPASS, &_dspFilter);
-    if (result != FMOD_OK)
-        std::cout << "Error while creating DSP" << std::endl;
-    result = _channel->addDSP(0, _dspFilter);
-    if (result != FMOD_OK)
-        std::cout << "Error while adding DSP" << std::endl;
-
-    result = _system->createDSPByType(FMOD_DSP_TYPE_ECHO, &_dspPhaser);
-    if (result != FMOD_OK)
-        std::cout << "Error while creating DSP" << std::endl;
-    result = _channel->addDSP(0, _dspPhaser);
-    if (result != FMOD_OK)
-        std::cout << "Error while adding DSP" << std::endl;
-
-    result = _system->createDSPByType(FMOD_DSP_TYPE_FLANGE, &_dspPhaser);
-    if (result != FMOD_OK)
-        std::cout << "Error while creating DSP" << std::endl;
-    result = _channel->addDSP(0, _dspPhaser);
-    if (result != FMOD_OK)
-        std::cout << "Error while adding DSP" << std::endl;
 }
 
 Mateyak::Audio::~Audio()
 {
-
+    _channel->stop();
 }
 
 void Mateyak::Audio::playSound()
@@ -57,6 +36,27 @@ void Mateyak::Audio::playSound()
     if (result != FMOD_OK)
         std::cout << "Error while playing sound" << std::endl;
     _beingPlayed = true;
+
+    result = _system->createDSPByType(FMOD_DSP_TYPE_LOWPASS, &_dspFilter);
+    if (result != FMOD_OK)
+        std::cout << "Error while creating DSP" << std::endl;
+    result = _channel->addDSP(0, _dspFilter);
+    if (result != FMOD_OK)
+        std::cout << "Error while adding DSP : " << FMOD_ErrorString(result) << std::endl;
+
+    /*result = _system->createDSPByType(FMOD_DSP_TYPE_ECHO, &_dspReverb);
+    if (result != FMOD_OK)
+        std::cout << "Error while creating DSP" << std::endl;
+    result = _channel->addDSP(0, _dspReverb);
+    if (result != FMOD_OK)
+        std::cout << "Error while adding DSP : " << FMOD_ErrorString(result) << std::endl;
+
+    result = _system->createDSPByType(FMOD_DSP_TYPE_FLANGE, &_dspPhaser);
+    if (result != FMOD_OK)
+        std::cout << "Error while creating DSP" << std::endl;
+    result = _channel->addDSP(0, _dspPhaser);
+    if (result != FMOD_OK)
+        std::cout << "Error while adding DSP : " << FMOD_ErrorString(result) << std::endl;*/
 }
 
 void Mateyak::Audio::stopSound() const
