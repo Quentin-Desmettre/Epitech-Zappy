@@ -321,3 +321,25 @@ void ServerInformations::setIncantationLevel(std::string name, int level)
         }
     }
 }
+
+std::queue<std::string> &ServerInformations::getCommandQueue()
+{
+    return _commandQueue;
+}
+
+void ServerInformations::addCommand(std::string command)
+{
+    _commandQueue.push(command);
+}
+
+bool ServerInformations::hasCommand() const
+{
+    return !_commandQueue.empty();
+}
+
+std::string ServerInformations::getCommand()
+{
+    std::string command = _commandQueue.front();
+    _commandQueue.pop();
+    return command;
+}
