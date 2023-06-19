@@ -1,6 +1,6 @@
 from time import time
 from src.ai.commands import Directions, CommandNames, Objects
-from src.ai.logic._finding import is_food_on_tile
+from src.ai.logic._finding import is_object_on_tile
 from src.ai.utils import my_print
 
 
@@ -19,12 +19,12 @@ def add_to_shared_inventory(self, object: str, amount: int) -> None:
 
 
 def walk_and_loot(self, direction: Directions, tiles: list[list[str]] = None) -> bool:
-    if is_food_on_tile(tiles, []):
+    if is_object_on_tile(tiles, [], Objects.FOOD):
         self.send(CommandNames.TAKE, Objects.FOOD.value)
     my_print("moving to other player")
     self.go_to_direction(direction)
     self.last_movement = time()
-    if is_food_on_tile(tiles, [direction]):
+    if is_object_on_tile(tiles, [direction], Objects.FOOD):
         self.send(CommandNames.TAKE, Objects.FOOD.value)
 
 

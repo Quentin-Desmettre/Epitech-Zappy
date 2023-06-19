@@ -30,14 +30,17 @@ class Ai:
     from ._evolve import get_needed_stones, can_evolve, elevate, drop_elevation_stones, check_requirements, get_items_on_ground
 
     def take_food(self, inventory: dict[str, int], tiles = None):
-        """Takes food from the map until the player has 25 food."""
+        """Takes food from the map until the player has 20 food."""
         my_print("Looting food")
         if "food" not in inventory:
             inventory["food"] = 0
-        for i in range(25 - inventory["food"]):
+        first = True
+        for i in range(20 - inventory["food"]):
+            if not first:
+                tiles = self.send(CommandNames.LOOK)
             if not self.loot_object(Objects.FOOD, tiles=tiles):
                 i -= 1
-            tiles = self.send(CommandNames.LOOK)
+            first = False
 
     def take_stones(self, inventory: dict[str, int], tiles = None):
         """Takes stones from the map until the player has all the stones needed to evolve."""
@@ -45,15 +48,12 @@ class Ai:
         stone = None
         sucess = False
         needed = self.get_needed_stones(inventory)
-        loot_food = False
-        if Objects.FOOD.value in inventory and inventory[Objects.FOOD.value] < 80:
-            loot_food = True
         while len(needed) > 0:
             stone = needed.pop()
-            if self.loot_object(stone, False, tiles, loot_food):
-                tiles = self.send(CommandNames.LOOK)
+            if self.loot_object(stone, False, tiles, True):
                 sucess = True
                 break
+            tiles = self.send(CommandNames.LOOK)
         if not sucess:
             self.move_randomly()
             self.last_movement = time()
@@ -61,11 +61,10 @@ class Ai:
         if stone.value not in inventory:
             inventory[stone.value] = 0
         inventory[stone.value] += 1
-        if self.can_evolve(inventory, tiles):
-            self.drop_elevation_stones(inventory, stone)
-        else:
-            self.send(CommandNames.BROADCAST, "lootedø§" + self.team + "ø§" + stone.value)
-            sleep(self.delta)
+        self.send(CommandNames.BROADCAST, "lootedø§" + self.team + "ø§" + stone.value)
+        sleep(self.delta)
+        # if self.can_evolve(inventory, self.send(CommandNames.LOOK)):
+        #     self.drop_elevation_stones(inventory, stone)
 
     def handle_broadcast(self, msg, inventory: dict[str, int], tiles: list[list[str]]):
         if msg[0].count("incantation") == 0\

@@ -65,11 +65,11 @@ def drop_elevation_stones(self, inventory = None, to_not_send: Objects = None):
         while inventory[stone] > 0 and stone != Objects.FOOD.value:
             inventory[stone] -= 1
             if self.send(CommandNames.SET, stone) != None:
-                if to_not_send != None and stone == to_not_send.value:
-                    to_not_send = None
-                else:
-                    self.send(CommandNames.BROADCAST, "droppedø§" + self.team + "ø§" + stone)
-                    sleep(self.delta)
+                # if to_not_send != None and stone == to_not_send.value:
+                #     to_not_send = None
+                # else:
+                self.send(CommandNames.BROADCAST, "droppedø§" + self.team + "ø§" + stone)
+                sleep(self.delta)
     my_print("Dropped all stones needed to evolve.")
 
 
@@ -81,9 +81,9 @@ def check_requirements(self, inventory = None, tiles = None) -> bool:
     ground = self.get_items_on_ground(tiles)
     total = merge_dicts(inventory, ground)
     if len(self.get_needed_stones(total)) != 0:
-        my_print("Not enough stones to evolve.")
+        my_print("Not enough stones to evolve : %s" % self.get_needed_stones(total))
         return False
-    if ground[Objects.PLAYER.value] < 6: # temporary fix to ensure that all 6 players are on the same tile (original: get_elevation_needs(self.level)[Objects.PLAYER])
+    if ground[Objects.PLAYER.value] < get_elevation_needs(self.level)[Objects.PLAYER]: # temporary fix to ensure that all 6 players are on the same tile (original: get_elevation_needs(self.level)[Objects.PLAYER])
         my_print("Not enough players to evolve.")
         return False
     return True

@@ -72,12 +72,12 @@ def get_object_path(object: Objects, tiles: list[list[str]]) -> list[Directions]
     return path
 
 
-def is_food_on_tile(tiles: list[list[str]] | None, directions: list[Directions]) -> bool:
+def is_object_on_tile(tiles: list[list[str]] | None, directions: list[Directions], object: Objects) -> bool:
     """Returns True if there is food on the given tile."""
     if len(directions) > 0 and directions[len(directions) - 1] != Directions.FORWARD:
         return False
     index = get_index_from_path(directions)
-    found = Objects.FOOD.value in tiles[index]
+    found = object.value in tiles[index]
     return found
 
 
@@ -89,15 +89,16 @@ def go_to_object(self, desired: Objects, tiles: list[list[str]] | None, loot_foo
         return False
     directions = get_object_path(desired, tiles)
     moved = []
-    if loot_food and desired is not Objects.FOOD and is_food_on_tile(tiles, moved):
+    if loot_food and desired is not Objects.FOOD and is_object_on_tile(tiles, moved, Objects.FOOD):
         self.send(CommandNames.TAKE, Objects.FOOD.value)
     for direction in directions:
         moved.append(direction)
         if self.send(direction) is None:
             return False
-        elif loot_food and desired is not Objects.FOOD and is_food_on_tile(tiles, moved):
+        elif loot_food and desired is not Objects.FOOD and is_object_on_tile(tiles, moved, Objects.FOOD):
             self.send(CommandNames.TAKE, Objects.FOOD.value)
-    if len(directions) != 0 and desired != Objects.PLAYER:
+    if len(directions) != 0 and desired != Objects.PLAYER\
+    and (desired == Objects.FOOD or not is_object_on_tile(tiles, moved, Objects.PLAYER)):
         self.send(CommandNames.TAKE, desired.value)
     return len(directions) != 0
 
@@ -108,7 +109,7 @@ def loot_object(self, object: Objects, can_move_randomly: bool = True, tiles = N
         self.send(CommandNames.LOOK)
     if tiles is None:
         return False
-    if object.value in tiles[0]:
+    if object.value in tiles[0] and (object == Objects.FOOD or Objects.PLAYER.value not in tiles[0]):
         if self.send(CommandNames.TAKE, object.value) == "ko":
             my_print("Error: could not loot %s" % object.name)
             return False

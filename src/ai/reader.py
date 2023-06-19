@@ -78,7 +78,9 @@ class Reader:
         cmd = Command(type, arg)
         send_to_server(self.sock, str(cmd))
         msg = self.get_next_match(type)
-        if match(PossibleResponsesRegex.INCANTATION.value[0], msg):
+        if type == CommandNames.INCANTATION and msg == "ko":
+            msg = self.get_next_match(type)
+        while match(PossibleResponsesRegex.INCANTATION.value[0], msg):
             msg = self.get_next_match(type)
         if msg == "ko":
             my_print("Command %s failed" % type.value)
