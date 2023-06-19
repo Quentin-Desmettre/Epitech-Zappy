@@ -277,3 +277,39 @@ void GuiClient::PlayerIncantationEnd(std::vector<std::string> parameters)
         }
     }
 }
+
+void GuiClient::PlayerTakeRessource(std::vector<std::string> parameters)
+{
+    if (parameters.size() != 2) {
+        std::cerr << "PlayerTakeRessource: invalid number of parameters" << std::endl;
+        return;
+    }
+    std::string name = parameters[0];
+    int ressource = std::stoi(parameters[1]);
+
+    if (name[0] == '#')
+        name.erase(0, 1);
+    if (ressource < 0 || ressource > 6) {
+        std::cerr << "PlayerTakeRessource: invalid ressource" << std::endl;
+        return;
+    }
+    _serverInformations.takeRessource(name, ressource);
+}
+
+void GuiClient::PlayerDropRessource(std::vector<std::string> parameters)
+{
+    if (parameters.size() != 2) {
+        std::cerr << "PlayerDropRessource: invalid number of parameters" << std::endl;
+        return;
+    }
+    std::string name = parameters[0];
+    int ressource = std::stoi(parameters[1]);
+
+    if (name[0] == '#')
+        name.erase(0, 1);
+    if (ressource < 0 || ressource > 6) {
+        std::cerr << "PlayerDropRessource: invalid ressource" << std::endl;
+        return;
+    }
+    _serverInformations.dropRessource(name, ressource);
+}
