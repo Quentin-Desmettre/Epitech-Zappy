@@ -17,7 +17,7 @@
     #define DEFAULT_WIDTH 10
     #define DEFAULT_HEIGHT 10
     #define DEFAULT_SLOTS 3
-    #define ARGS_STR "p:x:y:n:c:f:"
+    #define ARGS_STR "p:x:y:n:c:f:v"
     #define SIZE_T_MAX ((size_t)-1)
     #define IS_FREQ_VALID(freq) ((freq) >= 2 && (freq) <= 10000)
 
@@ -51,5 +51,6 @@ extern const arg_offset_t ARG_OFFSET[];
 
 bool get_args(int ac, char **av, args_t *args, char **err);
 char *perror_str(const char *str);
+bool check_args(args_t *args, char **err);
 
 #endif //EPITECH_ZAPPY_ARGS_H

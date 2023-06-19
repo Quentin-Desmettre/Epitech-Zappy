@@ -20,7 +20,10 @@ void delete_ai_from_server(server_t *server, client_t *cli,
 
     if (!has_disconnect)
         safe_write(cli->fd, "dead\n", 5);
-    player->team->available_slots += (player->is_from_egg ? 0 : 1);
+    if (!player->is_from_egg) {
+        create_egg(random() % server->trantor->width,
+                    random() % server->trantor->height, false, player->team);
+    }
     for (int i = 0; i < server->action_count; i++) {
         if (server->actions[i]->cli != cli)
             continue;
