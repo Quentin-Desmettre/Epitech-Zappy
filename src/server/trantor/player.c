@@ -8,33 +8,24 @@
 #include "trantor.h"
 #include "utility/garbage_collector.h"
 
-static void place_player(trantor_t *trantor, player_t *player)
-{
-    int x = random() % trantor->width;
-    int y = random() % trantor->height;
-    map_tile_t *tile;
-
-    player->x = x;
-    player->y = y;
-    tile = get_tile_by_pos(trantor->map, x, y);
-    append_node(&tile->players, player);
-}
-
-player_t *create_player(trantor_t *trantor, team_t *team,
-                        const char *team_name)
+player_t *create_player(trantor_t *trantor, egg_t *egg)
 {
     static int player_id = 0;
     player_t *p = my_calloc(sizeof(player_t), 1);
+    team_t *team = egg->team;
+    map_tile_t *tile = get_tile_by_pos(trantor->map, egg->x, egg->y);
 
-    p->level = 1;
     p->id = player_id++;
+    p->level = 1;
+    p->x = egg->x;
+    p->y = egg->y;
     p->dir = random() % NB_DIR;
     p->inventory[FOOD] = BASE_FOOD;
-    p->team = team;
-    p->team_name = my_strdup(team_name);
-    p->is_from_egg = team->egg_numbers ? true : false;
+    p->team = egg->team;
+    p->team_name = my_strdup(team->name);
+    p->is_from_egg = egg->is_forked;
     append_node(&team->players, p);
-    place_player(trantor, p);
+    append_node(&tile->players, p);
     return p;
 }
 

@@ -35,7 +35,8 @@ trantor_t *init_trantor(int width, int height,
     trantor->width = width;
     trantor->height = height;
     for (int i = 0; team_names[i]; i++)
-        append_node(&trantor->teams, create_team(team_names[i], max_players));
+        append_node(&trantor->teams,
+            create_team(team_names[i], max_players, width, height));
     return trantor;
 }
 

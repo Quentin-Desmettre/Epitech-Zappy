@@ -11,7 +11,7 @@
 
 static char *get_ai_connected_answer(team_t *team, int map_x, int map_y)
 {
-    return my_asprintf("%d\n%d %d\n", team->available_slots, map_x, map_y);
+    return my_asprintf("%d\n%d %d\n", list_size(team->eggs), map_x, map_y);
 }
 
 static char *gui_mess_ai_connected(server_t *server, player_t *player)
@@ -26,28 +26,49 @@ static char *gui_mess_ai_connected(server_t *server, player_t *player)
     return msg;
 }
 
-void log_ai(client_t *cli, server_t *server, const char *cmd, team_t *team)
+/**
+ * @brief Selects an egg from an egg list, prioritizing eggs that are the
+ * results of a fork command.
+ *
+ * @param eggs The egg list. Must be non empty, else the function will crash.
+ */
+static egg_t *select_egg_for_connection(list_t *eggs)
 {
-    player_t *player;
-    char *msg = my_strdup("");
-    size_t msg_len = 0;
+    list_t *start = eggs;
+    egg_t *egg;
+    egg_t *selected = NULL;
+
+    do {
+        egg = start->data;
+        if (!egg->is_forked)
+            return egg;
+        if (!selected)
+            selected = egg;
+        start = start->next;
+    } while (start != eggs);
+    return selected;
+}
+
+void log_ai(client_t *cli, server_t *server, team_t *team)
+{
+    egg_t *egg = select_egg_for_connection(team->eggs);
+    char *gui_mess = NULL;
+    size_t len;
+
     cli->state = AI;
-    cli->data = create_player(server->trantor, team, cmd);
-    if (team->eggs > 0) {
-        team->eggs--;
-        str_append_free(&msg, &msg_len, get_gui_message(EGG_HATCHED,
-            (int)(long)team->egg_numbers->data));
-        str_append(&msg, "\n");
-        remove_node(&team->egg_numbers, 0, NULL);
-    } else
-        team->available_slots--;
-    player = cli->data;
-    str_append_free(&msg, &msg_len, gui_mess_ai_connected(server, player));
-    safe_write_free(cli->fd, get_ai_connected_answer(team,
-        server->params.width, server->params.height));
+    cli->data = create_player(server->trantor, egg);
+    if (egg->is_forked)
+        gui_mess = get_gui_message(EGG_HATCHED, egg->id);
+    else
+        gui_mess = my_strdup("");
+    gui_mess = str_concat_free(&len, 2, gui_mess,
+        gui_mess_ai_connected(server, cli->data));
     append_node(&server->food_timeouts,
         create_food_timeout(server->params.freq, cli));
-    send_to_gui(server, msg, true);
+    send_to_gui(server, gui_mess, true);
+    safe_write_free(cli->fd, get_ai_connected_answer(team,
+        server->params.width, server->params.height));
+    remove_if(&team->eggs, egg, NULL, my_free);
 }
 
 void handle_ai(server_t *server, client_t *cli, const char *cmd)
