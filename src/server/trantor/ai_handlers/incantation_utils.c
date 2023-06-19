@@ -6,6 +6,7 @@
 */
 
 #include "server.h"
+#include "utility/strings.h"
 
 int count_same_level(player_t *player, map_tile_t *tile)
 {
@@ -54,4 +55,12 @@ void do_level_up(map_tile_t *tile, player_t *player, server_t *server)
         }
         players = players->next;
     } while (players != tile->players);
+}
+
+ai_cmd_response_t ai_connect_nbr_handler(action_t *action UNUSED,
+    server_t *server UNUSED, player_t *player)
+{
+    char *msg = my_asprintf("%d", player->team->available_slots);
+
+    return AI_CMD_RESPONSE_TEXT(msg);
 }

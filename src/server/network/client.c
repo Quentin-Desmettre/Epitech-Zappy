@@ -39,7 +39,6 @@ void destroy_client(server_t *server, void *data, bool has_disconnect)
     client_t *cli = (client_t *)data;
 
     if (cli->state == AI) {
-        printf("Deleting AI...\n");
         delete_ai_from_server(server, cli, has_disconnect);
     }
     close(cli->fd);

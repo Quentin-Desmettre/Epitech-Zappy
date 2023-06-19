@@ -79,3 +79,8 @@ Player::STATE Player::getState() const
 int Player::getLevel() const {
     return _level;
 }
+
+std::array<int, 7> Player::getInventory() const
+{
+    return _inventory;
+}

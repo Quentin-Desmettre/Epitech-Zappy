@@ -43,6 +43,7 @@ class GuiClient
         void EggHatching(std::vector<std::string> parameters);
         void EggConnection(std::vector<std::string> parameters);
         void EggDeath(std::vector<std::string> parameters);
+        void ServerTimeUnit(std::vector<std::string> parameters);
 
     private:
         boost::asio::io_context _io_context;

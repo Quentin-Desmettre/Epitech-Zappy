@@ -40,5 +40,6 @@ struct timespec get_end_time(int ticks, int freq, struct timespec now);
 struct timeval timespec_diff(struct timespec a, struct timespec b);
 char *my_asprintf(const char *format, ...);
 void str_append(char **str, char *append);
+void debug(const char *format, ...);
 
 #endif //EPITECH_ZAPPY_STRINGS_H

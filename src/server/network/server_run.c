@@ -88,5 +88,6 @@ void run_server(server_t *server)
         select_rval = try_select(FD_SETSIZE, &readfds, &writefds, &timeout);
         handle_events(select_rval, server, &readfds, &writefds);
     }
+    debug("Winning team: %s\n", winning_team);
     notify_gui(server, END_OF_GAME, winning_team);
 }

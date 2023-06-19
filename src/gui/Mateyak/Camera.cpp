@@ -59,8 +59,10 @@ void Mateyak::Camera::Update()
     }
     Mateyak::Vec3f dir = GetMouseRay(GetMousePosition(), _cam).direction;
     findClickPos(dir);
-    if (GetGestureDetected() == GESTURE_TAP || IsMouseButtonDown(MOUSE_MIDDLE_BUTTON))
+    if (IsMouseButtonDown(MOUSE_MIDDLE_BUTTON)) {
         _lastClickDir = dir;
+        _lastClickPos = {-1, -1};
+    }
     RecalculateCamPos();
     _oldCamPos = _camPos;
 }
@@ -108,4 +110,5 @@ void Mateyak::Camera::findClickPos(const Mateyak::Vec3f &dir)
     posInPlane = _position + norm * t;
     posInPlane = posInPlane / (10.0 / 3.0);
     _lastClickPos = {posInPlane.x, posInPlane.z};
+    _lastClickDir = {-1, -1, -1};
 }

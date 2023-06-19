@@ -13,8 +13,6 @@
 
 int get_direct_from_angle(double angle)
 {
-    if (angle >= 337.5 && angle < 22.5)
-        return 1;
     if (angle >= 22.5 && angle < 67.5)
         return 8;
     if (angle >= 67.5 && angle < 112.5)

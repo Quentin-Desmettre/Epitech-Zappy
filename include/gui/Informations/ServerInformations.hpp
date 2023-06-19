@@ -43,6 +43,9 @@ class ServerInformations
         void startComputing();
         void endComputing();
 
+        bool isRunning() const;
+        void setRunning(bool running);
+
         void updatePlayer(std::unique_ptr<Player> &player);
 
         void setMapSize(int x, int y);
@@ -61,6 +64,8 @@ class ServerInformations
         void PlayerLayEgg(std::string name, std::string eggName, int x, int y);
         void EggConnection(std::string eggName);
         void EggDeath(std::string eggName);
+        void setTimeUnit(int timeUnit);
+        int getTimeUnit() const;
 
         void updateAudioAction(std::tuple<int, int> pos, enum Mateyak::action_type type);
         void audioActionsHandler(Mateyak::Camera &camera);
@@ -79,6 +84,7 @@ class ServerInformations
         std::vector<std::unique_ptr<Player>> players{};
         std::vector<Message> broadCastMessage{};
         std::mutex mutex;
+        int _timeUnit = 0;
         bool _serverRunning = true;
         std::vector<std::tuple<short, std::vector<std::tuple<int, int, std::shared_ptr<Mateyak::Audio>>>>> audioAction;
 };

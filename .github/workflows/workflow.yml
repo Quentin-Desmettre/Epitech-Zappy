@@ -10,6 +10,9 @@
 name: "Push to remote"
 on: push
 
+env:
+  APT_DEPENDENCIES: "build-essential git cmake libboost-all-dev libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev gcovr"
+
 jobs:
   test:
     name: Run tests before pushing to remote
@@ -27,11 +30,13 @@ jobs:
           ref: ${{ steps.extract_branch.outputs.branch }}
           fetch-depth: 0
 
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ${{ env.APT_DEPENDENCIES }}
+
       - name: Install raylib/boost
         run: |
-          sudo apt install build-essential git cmake -y
-          sudo apt install libboost-all-dev -y
-          sudo apt install libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev -y
           git clone https://github.com/raysan5/raylib.git raylib
           cd raylib
           mkdir build && cd build
@@ -83,7 +88,7 @@ jobs:
             echo "all good."
 
       - name: Check coding style
-        run: "pip install websocket-client && python './.github/c_checker.py' --hard"
+        run: "pip install websocket-client==1.5.1 && python3 './.github/c_checker.py' --hard"
 
       - name: Check if it compiles
         shell: bash

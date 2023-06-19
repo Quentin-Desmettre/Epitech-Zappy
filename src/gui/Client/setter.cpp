@@ -211,6 +211,16 @@ void GuiClient::EggDeath(std::vector<std::string> parameters)
     _serverInformations.EggDeath(eggName);
 }
 
+void GuiClient::ServerTimeUnit(std::vector<std::string> parameters)
+{
+    if (parameters.size() != 1) {
+        std::cerr << "ServerTimeUnit: invalid number of parameters" << std::endl;
+        return;
+    }
+    int timeUnit = std::stoi(parameters[0]);
+    _serverInformations.setTimeUnit(timeUnit);
+}
+
 void GuiClient::PlayerIncantation(std::vector<std::string> parameters)
 {
     if (parameters.size() < 3) {

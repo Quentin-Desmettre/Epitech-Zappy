@@ -24,22 +24,13 @@ ai_cmd_response_t ai_broadcast_handler(action_t *action,
             player_dest = client->data;
             direction = find_direction(player, player_dest, server->trantor);
             msg = my_asprintf("message %d, %s\n", direction, action->arg);
-            printf("Sent %s to client %d\n", msg, client->fd);
             safe_write_free(client->fd, msg);
         }
         list_client = list_client->next;
     } while (list_client != server->clients);
     notify_gui(server, BROADCAST, player->id, action->arg);
     return AI_CMD_RESPONSE_OK;
-}
-
-ai_cmd_response_t ai_connect_nbr_handler(action_t *action UNUSED,
-    server_t *server UNUSED, player_t *player)
-{
-    char *msg = my_asprintf("%d\n", player->team->available_slots);
-
-    return AI_CMD_RESPONSE_TEXT(msg);
-}
+};
 
 ai_cmd_response_t ai_set_handler(action_t *action,
     server_t *server, player_t *player)
@@ -61,14 +52,12 @@ ai_cmd_response_t ai_set_handler(action_t *action,
     return AI_CMD_RESPONSE_OK;
 }
 
-ai_cmd_response_t ai_eject_handler(action_t *action UNUSED,
-    server_t *server, player_t *player)
+void remove_players(server_t *server, map_tile_t *tile, player_t *player)
 {
-    int save_direct;
-    map_tile_t *tile = get_tile_by_pos(server->trantor->map,
-        player->x, player->y);
-    list_t *players = tile->players;
     player_t *pl;
+    list_t *players = tile->players;
+    int save_direct;
+
     while (list_size(tile->players) > 1) {
         if (players->data != player) {
             pl = players->data;
@@ -81,8 +70,19 @@ ai_cmd_response_t ai_eject_handler(action_t *action UNUSED,
         } else
             players = players->next;
     }
-    while (tile->eggs)
+}
+
+ai_cmd_response_t ai_eject_handler(action_t *action UNUSED,
+    server_t *server, player_t *player)
+{
+    map_tile_t *tile = get_tile_by_pos(server->trantor->map,
+        player->x, player->y);
+
+    remove_players(server, tile, player);
+    while (tile->eggs) {
         notify_gui(server, EGG_DEAD, (int)(long)tile->eggs->data);
+        remove_node(&tile->eggs, 0, NULL);
+    }
     return AI_CMD_RESPONSE_OK;
 }
 
