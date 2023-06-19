@@ -37,6 +37,16 @@ void Message::FormatMessage(int maxLineSize)
 Message::Message(std::string name, std::string message, Color color) :
 _formated(false), _name(name), _message(message), _lines(), _color(color) {}
 
+bool ServerInformations::isRunning() const
+{
+    return _serverRunning;
+}
+
+void ServerInformations::setRunning(bool running)
+{
+    _serverRunning = running;
+}
+
 void ServerInformations::updatePlayer(std::unique_ptr<Player> &player)
 {
     Player::STATE state = player->getState();
@@ -258,6 +268,16 @@ void ServerInformations::EggDeath(std::string eggName)
     players.erase(std::remove_if(players.begin(), players.end(), [eggName](std::unique_ptr<Player> &player) {
     return player->getEggName() == eggName;
     }), players.end());
+}
+
+void ServerInformations::setTimeUnit(int timeUnit)
+{
+    _timeUnit = timeUnit;
+}
+
+int ServerInformations::getTimeUnit() const
+{
+    return _timeUnit;
 }
 
 Mateyak::Vec2f ServerInformations::getMapSize() const

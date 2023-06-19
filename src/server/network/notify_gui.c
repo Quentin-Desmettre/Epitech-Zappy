@@ -6,6 +6,7 @@
 */
 
 #include "server.h"
+#include "utility/strings.h"
 #include <stdarg.h>
 #include <string.h>
 #include "utility/strings.h"

@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_C_FLAGS "-Wall -Wextra")
-set(PAULIIINNN zappy_gui)
+set(PAULIIINNN src/ai/main.py)
 
 if (APPLE) # Mac OS X
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-field-initializers -Wno-unused-command-line-argument")
@@ -17,8 +17,9 @@ include_directories(include/server)
 include_directories(/usr/local/include)
 
 find_package(raylib QUIET)
-find_package(Boost COMPONENTS system filesystem QUIET)
 include_directories(${RAYLIB_INCLUDE_DIRS})
+find_package(Boost COMPONENTS system filesystem QUIET)
+include_directories(${Boost_INCLUDE_DIR})
 
 if (NOT Boost_FOUND)
     message(FATAL_ERROR "Please install boost!\nsudo apt install build-essential git cmake -y\nsudo apt install libboost-all-dev -y")
@@ -55,9 +56,10 @@ add_executable(zappy_gui
 target_link_libraries(zappy_gui ${raylib_LIBRARY} ${Boost_LIBRARY})
 set_target_properties(zappy_gui PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
-add_custom_command(TARGET zappy_gui POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/${PAULIIINNN} ${CMAKE_SOURCE_DIR}/zappy_ai
-        )
+
+add_custom_command(TARGET zappy_gui PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/${PAULIIINNN} ${CMAKE_SOURCE_DIR}/zappy_ai
+)
 
 add_executable(zappy_server
         src/server/network/notify_gui.c
@@ -111,6 +113,8 @@ if(MATH_LIBRARY)
     target_link_libraries(zappy_server PUBLIC ${MATH_LIBRARY})
 endif()
 set_target_properties(zappy_server PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+if (NOT APPLE)
 
 #add_executable(server_tests
 #        ./tests/server/test_tile_handling.c
@@ -178,4 +182,4 @@ set_target_properties(zappy_server PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_S
 #if(MATH_LIBRARY)
 #    target_link_libraries(server_tests PUBLIC criterion ${MATH_LIBRARY})
 #endif()
-
+endif ()
