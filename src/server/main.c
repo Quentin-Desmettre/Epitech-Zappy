@@ -10,6 +10,7 @@
 #include "server.h"
 #include "utility/strings.h"
 #include <signal.h>
+#include "utility/strings.h"
 
 void handle_sig(int sig)
 {

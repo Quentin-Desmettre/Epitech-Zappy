@@ -41,9 +41,7 @@ Test(ai_handlers, connect_nbr_only_one_team)
     asprintf(&nb_slots_str, "%d", nb_slots);
     team_t *team = create_team("team1", nb_slots);
     player_t player = {.team_name = "team1", .team = team};
-    trantor_t trantor = {0};
-    append_node(&trantor.teams, team);
-    ai_cmd_response_t resp = ai_connect_nbr_handler(NULL, &trantor, &player);
+    ai_cmd_response_t resp = ai_connect_nbr_handler(NULL, NULL, &player);
 
     cr_assert(resp.type == TEXT);
     cr_assert(resp.data != NULL);
@@ -67,15 +65,13 @@ Test(ai_handlers, connect_nbr_multiple_teams)
             {.team_name = "team2"},
             {.team_name = "team3"}
     };
-    trantor_t trantor = {0};
     for (int i = 0; i < 3; i++) {
         team_t *t = create_team(players[i].team_name, nb_slots[i]);
-        append_node(&trantor.teams, t);
         players[i].team = t;
     }
 
     for (int i = 0; i < 3; i++) {
-        ai_cmd_response_t resp = ai_connect_nbr_handler(NULL, &trantor, &players[i]);
+        ai_cmd_response_t resp = ai_connect_nbr_handler(NULL, NULL, &players[i]);
         cr_assert(resp.type == TEXT);
         cr_assert(resp.data != NULL);
         cr_assert_str_eq(resp.data, nb_slots_str[i]);

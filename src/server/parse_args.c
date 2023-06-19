@@ -85,7 +85,6 @@ static bool check_args(args_t *args, char **err)
 bool get_args(int ac, char **av, args_t *args, char **err)
 {
     int opt;
-
     reset_args(args, true);
     *err = NULL;
     while ((opt = getopt(ac, av, ARGS_STR)) != -1) {
@@ -93,15 +92,16 @@ bool get_args(int ac, char **av, args_t *args, char **err)
             reset_args(args, false);
             return false;
         }
+        if (opt == 'v')
+            *get_is_debug() = true;
         if (opt == 'n') {
             fetch_team_names(args, ac, av);
             continue;
         }
         *(int *)((char *) args + offset_of_arg(opt)) = atoi(optarg);
     }
-    if (!check_args(args, err)) {
-        reset_args(args, false);
-        return false;
-    }
-    return true;
+    if (check_args(args, err))
+        return true;
+    reset_args(args, false);
+    return false;
 }

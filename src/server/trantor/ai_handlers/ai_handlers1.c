@@ -37,6 +37,8 @@ ai_cmd_response_t ai_right_handler(action_t *action UNUSED,
     server_t *server UNUSED, player_t *player)
 {
     player->dir = (player->dir + 1) % 4;
+    notify_gui(server, PLAYER_POS, player->id,
+        player->x, player->y, player->dir);
     return AI_CMD_RESPONSE_OK;
 }
 
@@ -47,6 +49,8 @@ ai_cmd_response_t ai_left_handler(action_t *action UNUSED,
         player->dir = WEST;
     else
         player->dir = (player->dir - 1) % 4;
+    notify_gui(server, PLAYER_POS, player->id,
+        player->x, player->y, player->dir);
     return AI_CMD_RESPONSE_OK;
 }
 
