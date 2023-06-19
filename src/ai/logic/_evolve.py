@@ -6,7 +6,7 @@ from src.ai.utils import my_print, merge_dicts
 def has_stones(inventory: dict[Objects, int], current_level: int) -> bool:
     required = get_elevation_needs(current_level)
     for stone in required:
-        if stone != Objects.PLAYER and (stone.value not in inventory \
+        if stone != Objects.PLAYER and (stone.value not in inventory\
         or inventory[stone.value] < required[stone]):
             return False
     return True
@@ -16,7 +16,7 @@ def get_needed_stones(self, inventory: dict[Objects, int]) -> list[Objects]:
     required = get_elevation_needs(self.level)
     needed = []
     for stone in required.keys():
-        if stone != Objects.PLAYER and (stone.value not in inventory \
+        if stone != Objects.PLAYER and (stone.value not in inventory\
         or inventory[stone.value] < required[stone]):
             needed.append(stone)
     return needed
@@ -45,6 +45,7 @@ def elevate(self, send_cmd: bool = True, msg: str = None):
         my_print("Elevated to level %d !!!" % self.level)
         if self.level == 8:
             my_print("Congratulations, you won !!!")
+        self.shared_inventory = {}
     else:
         my_print("Error: could not elevate")
 
@@ -68,7 +69,7 @@ def drop_elevation_stones(self, inventory = None, to_not_send: Objects = None):
                 if to_not_send != None and stone == to_not_send.value:
                     to_not_send = None
                 else:
-                    self.send(CommandNames.BROADCAST, "droppedø§" + self.team + "ø§" + stone)
+                    self.send(CommandNames.BROADCAST, "droppedø§" + self.team + "ø§" + stone + "ø§" + str(self.level))
                     sleep(self.delta)
     my_print("Dropped all stones needed to evolve.")
 
@@ -81,9 +82,9 @@ def check_requirements(self, inventory = None, tiles = None) -> bool:
     ground = self.get_items_on_ground(tiles)
     total = merge_dicts(inventory, ground)
     if len(self.get_needed_stones(total)) != 0:
-        my_print("Not enough stones to evolve.")
+        my_print("Not enough stones to evolve : %s" % self.get_needed_stones(total))
         return False
-    if ground[Objects.PLAYER.value] < 6: # temporary fix to ensure that all 6 players are on the same tile (original: get_elevation_needs(self.level)[Objects.PLAYER])
+    if ground[Objects.PLAYER.value] < get_elevation_needs(self.level)[Objects.PLAYER]: # temporary fix to ensure that all 6 players are on the same tile, original solution : get_elevation_needs(self.level)[Objects.PLAYER]
         my_print("Not enough players to evolve.")
         return False
     return True
