@@ -5,16 +5,24 @@
 ** debug_print
 */
 
+#include "server.h"
 #include "utility/strings.h"
 #include <stdarg.h>
-#include "utility/safe_write.h"
+
+bool *get_is_debug(void)
+{
+    static bool is_debug = false;
+
+    return &is_debug;
+}
 
 void debug(const char *format, ...)
 {
     va_list ap;
     char *str = NULL;
-    char *dup;
 
+    if (!*get_is_debug())
+        return;
     va_start(ap, format);
     if (vasprintf(&str, format, ap) == -1) {
         perror("vasprintf");

@@ -30,7 +30,7 @@ ai_cmd_response_t ai_broadcast_handler(action_t *action,
     } while (list_client != server->clients);
     notify_gui(server, BROADCAST, player->id, action->arg);
     return AI_CMD_RESPONSE_OK;
-}
+};
 
 ai_cmd_response_t ai_set_handler(action_t *action,
     server_t *server, player_t *player)

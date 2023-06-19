@@ -8,6 +8,7 @@
 #include "server.h"
 #include <stdarg.h>
 #include <string.h>
+#include "utility/strings.h"
 
 const gui_event_t GUI_EVENTS[] = {
         {PLAYER_CONNECTION, "pnw #%d %d %d %d %d %s\n"},
@@ -54,11 +55,14 @@ char *va_get_gui_message(enum gui_event event, va_list args)
 {
     const char *format_str = GUI_EVENTS[event].format_str;
     char *msg;
+    char *dup;
 
     if (!format_str)
         return NULL;
     vasprintf(&msg, format_str, args);
-    return msg;
+    dup = my_strdup(msg);
+    free(msg);
+    return dup;
 }
 
 char *get_gui_message(enum gui_event event, ...)
@@ -83,4 +87,5 @@ void notify_gui(server_t *server, enum gui_event event, ...)
     if (!msg)
         return;
     send_to_gui(server, msg, true);
+    my_free(msg);
 }

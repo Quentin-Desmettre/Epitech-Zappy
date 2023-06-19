@@ -230,6 +230,8 @@ void spawn_resources(server_t *server);
 char *get_winning_team(trantor_t *trantor);
 void accept_client(server_t *server);
 void do_level_up(map_tile_t *tile, player_t *player, server_t *server);
+bool *get_is_debug(void);
+int create_egg(team_t *team);
 
 UNUSED static const int requirements_for_level[8][7] = {
         {}, // UNUSED
