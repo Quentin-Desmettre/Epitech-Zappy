@@ -33,7 +33,7 @@ namespace Mateyak
             void setStereo(float pan) const;
             bool getState();
             void computeStereoAndVolume(Mateyak::Vec3<float> camPos, std::tuple<float, float> pos, Mateyak::Vec3<float> camRot);
-            void setEffects(float angle, float distance);
+            void setEffects(float angle) const;
 
             bool _beingPlayed = false;
             FMOD::Channel* _channel;

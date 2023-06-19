@@ -143,13 +143,33 @@ void Mateyak::Audio::computeStereoAndVolume(Mateyak::Vec3<float> camPos,
             volume *= 1.0f - ((angle3 - 180) * (0.20f / 90));
             std::cout << "Avant gauche" << std::endl;
         }
+        if (volume > 1)
+            volume = 1;
+        if (volume < 0)
+            volume = 0;
         std::cout << "angle : " << angle3 << " volume : " << volume << std::endl;
         this->setVolume(volume);
     }
-
+    setEffects(angle3);
     this->setStereo(pan);
 }
 
-void Mateyak::Audio::setEffects(float angle, float distance)
+void Mateyak::Audio::setEffects(float angle) const
 {
+    if (angle >= 0 && angle <= 90) {
+        _dspFilter->setParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, 5000.0f + ((angle) * ((22000.0f - 5000.0f) / 90)));
+        std::cout << "filter : " << 5000.0f + ((angle) * ((22000.0f - 5000.0f) / 90)) << std::endl;
+    }
+    if (angle <= 360 && angle > 270) {
+        _dspFilter->setParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, 22000.0f - ((angle - 270) * ((22000.0f - 5000.0f) / 90)));
+        std::cout << "filter : " << 22000.0f - ((angle - 270) * ((22000.0f - 5000.0f) / 90)) << std::endl;
+    }
+    if (angle > 90 && angle <= 180) {
+        _dspFilter->setParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, 22000.0f);
+        std::cout << "filter : " << 22000.0f << std::endl;
+    }
+    if (angle > 180 && angle <= 270) {
+        _dspFilter->setParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, 22000.0f);
+        std::cout << "filter : " << 22000.0f << std::endl;
+    }
 }
