@@ -39,9 +39,6 @@ void GuiClient::parseOutput(std::string re) {
 
     _serverInformations.startComputing();
 
-    for (auto &s : res)
-        std::cout << s << std::endl;
-
     for (auto &resp : res) {
         std::stringstream ss(resp);
         std::string token;
@@ -90,12 +87,11 @@ void GuiClient::compute()
                 resp = getInformations();
                 parseOutput(resp);
             }
-            if (FD_ISSET(socket_descriptor, &write_fds)) {
-                //verify _serverInformations._commandIsEmpty == false
+            if (FD_ISSET(socket_descriptor, &write_fds) && _serverInformations.hasCommand()) {
                 _serverInformations.startComputing();
+                std::string command = _serverInformations.getCommand();
+                _socket.write_some(boost::asio::buffer(command));
                 _serverInformations.endComputing();
-                //sendCommand();
-                //_socket.write_some(boost::asio::buffer(command));
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }

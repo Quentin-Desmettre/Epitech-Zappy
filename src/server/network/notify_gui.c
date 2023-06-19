@@ -88,5 +88,4 @@ void notify_gui(server_t *server, enum gui_event event, ...)
     if (!msg)
         return;
     send_to_gui(server, msg, true);
-    my_free(msg);
 }
