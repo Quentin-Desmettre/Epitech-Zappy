@@ -147,7 +147,7 @@ void Graphic::drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam)
     Mateyak::Window::drawBox(boxPosX, boxPosY, boxWidth, boxHeight, {0, 39, 97, 94});
     Mateyak::Vec2f position = _serverInformations.getPlayers()[playerSelected]->_position;
 
-    // Name
+    // Name + Position
     Mateyak::Window::draw("Player: " + _serverInformations.getPlayers()[playerSelected]->getName() + " on tile (" + std::to_string((int)position.x) + ", " + std::to_string((int)position.y) + ")", boxPosX + 20, boxPosY + 20, 25, white);
 
     // Team

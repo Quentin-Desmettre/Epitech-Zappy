@@ -59,7 +59,7 @@ void Mateyak::Camera::Update()
     }
     Mateyak::Vec3f dir = GetMouseRay(GetMousePosition(), _cam).direction;
     findClickPos(dir);
-    if (IsMouseButtonDown(MOUSE_MIDDLE_BUTTON)) {
+    if (IsMouseButtonDown(MOUSE_MIDDLE_BUTTON) || IsKeyPressed(KEY_I)) {
         _lastClickDir = dir;
         _lastClickPos = {-1, -1};
     }
