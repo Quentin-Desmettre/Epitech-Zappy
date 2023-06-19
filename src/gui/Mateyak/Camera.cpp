@@ -111,4 +111,5 @@ void Mateyak::Camera::findClickPos(const Mateyak::Vec3f &dir)
     posInPlane = posInPlane / (10.0 / 3.0);
     _lastClickPos = {posInPlane.x, posInPlane.z};
     _lastClickDir = {-1, -1, -1};
+    lastSelectedPlayer = -1;
 }
