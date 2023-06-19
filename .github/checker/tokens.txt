@@ -1,22 +1,88 @@
 /*
-** EPITECH PROJECT, 2023
-** Epitech-MyTeams
+** EPITECH PROJECT, 2022
+** Epitech-Template
 ** File description:
-** tmp
+** main.c
 */10ccomment
 62newline
-70newline#include <unistd.h>80pp_hheader
-819newline#include <fcntl.h>90pp_hheader
-918newline                100spaceint1016int 1019spacemain1020identifier(1024leftparenvoid1025void)1029rightparen
-1030newline{110leftbrace
-111newline        120spaceint128int 1211spacea1212identifier,1213comma 1214spaceb1215identifier,1216comma 1217spacec1218identifier;1219semicolon
-1220newline
-130newline    140spacea144identifier 145space=146assign 147spaceb148identifier 149space=1410assign 1411spacec1412identifier 1413space=1414assign 1415space01416intlit;1417semicolon
-1418newline    150spaceint154int 157spacefd158identifier 1510space=1511assign 1512spaceopen1513identifier(1517leftparen"tmp"1518stringlit,1523comma 1524spaceO_WRONLY1525identifier 1533space|1534or 1535spaceO_CREAT1536identifier,1543comma06441544intlit,1548comma11549intlit)1550rightparen;1551semicolon
-1552newlinewrite160identifier(165leftparenfd166identifier,168comma 169space"Hello"1610stringlit,1617comma         1618space51627intlit)1628rightparen;1629semicolon
-1630newline        170spaceclose178identifier(1713leftparenfd1714identifier)1716rightparen                   1717space;1736semicolon
-1737newline                180spaceif1816if 1818space(1819leftparen11820intlit)1821rightparen{1822leftbrace
-1823newline                190space}1916rightbrace 1917spaceint1918int 1921spacez1922identifier 1923space=1924assign 1925space31926intlit;1927semicolon
-1928newline    200spacereturn204return 2010space02011intlit                        2012space;2036semicolon
-2037newline                        210space}2124rightbrace
-2125newline220eof
+70newline#include "utility/garbage_collector.h"80pp_qheader
+838newline#include <stdarg.h>90pp_hheader
+919newline#include <string.h>100pp_hheader
+1019newline#include <stdbool.h>110pp_hheader
+1120newline
+120newlinechar130char 134space*135starstr_concat_free136identifier(1321leftparensize_t1322identifier 1328space*1329starlen1330identifier,1333comma 1334spaceint1335int 1338spacenb_strings1339identifier,1349comma 1350space...1351ellipsis)1354rightparen
+1355newline{140leftbrace
+141newline    150spaceva_list154identifier 1511spaceap1512identifier;1514semicolon
+1515newline    160spacechar164char 168space*169starstr1610identifier 1613space=1614assign 1615spaceNULL1616identifier;1620semicolon
+1621newline    170spacechar174char 178space*179startmp1710identifier;1713semicolon
+1714newline
+180newline    190space*194starlen195identifier 198space=199assign 1910space01911intlit;1912semicolon
+1913newline    200spaceva_start204identifier(2012leftparenap2013identifier,2015comma 2016spacenb_strings2017identifier)2027rightparen;2028semicolon
+2029newline    210spacefor214for 217space(218leftparenint219int 2112spacei2113identifier 2114space=2115assign 2116space02117intlit;2118semicolon 2119spacei2120identifier 2121space<2122less 2123spacenb_strings2124identifier;2134semicolon 2135spacei2136identifier++2137plusplus)2139rightparen 2140space{2141leftbrace
+2142newline        220spacetmp228identifier 2211space=2212assign 2213spaceva_arg2214identifier(2220leftparenap2221identifier,2223comma 2224spacechar2225char 2229space*2230star)2231rightparen;2232semicolon
+2233newline        230space*238starlen239identifier 2312space+=2313plusassign 2315spacestrlen2316identifier(2322leftparentmp2323identifier)2326rightparen;2327semicolon
+2328newline    240space}244rightbrace
+245newline    250spaceva_end254identifier(2510leftparenap2511identifier)2513rightparen;2514semicolon
+2515newline    260spacestr264identifier 267space=268assign 269spacemy_calloc2610identifier(2619leftparen*2620starlen2621identifier 2624space+2625plus 2626space12627intlit,2628comma 2629spacesizeof2630sizeof(2636leftparenchar2637char)2641rightparen)2642rightparen;2643semicolon
+2644newline    270spaceva_start274identifier(2712leftparenap2713identifier,2715comma 2716spacenb_strings2717identifier)2727rightparen;2728semicolon
+2729newline    280spacefor284for 287space(288leftparenint289int 2812spacei2813identifier 2814space=2815assign 2816space02817intlit;2818semicolon 2819spacei2820identifier 2821space<2822less 2823spacenb_strings2824identifier;2834semicolon 2835spacei2836identifier++2837plusplus)2839rightparen 2840space{2841leftbrace
+2842newline        290spacetmp298identifier 2911space=2912assign 2913spaceva_arg2914identifier(2920leftparenap2921identifier,2923comma 2924spacechar2925char 2929space*2930star)2931rightparen;2932semicolon
+2933newline        300spacestrcat308identifier(3014leftparenstr3015identifier,3018comma 3019spacetmp3020identifier)3023rightparen;3024semicolon
+3025newline        310spacemy_free318identifier(3115leftparentmp3116identifier)3119rightparen;3120semicolon
+3121newline    320space}324rightbrace
+325newline    330spaceva_end334identifier(3310leftparenap3311identifier)3313rightparen;3314semicolon
+3315newline    340spacereturn344return 3410spacestr3411identifier;3414semicolon
+3415newline}350rightbrace
+351newline
+360newlinechar370char 374space*375starstr_concat376identifier(3716leftparensize_t3717identifier 3723space*3724starlen3725identifier,3728comma 3729spaceint3730int 3733spacenb_strings3734identifier,3744comma 3745space...3746ellipsis)3749rightparen
+3750newline{380leftbrace
+381newline    390spaceva_list394identifier 3911spaceap3912identifier;3914semicolon
+3915newline    400spacechar404char 408space*409starstr4010identifier 4013space=4014assign 4015spaceNULL4016identifier;4020semicolon
+4021newline    410spacechar414char 418space*419startmp4110identifier;4113semicolon
+4114newline
+420newline    430space*434starlen435identifier 438space=439assign 4310space04311intlit;4312semicolon
+4313newline    440spaceva_start444identifier(4412leftparenap4413identifier,4415comma 4416spacenb_strings4417identifier)4427rightparen;4428semicolon
+4429newline    450spacefor454for 457space(458leftparenint459int 4512spacei4513identifier 4514space=4515assign 4516space04517intlit;4518semicolon 4519spacei4520identifier 4521space<4522less 4523spacenb_strings4524identifier;4534semicolon 4535spacei4536identifier++4537plusplus)4539rightparen 4540space{4541leftbrace
+4542newline        460spacetmp468identifier 4611space=4612assign 4613spaceva_arg4614identifier(4620leftparenap4621identifier,4623comma 4624spacechar4625char 4629space*4630star)4631rightparen;4632semicolon
+4633newline        470space*478starlen479identifier 4712space+=4713plusassign 4715spacestrlen4716identifier(4722leftparentmp4723identifier)4726rightparen;4727semicolon
+4728newline    480space}484rightbrace
+485newline    490spaceva_end494identifier(4910leftparenap4911identifier)4913rightparen;4914semicolon
+4915newline    500spacestr504identifier 507space=508assign 509spacemy_calloc5010identifier(5019leftparen*5020starlen5021identifier 5024space+5025plus 5026space15027intlit,5028comma 5029spacesizeof5030sizeof(5036leftparenchar5037char)5041rightparen)5042rightparen;5043semicolon
+5044newline    510spaceva_start514identifier(5112leftparenap5113identifier,5115comma 5116spacenb_strings5117identifier)5127rightparen;5128semicolon
+5129newline    520spacefor524for 527space(528leftparenint529int 5212spacei5213identifier 5214space=5215assign 5216space05217intlit;5218semicolon 5219spacei5220identifier 5221space<5222less 5223spacenb_strings5224identifier;5234semicolon 5235spacei5236identifier++5237plusplus)5239rightparen 5240space{5241leftbrace
+5242newline        530spacetmp538identifier 5311space=5312assign 5313spaceva_arg5314identifier(5320leftparenap5321identifier,5323comma 5324spacechar5325char 5329space*5330star)5331rightparen;5332semicolon
+5333newline        540spacestrcat548identifier(5414leftparenstr5415identifier,5418comma 5419spacetmp5420identifier)5423rightparen;5424semicolon
+5425newline    550space}554rightbrace
+555newline    560spaceva_end564identifier(5610leftparenap5611identifier)5613rightparen;5614semicolon
+5615newline    570spacereturn574return 5710spacestr5711identifier;5714semicolon
+5715newline}580rightbrace
+581newline
+590newlinebool600bool 604spacestr_ends_with605identifier(6018leftparenconst6019const 6024spacechar6025char 6029space*6030starstr6031identifier,6034comma 6035spaceconst6036const 6041spacechar6042char 6046space*6047starsuffix6048identifier)6054rightparen
+6055newline{610leftbrace
+611newline    620spacesize_t624identifier 6210spacestr_len6211identifier 6218space=6219assign 6220spacestrlen6221identifier(6227leftparenstr6228identifier)6231rightparen;6232semicolon
+6233newline    630spacesize_t634identifier 6310spacesuffix_len6311identifier 6321space=6322assign 6323spacestrlen6324identifier(6330leftparensuffix6331identifier)6337rightparen;6338semicolon
+6339newline
+640newline    650spaceif654if 656space(657leftparensuffix_len658identifier 6518space>6519greater 6520spacestr_len6521identifier)6528rightparen
+6529newline        660spacereturn668return 6614spacefalse6615false;6620semicolon
+6621newline    670spacereturn674return 6710spacestrcmp6711identifier(6717leftparenstr6718identifier 6721space+6722plus 6723spacestr_len6724identifier 6731space-6732minus 6733spacesuffix_len6734identifier,6744comma 6745spacesuffix6746identifier)6752rightparen 6753space==6754equal 6756space06757intlit;6758semicolon
+6759newline}680rightbrace
+681newline
+690newlinevoid700void 704spacestr_append_free705identifier(7020leftparenchar7021char 7025space*7026star*7027starstr7028identifier,7031comma 7032spacesize_t7033identifier 7039space*7040starlen7041identifier,7044comma 7045spacechar7046char 7050space*7051starappend7052identifier)7058rightparen
+7059newline{710leftbrace
+711newline    720spacesize_t724identifier 7210spaceappend_len7211identifier 7221space=7222assign 7223spacestrlen7224identifier(7230leftparenappend7231identifier)7237rightparen;7238semicolon
+7239newline
+730newline    740space*744starstr745identifier 748space=749assign 7410spacemy_realloc7411identifier(7421leftparen*7422starstr7423identifier,7426comma 7427space*7428starlen7429identifier 7432space+7433plus 7434spaceappend_len7435identifier 7445space+7446plus 7447space17448intlit)7449rightparen;7450semicolon
+7451newline    750spacememcpy754identifier(7510leftparen*7511starstr7512identifier 7515space+7516plus 7517space*7518starlen7519identifier,7522comma 7523spaceappend7524identifier,7530comma 7531spaceappend_len7532identifier 7542space+7543plus 7544space17545intlit)7546rightparen;7547semicolon
+7548newline    760space*764starlen765identifier 768space+=769plusassign 7611spaceappend_len7612identifier;7622semicolon
+7623newline    770spacemy_free774identifier(7711leftparenappend7712identifier)7718rightparen;7719semicolon
+7720newline}780rightbrace
+781newline
+790newlinevoid800void 804spacestr_append805identifier(8015leftparenchar8016char 8020space*8021star*8022starstr8023identifier,8026comma 8027spacechar8028char 8032space*8033starappend8034identifier)8040rightparen
+8041newline{810leftbrace
+811newline    820spacesize_t824identifier 8210spaceappend_len8211identifier 8221space=8222assign 8223spacestrlen8224identifier(8230leftparenappend8231identifier)8237rightparen;8238semicolon
+8239newline    830spacesize_t834identifier 8310spacelen8311identifier 8314space=8315assign 8316space*8317starstr8318identifier 8321space?8322question_mark 8323spacestrlen8324identifier(8330leftparen*8331starstr8332identifier)8335rightparen 8336space:8337colon 8338space08339intlit;8340semicolon
+8341newline
+840newline    850space*854starstr855identifier 858space=859assign 8510spacemy_realloc8511identifier(8521leftparen*8522starstr8523identifier,8526comma 8527spacelen8528identifier 8531space+8532plus 8533spaceappend_len8534identifier 8544space+8545plus 8546space18547intlit)8548rightparen;8549semicolon
+8550newline    860spacememcpy864identifier(8610leftparen*8611starstr8612identifier 8615space+8616plus 8617spacelen8618identifier,8621comma 8622spaceappend8623identifier,8629comma 8630spaceappend_len8631identifier 8641space+8642plus 8643space18644intlit)8645rightparen;8646semicolon
+8647newline}870rightbrace
+871newline880eof
