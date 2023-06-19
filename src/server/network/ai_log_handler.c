@@ -59,6 +59,8 @@ void log_ai(client_t *cli, server_t *server, team_t *team)
     cli->data = create_player(server->trantor, egg);
     if (egg->is_forked)
         gui_mess = get_gui_message(EGG_HATCHED, egg->id);
+    else
+        gui_mess = my_strdup("");
     gui_mess = str_concat_free(&len, 2, gui_mess,
         gui_mess_ai_connected(server, cli->data));
     append_node(&server->food_timeouts,

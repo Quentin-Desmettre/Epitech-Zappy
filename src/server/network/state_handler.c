@@ -21,6 +21,17 @@ const gui_cmd_t GUI_HANDLERS[] = {
         {"sst", &gui_time_change_handler},
 };
 
+/*
+ * Upon connection of a GUI, send it:
+ *
+ * - The map size
+ * - The time unit
+ * - The tiles content
+ * - The team names
+ * - The players
+ * - The eggs
+ *
+ */
 static char *get_gui_connected_answer(server_t *server)
 {
     size_t len;
