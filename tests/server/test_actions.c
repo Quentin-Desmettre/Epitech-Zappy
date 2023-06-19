@@ -143,7 +143,7 @@ static void redirect_all_stdout(void)
 Test(do_action_pre_check, pre_check_failed, .init = redirect_all_stdout)
 {
     action_t ac = {
-            .data.pre_check = &check_failed
+            .data.pre_check = (ai_cmd_handler_t)check_failed
     };
     client_t cli = {
             .data = NULL,
@@ -156,7 +156,7 @@ Test(do_action_pre_check, pre_check_failed, .init = redirect_all_stdout)
 Test(do_action_pre_check, pre_check_succeeded)
 {
     action_t ac = {
-            .data.pre_check = &check_succeeded
+            .data.pre_check = (ai_cmd_handler_t)&check_succeeded
     };
     client_t cli = {
             .data = NULL
@@ -171,7 +171,7 @@ Test(do_action, check_failed, .init = redirect_all_stdout)
             .data = NULL
     };
     action_t ac = {
-            .data.handler = &check_failed,
+            .data.handler = (ai_cmd_handler_t)&check_failed,
             .cli = &cli
     };
 
@@ -187,7 +187,7 @@ Test(do_action, check_succeeded, .init = redirect_all_stdout)
             .data = NULL
     };
     action_t ac = {
-            .data.handler = &check_succeeded,
+            .data.handler = (ai_cmd_handler_t)&check_succeeded,
             .cli = &cli
     };
 
@@ -203,7 +203,7 @@ Test(do_action, check_ok_string, .init = redirect_all_stdout)
             .data = NULL
     };
     action_t ac = {
-            .data.handler = &check_ok_string,
+            .data.handler = (ai_cmd_handler_t)&check_ok_string,
             .cli = &cli
     };
 

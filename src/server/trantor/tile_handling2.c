@@ -86,12 +86,12 @@ int find_direction(player_t *from, player_t *to, trantor_t *trantor)
     int x_diff = from->x - to->x;
     int y_diff = from->y - to->y;
 
-    if (from == to)
+    if (from == to || (x_diff == 0 && y_diff == 0))
         return 0;
     vect[0] = (abs(x_diff) > trantor->width / 2) ?
-                (x_diff - trantor->width) : x_diff;
+                (x_diff - (trantor->width * (x_diff / abs(x_diff)))) : x_diff;
     vect[1] = (abs(y_diff) > trantor->height / 2) ?
-                (y_diff - trantor->height) : y_diff;
+                (y_diff - (trantor->height * (y_diff / abs(y_diff)))) : y_diff;
     angle = atan2(vect[1], vect[0]) * (180 / M_PI);
     angle += 90;
     if (angle < 0)

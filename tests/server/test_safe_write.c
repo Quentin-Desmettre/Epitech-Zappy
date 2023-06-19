@@ -66,7 +66,7 @@ int create_server_fd(int *port)
     return fd;
 }
 
-static void *accept_client_test(void *fd)
+static void *test_accept_client(void *fd)
 {
     int r_fd = (long)fd;
     char buf[1024];
@@ -100,7 +100,7 @@ Test(test_safe_write, test_enormous_write)
     int port;
     int fd = create_server_fd(&port);
     pthread_t thread;
-    pthread_create(&thread, NULL, accept_client_test, (void *)(long)fd);
+    pthread_create(&thread, NULL, test_accept_client, (void *)(long)fd);
     int cli_fd = connect_to_server(port);
 
     char *bigstr = malloc(100000000);
@@ -167,7 +167,7 @@ static void *accept_client_no_read(void *fd)
 
     struct sockaddr_in addr;
     socklen_t size;
-    int tmp = accept(r_fd, (struct sockaddr *)&addr, &size);
+    accept(r_fd, (struct sockaddr *)&addr, &size);
     return NULL;
 }
 
