@@ -55,9 +55,9 @@ void log_ai(client_t *cli, server_t *server, team_t *team)
     append_node(&server->food_timeouts,
         create_food_timeout(server->params.freq, cli));
     send_to_gui(server, gui_mess, true);
+    remove_if(&team->eggs, egg, NULL, my_free);
     safe_write_free(cli->fd, get_ai_connected_answer(team,
         server->params.width, server->params.height));
-    remove_if(&team->eggs, egg, NULL, my_free);
 }
 
 void handle_ai(server_t *server, client_t *cli, const char *cmd)

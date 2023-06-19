@@ -232,6 +232,7 @@ void send_to_elevated_clients(server_t *server, char *mess, player_t *player);
 
 void freeze_player(player_t *player, int incant_id);
 void freeze_players(map_tile_t *tile, player_t *player);
+char *get_gui_connected_answer(server_t *server);
 
 UNUSED static const int requirements_for_level[8][7] = {
         {}, // UNUSED

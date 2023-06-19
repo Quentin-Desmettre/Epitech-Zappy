@@ -150,6 +150,7 @@ typedef struct egg {
     int x;
     int y;
     int id;
+    int player_id;
     team_t *team;
 } egg_t;
 
