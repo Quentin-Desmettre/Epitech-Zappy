@@ -47,7 +47,7 @@ void handle_connected(server_t *server, client_t *cli, const char *cmd)
     team = get_team_by_name(server->trantor, cmd);
     if (!team || !team->eggs) {
         debug("Refused connection for AI\n");
-        return safe_write(cli->fd, "ko", 2);
+        return safe_write(cli->fd, "ko\n", 3);
     }
     log_ai(cli, server, team);
     debug("New AI connected\n");
@@ -61,7 +61,7 @@ void handle_gui(server_t *server, UNUSED client_t *cli, const char *cmd)
     for (int i = 0; GUI_HANDLERS[i].cmd; i++) {
         if (strncmp(GUI_HANDLERS[i].cmd, cmd, 3) != 0)
             continue;
-        printf("Handling GUI command: %s\n", cmd);
+        debug("Handling GUI command: %s\n", cmd);
         output = str_concat_free(&len, 2,
                     GUI_HANDLERS[i].handler(server, cmd), my_strdup("\n"));
         return safe_write(cli->fd, output, len);

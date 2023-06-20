@@ -143,6 +143,8 @@ typedef struct player {
     bool is_from_egg;
     bool is_freezed;
     struct timeval time_left;
+    void *client;
+    list_t *related_players;
 } player_t;
 
 typedef struct egg {
@@ -156,7 +158,7 @@ typedef struct egg {
 
 egg_t *create_egg(int x, int y, bool is_forked, team_t *team);
 
-player_t *create_player(trantor_t *trantor, egg_t *egg);
+player_t *create_player(trantor_t *trantor, egg_t *egg, void *cli);
 void destroy_player(trantor_t *trantor, player_t *player);
 
 // Ai request handling

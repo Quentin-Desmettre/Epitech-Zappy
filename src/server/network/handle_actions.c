@@ -66,18 +66,15 @@ void handle_actions(server_t *server)
 
     get_time(&now);
     while (server->action_count && i < server->action_count) {
-        cli = server->actions[0]->cli;
         i++;
-        if (!is_action_finished(server->actions[0], &now))
+        cli = server->actions[i - 1]->cli;
+        if (!is_action_finished(server->actions[i - 1], &now))
             break;
         if (cli->data->is_freezed)
             continue;
-        clear_action(server, server->actions[0], cli, &i);
+        clear_action(server, server->actions[i - 1], cli, &i);
         if (!cli->data->buffered_actions)
             continue;
-        cli->data->current_action = cli->data->buffered_actions->data;
-        do_action_pre_check(cli->data->current_action, server, cli);
-        put_action_in_waitlist(server, cli->data->current_action);
-        remove_node(&cli->data->buffered_actions, 0, NULL);
+        pop_waitlist(server, cli);
     }
 }

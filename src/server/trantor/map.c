@@ -34,27 +34,47 @@ static void fetch_resource_to_spawn(trantor_t *trantor,
         to_spawn[i] = (int)(RESOURCE_FREQ[i] * (float)map_dim) - resources[i];
 }
 
-static void spawn_resource(trantor_t *trantor,
-                            resource_t resource, server_t *server)
+static void spawn_resource(trantor_t *trantor, resource_t resource,
+    map_tile_t *has_spawned[trantor->width][trantor->height])
 {
     int rand_x = random() % trantor->width;
     int rand_y = random() % trantor->height;
     map_tile_t *tile = get_tile_by_pos(trantor->map, rand_x, rand_y);
 
     tile->resources[resource] += 1;
-    notify_gui(server, TILE_CONTENT, tile->x, tile->y, tile->resources[FOOD],
-        tile->resources[LINEMATE], tile->resources[DERAUMERE],
-        tile->resources[SIBUR], tile->resources[MENDIANE],
-        tile->resources[PHIRAS], tile->resources[THYSTAME]);
+    has_spawned[rand_x][rand_y] = tile;
+}
+
+static void notify_resource_spawn(server_t *server, int width, int height,
+    map_tile_t *has_spawned[width][height])
+{
+    map_tile_t *tile;
+
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++) {
+            tile = has_spawned[i][j];
+            tile ? notify_gui(server, TILE_CONTENT, tile->x, tile->y,
+                tile->resources[FOOD], tile->resources[LINEMATE],
+                tile->resources[DERAUMERE], tile->resources[SIBUR],
+                tile->resources[MENDIANE], tile->resources[PHIRAS],
+                tile->resources[THYSTAME])
+            : 0;
+        }
+    }
 }
 
 void spawn_resources(server_t *server)
 {
+    int width = server->trantor->width;
+    int height = server->trantor->height;
     int ressources_to_spawn[NB_RESOURCE] = {0};
+    map_tile_t *has_spawned[width][height];
 
+    memset(has_spawned, 0, sizeof(has_spawned));
     fetch_resource_to_spawn(server->trantor, ressources_to_spawn);
     for (int i = 0; i < NB_RESOURCE; i++) {
         for (int j = 0; j < ressources_to_spawn[i]; j++)
-            spawn_resource(server->trantor, i, server);
+            spawn_resource(server->trantor, i, has_spawned);
     }
+    notify_resource_spawn(server, width, height, has_spawned);
 }
