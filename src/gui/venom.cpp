@@ -272,7 +272,8 @@ void Venom::setLevel(int level)
     this->level = level;
 }
 
-void Venom::setState(int state) {
+void Venom::setState(int state)
+{
     this->state = state;
 }
 

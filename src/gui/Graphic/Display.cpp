@@ -98,7 +98,6 @@ void Graphic::drawTileInformation(Mateyak::Window &win, Mateyak::Camera &cam)
     Mateyak::Window::draw("Tile: (" + std::to_string((int)tileX) + ", " + std::to_string((int)tileY) + ")", boxPosX + 20, boxPosY + 20, 25, {255, 255, 255, 255});
 
     win.begin3D(cam);
-    std::cout << ((tileX) * (10 / 3.f)) << std::endl;
     Mateyak::Window::draw({(int(tileX) * (10 / 3.f)) + 5 / 3.f , 0.3, (int(tileY) * (10 / 3.f)) + 5 / 3.f}, {10 / 3.f, 10 / 3.f}, {255, 255, 255, 100});
     win.end3D();
     boxPosY += 30;
