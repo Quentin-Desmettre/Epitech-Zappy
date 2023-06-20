@@ -16,3 +16,4 @@ test.sh
 __pycache__
 out
 .vscode
+.coverage

@@ -62,6 +62,7 @@ void GuiClient::NewPlayer(std::vector<std::string> parameters)
     std::string team = parameters[5];
 
     _serverInformations.addPlayer(name, x, y, orientation, level, team);
+    _serverInformations.updateAudioAction(std::make_tuple(std::stoi(parameters[1]), std::stoi(parameters[2])), Mateyak::NEWPLAYER);
 }
 
 void GuiClient::MovePlayer(std::vector<std::string> parameters)
@@ -251,6 +252,7 @@ void GuiClient::PlayerIncantation(std::vector<std::string> parameters)
         _serverInformations.setIncantationLevel(name, level);
         _serverInformations.setPlayerState(name, Player::STATE::INCANTING);
     }
+    _serverInformations.updateAudioAction(std::make_tuple(std::stoi(parameters[0]), std::stoi(parameters[1])), Mateyak::ELEVATIONSTART);
 }
 
 void GuiClient::PlayerIncantationEnd(std::vector<std::string> parameters)
@@ -282,6 +284,8 @@ void GuiClient::PlayerIncantationEnd(std::vector<std::string> parameters)
             _serverInformations.setIncantationLevel((*it).getName(), -1);
         }
     }
+    _serverInformations.updateAudioAction(std::make_tuple(std::stoi(parameters[0]), std::stoi(parameters[1])), Mateyak::LEVELUP);
+
 }
 
 void GuiClient::PlayerTakeRessource(std::vector<std::string> parameters)

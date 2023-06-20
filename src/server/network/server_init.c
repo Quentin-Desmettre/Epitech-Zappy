@@ -68,6 +68,7 @@ server_t *init_server(int ac, char **av, char **err)
     }
     init_read_set(server);
     update_next_spawn(server);
+    spawn_resources(server);
     return server;
 }
 

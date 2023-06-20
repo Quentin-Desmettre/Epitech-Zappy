@@ -10,11 +10,13 @@
 
 #include "Informations/ServerInformations.hpp"
 #include "Mateyak/Window.hpp"
+#include <fmod.hpp>
+#include <fmod_errors.h>
 
 class Graphic {
     public:
         Graphic(const Mateyak::Vec2f &mapSize, const Mateyak::Vec2f &windowSize, ServerInformations &serverInformations);
-        ~Graphic() = default;
+        ~Graphic();
         void loop();
         bool menu(std::string &ip, std::string &port);
         void drawTeams();
@@ -39,6 +41,9 @@ class Graphic {
         std::unique_ptr<Map> _map;
         Mateyak::Model3D _flat;
         Mateyak::Shaders _shader;
+        FMOD::System *_system;
+        FMOD::Sound *_sound;
+        FMOD::Channel *_channel;
 };
 
 #endif //EPITECH_ZAPPY_GRAPHIC_HPP
