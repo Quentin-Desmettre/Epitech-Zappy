@@ -167,3 +167,11 @@ void Graphic::drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam)
         boxPosY += 20;
     }
 }
+
+Graphic::~Graphic()
+{
+    _channel->stop();
+    _sound->release();
+    _system->close();
+    _system->release();
+}
