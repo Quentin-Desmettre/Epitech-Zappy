@@ -10,17 +10,22 @@
 
 #include "Informations/ServerInformations.hpp"
 #include "Mateyak/Window.hpp"
+#include <fmod.hpp>
+#include <fmod_errors.h>
 
 class Graphic {
     public:
-        Graphic(Mateyak::Vec2f mapSize, Mateyak::Vec2f windowSize, ServerInformations &serverInformations);
-        ~Graphic() = default;
+        Graphic(const Mateyak::Vec2f &mapSize, const Mateyak::Vec2f &windowSize, ServerInformations &serverInformations);
+        ~Graphic();
         void loop();
+        bool menu(std::string &ip, std::string &port);
         void drawTeams();
         void getTeamsPlace(Mateyak::Window &win);
         void drawBroadCastMessage(Mateyak::Window &win);
         void drawTileInformation(Mateyak::Window &win, Mateyak::Camera &cam);
         void drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam);
+        void setMapSize(const Mateyak::Vec2f &mapSize);
+        void drawTimeUnit();
 
     private:
         ServerInformations &_serverInformations;
@@ -33,9 +38,12 @@ class Graphic {
         Vector2 _charSize{0, 0};
         Mateyak::Window _win;
         Mateyak::Camera _cam;
-        Map _map;
+        std::unique_ptr<Map> _map;
         Mateyak::Model3D _flat;
         Mateyak::Shaders _shader;
+        FMOD::System *_system;
+        FMOD::Sound *_sound;
+        FMOD::Channel *_channel;
 };
 
 #endif //EPITECH_ZAPPY_GRAPHIC_HPP

@@ -10,6 +10,8 @@
 #include <raylib.h>
 #include <string>
 #include <raymath.h>
+#include <fmod.hpp>
+#include <fmod_errors.h>
 #include "Triangle.hpp"
 #include "Camera.hpp"
 #include "Vector2.hpp"
@@ -43,6 +45,7 @@ namespace Mateyak
         static void draw(const std::string &text, float x = 0, float y = 0, int fontSize = 15, Color color = DARKGRAY);
         static void draw(const Map &map);
         static void drawBox(float posX, float posY, float width, float height, Color color);
+        static void draw(const Mateyak::Vec3f& posCenter, const Mateyak::Vec2f& size, Color clr);
         void end3D();
         void endDrawing();
 
@@ -53,7 +56,6 @@ namespace Mateyak
         Vec2f getMousePosition() const {
             return Vec2f{static_cast<float>(GetMouseX()), static_cast<float>(GetMouseY())};
         }
-
 
         static double time;
         static double timePass;

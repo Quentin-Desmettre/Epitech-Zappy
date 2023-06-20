@@ -1,4 +1,5 @@
 #include "Mateyak/Window.hpp"
+#include "Mateyak/Audio.hpp"
 
 double Mateyak::Window::timePass = 0;
 double Mateyak::Window::time = GetTime();
@@ -8,6 +9,7 @@ Font Mateyak::Window::_font = GetFontDefault();
 
 Mateyak::Window::Window(int width, int height, std::string title, int fps)
 {
+    FMOD_RESULT result;
     InitWindow(width, height, title.c_str());
     SetTargetFPS(fps);
     Mateyak::Window::_font = LoadFont("assets/arial.ttf");
@@ -86,4 +88,9 @@ void Mateyak::Window::end3D()
 void Mateyak::Window::draw(const Map &map)
 {
     draw(map.getGround());
+}
+
+void Mateyak::Window::draw(const Mateyak::Vec3f& posCenter, const Mateyak::Vec2f& size, Color clr)
+{
+    DrawPlane(posCenter, {size.x, size.y}, clr);
 }

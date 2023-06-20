@@ -12,12 +12,15 @@
 #include <array>
 #include <mutex>
 #include "Mateyak/Vector2.hpp"
+#include "Mateyak/Audio.hpp"
+#include "Mateyak/Wave.hpp"
 #include <algorithm>
 #include "Informations/Player.hpp"
 #include "Informations/Team.hpp"
 #include "Ressource.hpp"
 #include <memory>
 #include <queue>
+#include <chrono>
 
 typedef std::vector<std::vector<std::vector<Ressource>>> ZappyMap;
 
@@ -37,8 +40,8 @@ class Message {
 class ServerInformations
 {
     public:
-        ServerInformations() = default;
-        ~ServerInformations() = default;
+        ServerInformations();
+        ~ServerInformations();
 
         void startComputing();
         void endComputing();
@@ -69,6 +72,8 @@ class ServerInformations
         void takeRessource(const std::string &name, int ressource);
         void dropRessource(const std::string &name, int ressource);
         Mateyak::Vec2f getMapSize() const;
+        void updateAudioAction(std::tuple<int, int> pos, enum Mateyak::action_type type);
+        void audioActionsHandler(Mateyak::Camera &camera);
         ZappyMap getMap() const;
         std::vector<Team> getTeams() const;
         std::vector<std::unique_ptr<Player>> &getPlayers();
@@ -79,7 +84,10 @@ class ServerInformations
         std::string getCommand();
         bool hasCommand() const;
 
+        void updateTimeUnit();
+
     private:
+        FMOD::System *_systemAudio;
         Mateyak::Vec2f mapSize {0, 0};
         ZappyMap map;
         std::vector<Team> teams{};
@@ -87,7 +95,11 @@ class ServerInformations
         std::vector<Message> broadCastMessage{};
         std::mutex mutex;
         int _timeUnit = 0;
+        int _newTimeUnit = -1;
+        std::chrono::time_point<std::chrono::system_clock> _lastKeyPressedTime;
+
         bool _serverRunning = true;
+        std::vector<std::tuple<short, std::vector<std::tuple<int, int, std::shared_ptr<Mateyak::Audio>>>>> audioAction;
 
         std::queue<std::string> _commandQueue;
 };

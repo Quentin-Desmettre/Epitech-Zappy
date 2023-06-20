@@ -15,10 +15,33 @@ if (APPLE) # Mac OS X
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-field-initializers -Wno-unused-command-line-argument")
 endif ()
 
+add_custom_target( unZip ALL)
+add_custom_command(TARGET unZip PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_SOURCE_DIR}/fmod
+        COMMAND ${CMAKE_COMMAND} -E tar xzvf ${CMAKE_SOURCE_DIR}/fmod.tar.gz
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        DEPENDS ${CMAKE_SOURCE_DIR}/fmod.tar.gz
+        COMMENT "Unpacking abc.zip"
+        VERBATIM)
+
 include_directories(include)
 include_directories(include/gui)
 include_directories(include/server)
-include_directories(/usr/local/include)
+
+if (APPLE)
+    include_directories(fmod/inc)
+    set(FMOD_INCLUDE_DIR "fmod/inc")
+    set(FMOD_LIBRARY "fmod/lib")
+else ()
+    include_directories(fmod/include)
+    set(FMOD_INCLUDE_DIR "fmod/include")
+    set(FMOD_LIBRARY "fmod/libs")
+endif ()
+
+set(FMOD_LIBRARIES "-lfmod")
+
+include_directories(${FMOD_INCLUDE_DIR})
+link_directories(${FMOD_LIBRARY})
 
 find_package(raylib QUIET)
 include_directories(${RAYLIB_INCLUDE_DIRS})
@@ -54,10 +77,10 @@ add_executable(zappy_gui
         src/gui/Utils3d.cpp
         src/gui/main.cpp
         src/gui/venom.cpp
-        src/gui/Informations/Player.cpp src/gui/Informations/ServerInformations.cpp src/gui/Client/setter.cpp include/gui/Informations/Player.hpp include/gui/Informations/ServerInformations.hpp src/gui/Mateyak/Model3D.cpp include/gui/Graphic.hpp src/gui/Informations/Team.cpp include/gui/Informations/Team.hpp src/gui/Graphic/Display.cpp src/gui/Graphic/Compute.cpp src/gui/ErrorHandling/ErrorHandling.cpp include/gui/ErrorHandling.hpp)
+        src/gui/Informations/Player.cpp src/gui/Informations/ServerInformations.cpp src/gui/Client/setter.cpp include/gui/Informations/Player.hpp include/gui/Informations/ServerInformations.hpp src/gui/Mateyak/Model3D.cpp include/gui/Graphic.hpp src/gui/Informations/Team.cpp include/gui/Informations/Team.hpp src/gui/Graphic/Display.cpp src/gui/Graphic/Compute.cpp src/gui/ErrorHandling/ErrorHandling.cpp include/gui/ErrorHandling.hpp
+        include/gui/Mateyak/Audio.hpp src/gui/Mateyak/Audio.cpp)
 
-
-target_link_libraries(zappy_gui ${raylib_LIBRARY} ${Boost_LIBRARY})
+target_link_libraries(zappy_gui ${raylib_LIBRARY} ${Boost_LIBRARY} ${FMOD_LIBRARIES})
 set_target_properties(zappy_gui PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 
@@ -118,8 +141,10 @@ if(MATH_LIBRARY)
 endif()
 set_target_properties(zappy_server PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
-if (NOT APPLE)
+add_dependencies(zappy_server unZip)
+add_dependencies(zappy_gui unZip)
 
+if (NOT APPLE)
 #add_executable(server_tests
 #        ./tests/server/test_tile_handling.c
 #        ./tests/server/test_tile_handling2.c

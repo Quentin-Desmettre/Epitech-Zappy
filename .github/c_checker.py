@@ -12,7 +12,7 @@ def isIgnore(filename):
     """
     -not -path './bonus/*' -not -path './tests/*' -not -path './libs/myteams/*'
     """
-    patterns = ["./bonus/", "./tests/", "./libs/"]
+    patterns = ["./bonus/", "./tests/", "./libs/", "./fmod/"]
     for pattern in patterns:
         if filename.startswith(pattern):
             return True
