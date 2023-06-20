@@ -173,3 +173,9 @@ void Graphic::drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam)
         boxPosY += 20;
     }
 }
+
+void Graphic::drawTimeUnit()
+{
+    std::string str = "Time unit: " + std::to_string(_serverInformations.getTimeUnit());
+    Mateyak::Window::draw(str, 10, 35, 25, {255, 255, 255, 255});
+}

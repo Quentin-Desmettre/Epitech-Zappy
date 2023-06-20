@@ -409,3 +409,28 @@ std::string ServerInformations::getCommand()
     _commandQueue.pop();
     return res;
 }
+
+void ServerInformations::updateTimeUnit()
+{
+    if (IsKeyDown(KEY_UP)) {
+        _newTimeUnit = (_newTimeUnit == -1) ? _timeUnit + 1 : _newTimeUnit + 1;
+        _newTimeUnit = (_newTimeUnit < 1) ? 1 : _newTimeUnit;
+
+        _timeUnit = _newTimeUnit;
+        _lastKeyPressedTime = std::chrono::system_clock::now();
+    }
+    if (IsKeyDown(KEY_DOWN)) {
+        _newTimeUnit = (_newTimeUnit == -1) ? _timeUnit - 1 : _newTimeUnit - 1;
+        _newTimeUnit = (_newTimeUnit < 1) ? 1 : _newTimeUnit;
+
+        _timeUnit = _newTimeUnit;
+        _lastKeyPressedTime = std::chrono::system_clock::now();
+    }
+
+    long elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - _lastKeyPressedTime).count();
+    if (_newTimeUnit != -1 && elapsedTime > 1000) {
+        addCommand("sst " + std::to_string(_newTimeUnit) + "\n");
+        _newTimeUnit = -1;
+        addCommand("sgt\n");
+    }
+}
