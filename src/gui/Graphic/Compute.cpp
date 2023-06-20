@@ -44,7 +44,7 @@ Graphic::Graphic(Mateyak::Vec2f mapSize, Mateyak::Vec2f windowSize, ServerInform
     result = _system->init(512, FMOD_INIT_NORMAL, nullptr);
     if (result != FMOD_OK)
         throw std::runtime_error("FMOD error! (" + std::to_string(result) + ") " + FMOD_ErrorString(result));
-    result = _system->createSound("assets/sounds/trantor.wav", FMOD_LOOP_NORMAL, nullptr, &_sound);
+    result = _system->createSound("assets/sounds/trantor.ogg", FMOD_LOOP_NORMAL, nullptr, &_sound);
     if (result != FMOD_OK)
         throw std::runtime_error("FMOD error! (" + std::to_string(result) + ") " + FMOD_ErrorString(result));
     result = _system->playSound(_sound, nullptr, false, &_channel);
