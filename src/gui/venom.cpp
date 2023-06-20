@@ -18,10 +18,11 @@ Venom::Venom(Mateyak::Vec2f pos, Mateyak::Vec2f mapSize, Color clr): mapSize(map
     _clr(clr)
 {
     rnd = {rand() % 100 / 100.f - 0.5f, 0, rand() % 100 / 100.f - 0.5f};
-    _pos = {(pos.x * 10 + 5) / 3.F, 0.75, (pos.y * 10 + 5) / 3.F};
+    _pos = {(pos.x * 10 + 5) / 3.F, 3, (pos.y * 10 + 5) / 3.F};
     _nextPosition = _pos;
+    _nextPosition.y = 0.75;
     level = 1;
-    state = Player::STATE::NONE;
+    state = Player::STATE::SPAWNING;
 }
 
 Venom::~Venom()
@@ -199,7 +200,8 @@ Mateyak::Vec3f &Venom::getPosition()
     return _pos;
 }
 
-void Venom::setNextPos(const Mateyak::Vec3f &pos) {
+void Venom::setNextPos(const Mateyak::Vec3f &pos)
+{
     _pos = _nextPosition;
     _nextPosition = {(pos.x * 10 + 5) / 3.F, _pos.y, (pos.y * 10 + 5) / 3.F};
 }

@@ -6,7 +6,8 @@
 */
 
 #include "Informations/ServerInformations.hpp"
-#include <iostream>
+#include <algorithm>
+#include <iterator>
 
 void Message::FormatMessage(int maxLineSize)
 {
@@ -53,6 +54,13 @@ void ServerInformations::updatePlayer(std::unique_ptr<Player> &player)
     if (state == Player::STATE::NONE) {
         player->ven.move_ven(_timeUnit);
         return;
+    }
+    if (state == Player::STATE::SPAWNING) {
+        player->ven.getPosition().y -= 0.01;
+        if (player->ven.getPos().y <= 0.75) {
+            player->ven.getPosition().y = 0.75;
+            player->setState(Player::STATE::NONE);
+        }
     }
     if (state == Player::STATE::DEAD)
         player->ven.getPosition().y += 0.01;
@@ -126,6 +134,7 @@ void ServerInformations::addPlayer(const std::string &name, int x, int y, Player
     for (size_t i = 0; i < teams.size(); i++) {
         if (teams[i].getName() == team) {
             player = std::make_unique<Player>(name, x, y, orientation, level, teams[i], mapSize);
+            player->setState(Player::STATE::SPAWNING);
             team_exist = true;
             break;
         }
@@ -134,15 +143,11 @@ void ServerInformations::addPlayer(const std::string &name, int x, int y, Player
     for (auto &it : players) {
         int posX = it->ven.getPos().x / (10 / 3.f);
         int posY = it->ven.getPos().z / (10 / 3.f);
-        std::cout << posX << " == " << x << " && " << posY << " == " << y << std::endl;
-        std::cout << it->getState() << " == " << Player::STATE::EGGHATCHING << std::endl;
-        std::cout << "===============" << std::endl;
         if (posX == x && posY == y && it->getState() == Player::STATE::EGGHATCHING) {
             players.erase(std::find(players.begin(), players.end(), it));
             break;
         }
     }
-    std::cout << std::endl;
     if (!team_exist)
         throw std::runtime_error("Team doesn't exist");
     players.push_back(std::move(player));
@@ -260,7 +265,6 @@ void ServerInformations::PlayerLayEgg(const std::string &name, const std::string
 
 void ServerInformations::EggConnection(const std::string &eggName)
 {
-    std::cerr << "EggConnection" << std::endl;
     for (auto &it : players) {
         if (it->getEggName() == eggName) {
             it->setState(Player::STATE::EGGHATCHING);
@@ -383,7 +387,19 @@ bool ServerInformations::hasCommand() const
 
 std::string ServerInformations::getCommand()
 {
-    std::string command = _commandQueue.front();
+    std::queue<std::string> tmp;
+    std::string lastCommand = "";
+
+    while (!_commandQueue.empty()) {
+        std::string command = _commandQueue.front();
+        _commandQueue.pop();
+        if (command != lastCommand) {
+            tmp.push(command);
+            lastCommand = command;
+        }
+    }
+    _commandQueue = tmp;
+    std::string res = _commandQueue.front();
     _commandQueue.pop();
-    return command;
+    return res;
 }

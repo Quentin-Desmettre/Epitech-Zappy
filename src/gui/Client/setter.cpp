@@ -312,3 +312,8 @@ void GuiClient::PlayerDropRessource(std::vector<std::string> parameters)
     }
     _serverInformations.dropRessource(name, ressource);
 }
+
+void GuiClient::ServerEndGame(std::vector<std::string> parameters)
+{
+    _serverInformations.setRunning(false);
+}

@@ -46,6 +46,7 @@ class GuiClient
         void ServerTimeUnit(std::vector<std::string> parameters);
         void PlayerTakeRessource(std::vector<std::string> parameters);
         void PlayerDropRessource(std::vector<std::string> parameters);
+        void ServerEndGame(std::vector<std::string> parameters);
 
 private:
         boost::asio::io_context _io_context;
