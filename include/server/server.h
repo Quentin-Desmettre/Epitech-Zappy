@@ -26,6 +26,7 @@
 
 // -20 In case you want to open other file descriptors
     #define MAX_CLIENTS (FD_SETSIZE - 20)
+    #define MAX_BUFFER_SIZE 4096
 
     #define WELCOME_MESSAGE "WELCOME\n"
     #define UNUSED __attribute__((unused))
@@ -89,6 +90,8 @@ typedef struct server {
     args_t params;
 
     fd_set read_fds;
+
+    bool run;
 } server_t;
 
 // Client handling
@@ -102,7 +105,7 @@ typedef struct client {
     client_state_t state;
     int fd;
     player_t *data;
-    char *buffer;
+    char buffer[MAX_BUFFER_SIZE + 1];
     size_t buffer_size;
 } client_t;
 
@@ -234,6 +237,14 @@ void freeze_players(list_t *players);
 char *get_gui_connected_answer(server_t *server);
 
 void pop_waitlist(server_t *server, client_t *cli);
+
+static inline void destroy_action(void *action)
+{
+    if (!action)
+        return;
+    my_free((char *)((action_t *)action)->arg);
+    my_free(action);
+}
 
 UNUSED static const int requirements_for_level[8][7] = {
         {}, // UNUSED

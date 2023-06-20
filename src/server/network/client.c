@@ -46,7 +46,6 @@ void destroy_client(server_t *server, void *data, bool has_disconnect)
         delete_ai_from_server(server, cli, has_disconnect);
     }
     close(cli->fd);
-    my_free(cli->buffer);
     my_free(cli);
 }
 
