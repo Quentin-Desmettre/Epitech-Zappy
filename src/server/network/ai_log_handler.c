@@ -45,7 +45,7 @@ void log_ai(client_t *cli, server_t *server, team_t *team)
     player_t *p;
 
     cli->state = AI;
-    cli->data = create_player(server->trantor, egg);
+    cli->data = create_player(server->trantor, egg, cli);
     p = cli->data;
     gui_mess = egg->is_forked ?
         get_gui_message(EGG_HATCHED, egg->id) : my_strdup("");
@@ -60,19 +60,37 @@ void log_ai(client_t *cli, server_t *server, team_t *team)
         server->params.width, server->params.height));
 }
 
+void pop_waitlist(server_t *server, client_t *cli)
+{
+    action_t *todo;
+    struct timespec now;
+
+    if (!cli->data->buffered_actions)
+        return;
+    todo = cli->data->buffered_actions->data;
+    get_time(&now);
+    todo->end_time = get_end_time(todo->data.ticks, server->params.freq, now);
+    cli->data->current_action = todo;
+    do_action_pre_check(todo, server, cli);
+    put_action_in_waitlist(server, todo);
+    remove_node(&cli->data->buffered_actions, 0, NULL);
+}
+
 void handle_ai(server_t *server, client_t *cli, const char *cmd)
 {
     action_t *action;
+    int cur_ac = cli->data->current_action ? 1 : 0;
 
-    if (list_size(cli->data->buffered_actions) + 1 >= AI_MAX_COMMANDS)
+    if (list_size(cli->data->buffered_actions) + cur_ac >= AI_MAX_COMMANDS)
         return;
     action = create_action(cmd, cli, server->params.freq);
-    if (!action)
+    if (!action) {
+        debug("Invalid command: %s", cmd);
         return safe_write(cli->fd, ERR_NO_CMD, strlen(ERR_NO_CMD));
-    if (!cli->data->current_action) {
-        do_action_pre_check(action, server, cli);
-        cli->data->current_action = action;
-        put_action_in_waitlist(server, action);
-    } else
-        append_node(&cli->data->buffered_actions, action);
+    }
+    debug("Putting command in wait-list of player %d: %s\n",
+        cli->data->id, cmd);
+    append_node(&cli->data->buffered_actions, action);
+    if (!cli->data->current_action && !cli->data->is_freezed)
+        pop_waitlist(server, cli);
 }

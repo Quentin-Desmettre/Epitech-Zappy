@@ -76,27 +76,28 @@ void GuiClient::compute()
     fd_set read_fds;
     fd_set write_fds;
 
-    while (_loop) {
-        if (!_socket.is_open())
-            break;
-            resetFds(read_fds, socket_descriptor);
-            resetFds(write_fds, socket_descriptor);
-            select(socket_descriptor + 1, &read_fds, &write_fds, NULL, NULL);
-        try {
-            if (FD_ISSET(socket_descriptor, &read_fds)) {
-                resp = getInformations();
-                parseOutput(resp);
-            }
-            if (FD_ISSET(socket_descriptor, &write_fds) && _serverInformations.hasCommand()) {
-                _serverInformations.startComputing();
-                std::string command = _serverInformations.getCommand();
-                _serverInformations.endComputing();
-                _socket.write_some(boost::asio::buffer(command));
-            }
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        } catch (std::exception &e) {
-            std::cout << e.what() << std::endl;
-        }
-        _serverInformations.updateTimeUnit();
+    try {
+       while (_loop) {
+           if (!_socket.is_open())
+               break;
+           resetFds(read_fds, socket_descriptor);
+           resetFds(write_fds, socket_descriptor);
+           select(socket_descriptor + 1, &read_fds, &write_fds, NULL, NULL);
+           if (FD_ISSET(socket_descriptor, &read_fds)) {
+               resp = getInformations();
+               parseOutput(resp);
+           }
+           if (FD_ISSET(socket_descriptor, &write_fds) && _serverInformations.hasCommand()) {
+               _serverInformations.startComputing();
+               std::string command = _serverInformations.getCommand();
+               _serverInformations.endComputing();
+                   _socket.write_some(boost::asio::buffer(command));
+           }
+           std::this_thread::sleep_for(std::chrono::milliseconds(100));
+       }
+    } catch (std::exception &e) {
+        std::cout << e.what() << std::endl;
+        _serverInformations.setRunning(false);
+        _loop = false;
     }
 }

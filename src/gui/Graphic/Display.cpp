@@ -182,3 +182,11 @@ void Graphic::drawTimeUnit()
     std::string str = "Time unit: " + std::to_string(_serverInformations.getTimeUnit());
     Mateyak::Window::draw(str, 10, 35, 25, {255, 255, 255, 255});
 }
+
+Graphic::~Graphic()
+{
+    _channel->stop();
+    _sound->release();
+    _system->close();
+    _system->release();
+}

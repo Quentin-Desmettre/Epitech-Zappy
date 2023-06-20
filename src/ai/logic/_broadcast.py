@@ -43,15 +43,15 @@ def parse_message(self, msg: str, inventory = None, tiles: list[list[str]] = Non
     if msg.count(self.team) == 0:
         self.send(CommandNames.BROADCAST, msg + "ø")
         return
-    uuid = msg.split('§ø')
+    uuid = msg.split('|~')
     if self.messages_uuids.count(uuid[0]) > 0:
         return
     msg = uuid[1]
     self.add_to_list(uuid[0])
     if msg.startswith("looted") and msg.endswith(str(self.level)):
-        add_to_shared_inventory(self, msg.split('ø§')[2], 1)
+        add_to_shared_inventory(self, msg.split('~|')[2], 1)
     elif msg.startswith("dropped") and msg.endswith(str(self.level)):
-        add_to_shared_inventory(self, msg.split('ø§')[2], -1)
+        add_to_shared_inventory(self, msg.split('~|')[2], -1)
     elif msg.startswith("incantation") and msg.endswith(str(self.level)):
         if direction == Directions.HERE:
             self.drop_elevation_stones(inventory)

@@ -43,6 +43,7 @@ public:
     void move_ven(int timeUnit);
     void draw_ven(int seed, const Mateyak::Camera& camera);
     Mateyak::Vec3f getPos() const;
+    Mateyak::Vec3f getNextPos() const;
     Mateyak::Vec3f &getPosition();
     void setPos(const Mateyak::Vec3f &pos);
     void setNextPos(const Mateyak::Vec3f &pos);

@@ -8,8 +8,9 @@
 #pragma once
 
 #include <array>
+#include <cstdio>
 #include "Vector.hpp"
-#define unused __attribute__((unused))
+#define argunused [[maybe_unused]]
 
 class Mat4 {
     public: 

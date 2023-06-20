@@ -18,7 +18,7 @@ endif ()
 include_directories(include)
 include_directories(include/gui)
 include_directories(include/server)
-include_directories(/usr/local/include)
+include_directories(fmod/include)
 
 find_package(raylib QUIET)
 include_directories(${RAYLIB_INCLUDE_DIRS})
@@ -32,6 +32,13 @@ endif ()
 if (NOT raylib_FOUND)
     message(FATAL_ERROR "Please install raylib!\nsudo apt install libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev -y\ngit clone https://github.com/raysan5/raylib.git raylib\ncd raylib\nmkdir build && cd build\ncmake -DBUILD_SHARED_LIBS=ON ..\nmake\nsudo make install\ncd ../../\nrm -rf raylib")
 endif ()
+
+set(FMOD_INCLUDE_DIR "fmod/include")
+set(FMOD_LIBRARY "fmod/libs")
+set(FMOD_LIBRARIES "-lfmod")
+
+include_directories(${FMOD_INCLUDE_DIR})
+link_directories(${FMOD_LIBRARY})
 
 add_executable(zappy_gui
         src/gui/Map.cpp
@@ -54,10 +61,10 @@ add_executable(zappy_gui
         src/gui/Utils3d.cpp
         src/gui/main.cpp
         src/gui/venom.cpp
-        src/gui/Informations/Player.cpp src/gui/Informations/ServerInformations.cpp src/gui/Client/setter.cpp include/gui/Informations/Player.hpp include/gui/Informations/ServerInformations.hpp src/gui/Mateyak/Model3D.cpp include/gui/Graphic.hpp src/gui/Informations/Team.cpp include/gui/Informations/Team.hpp src/gui/Graphic/Display.cpp src/gui/Graphic/Compute.cpp src/gui/ErrorHandling/ErrorHandling.cpp include/gui/ErrorHandling.hpp)
+        src/gui/Informations/Player.cpp src/gui/Informations/ServerInformations.cpp src/gui/Client/setter.cpp include/gui/Informations/Player.hpp include/gui/Informations/ServerInformations.hpp src/gui/Mateyak/Model3D.cpp include/gui/Graphic.hpp src/gui/Informations/Team.cpp include/gui/Informations/Team.hpp src/gui/Graphic/Display.cpp src/gui/Graphic/Compute.cpp src/gui/ErrorHandling/ErrorHandling.cpp include/gui/ErrorHandling.hpp
+        include/gui/Mateyak/Audio.hpp src/gui/Mateyak/Audio.cpp)
 
-
-target_link_libraries(zappy_gui ${raylib_LIBRARY} ${Boost_LIBRARY})
+target_link_libraries(zappy_gui ${raylib_LIBRARY} ${Boost_LIBRARY} ${FMOD_LIBRARIES})
 set_target_properties(zappy_gui PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 

@@ -34,10 +34,10 @@ class GuiClient
         void PlayerLevel(std::vector<std::string> parameters);
         void PlayerInventory(std::vector<std::string> parameters);
         void PlayerDeath(std::vector<std::string> parameters);
-        void PlayerBroadcast(std::vector<std::string> parameters);
-        void PlayerExpulse(std::vector<std::string> parameters);
         void PlayerIncantation(std::vector<std::string> parameters);
         void PlayerIncantationEnd(std::vector<std::string> parameters);
+        void PlayerBroadcast(std::vector<std::string> parameters);
+        void PlayerExpulse(std::vector<std::string> parameters);
         void PlayerFork(std::vector<std::string> parameters);
         void EggLaying(std::vector<std::string> parameters);
         void EggHatching(std::vector<std::string> parameters);
