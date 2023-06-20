@@ -141,6 +141,9 @@ if(MATH_LIBRARY)
 endif()
 set_target_properties(zappy_server PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
+add_dependencies(zappy_server unZip)
+add_dependencies(zappy_gui unZip)
+
 if (NOT APPLE)
 #add_executable(server_tests
 #        ./tests/server/test_tile_handling.c
