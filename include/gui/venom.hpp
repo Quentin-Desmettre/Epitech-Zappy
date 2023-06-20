@@ -29,6 +29,7 @@ private:
     std::vector<Mateyak::Vec3f> pos_feet;
 
 public:
+    bool isSelected;
     void setLevel(int level);
     int getLevel() const;
     void setState(int state);
