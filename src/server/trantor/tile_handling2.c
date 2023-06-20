@@ -97,5 +97,7 @@ int find_direction(player_t *from, player_t *to, trantor_t *trantor)
     if (angle < 0)
         angle += 360;
     angle -= dir[to->dir];
+    if (angle < 0)
+        angle += 360;
     return get_direct_from_angle(angle);
 }
