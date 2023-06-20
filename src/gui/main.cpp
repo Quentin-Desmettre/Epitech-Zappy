@@ -36,7 +36,6 @@ void Graphic::loop()
         Venom::fpsHandler();
         _serverInformations.startComputing();
         _map.update(_serverInformations);
-        timeUnit = _serverInformations.getTimeUnit();
         for (auto &it : _serverInformations.getPlayers()) {
             if (!it) continue;
             it->ven.draw_ven(seed, _cam);

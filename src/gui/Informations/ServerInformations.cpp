@@ -132,12 +132,17 @@ void ServerInformations::addPlayer(const std::string &name, int x, int y, Player
     }
 
     for (auto &it : players) {
-        if (it->ven.getPos().x == x && it->ven.getPos().y == y && it->getState() == Player::STATE::EGGHATCHING) {
-            std::remove(players.begin(), players.end(), it), players.end();
-            std::cerr << "removeEgg" << std::endl;
+        int posX = it->ven.getPos().x / (10 / 3.f);
+        int posY = it->ven.getPos().z / (10 / 3.f);
+        std::cout << posX << " == " << x << " && " << posY << " == " << y << std::endl;
+        std::cout << it->getState() << " == " << Player::STATE::EGGHATCHING << std::endl;
+        std::cout << "===============" << std::endl;
+        if (posX == x && posY == y && it->getState() == Player::STATE::EGGHATCHING) {
+            players.erase(std::find(players.begin(), players.end(), it));
             break;
         }
     }
+    std::cout << std::endl;
     if (!team_exist)
         throw std::runtime_error("Team doesn't exist");
     players.push_back(std::move(player));
@@ -255,6 +260,7 @@ void ServerInformations::PlayerLayEgg(const std::string &name, const std::string
 
 void ServerInformations::EggConnection(const std::string &eggName)
 {
+    std::cerr << "EggConnection" << std::endl;
     for (auto &it : players) {
         if (it->getEggName() == eggName) {
             it->setState(Player::STATE::EGGHATCHING);

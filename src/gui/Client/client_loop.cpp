@@ -50,6 +50,12 @@ void GuiClient::parseOutput(std::string re) {
             parameters.push_back(token);
         if (commands.find(command) != commands.end()) {
             try {
+                if (command == "pfk" || command == "enw" || command == "ebo" || command == "edi") {
+                    std::cout << command << " ";
+                    for (auto &param : parameters)
+                        std::cout << param << " ";
+                    std::cout << std::endl;
+                }
                 std::invoke(commands[command], this, parameters);
             } catch (std::exception &e) {}
         } else
