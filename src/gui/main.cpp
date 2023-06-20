@@ -45,6 +45,7 @@ void Graphic::loop()
             Utils::drawGrid(_mapSize, 10 / 3.F, {0, 0, 0});
         }
         _win.end3D();
+        _serverInformations.audioActionsHandler(_cam);
         DrawFPS(10, 10);
         drawTeams();
         drawBroadCastMessage(_win);

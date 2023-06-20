@@ -10,6 +10,8 @@
 #include <raylib.h>
 #include <string>
 #include <raymath.h>
+#include <fmod.hpp>
+#include <fmod_errors.h>
 #include "Triangle.hpp"
 #include "Camera.hpp"
 #include "Vector2.hpp"
@@ -53,7 +55,6 @@ namespace Mateyak
         Vec2f getMousePosition() const {
             return Vec2f{static_cast<float>(GetMouseX()), static_cast<float>(GetMouseY())};
         }
-
 
         static double time;
         static double timePass;

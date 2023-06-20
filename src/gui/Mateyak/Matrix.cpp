@@ -216,7 +216,7 @@ Mat4 Mat4::inverse() const
     return inv;
 }
 
-Mateyak::Vec3f Mat4::vecRotate(Mateyak::Vec3f vec, Mateyak::Vec3f dir, unused Mateyak::Vec3f pos)
+Mateyak::Vec3f Mat4::vecRotate(Mateyak::Vec3f vec, Mateyak::Vec3f dir, argunused Mateyak::Vec3f pos)
 {
     Mat4 mat3 = Mat4({
         1, 0, 0, 0,

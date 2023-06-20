@@ -8,6 +8,7 @@
 #include "Informations/ServerInformations.hpp"
 #include <algorithm>
 #include <iterator>
+#include <iostream>
 
 void Message::FormatMessage(int maxLineSize)
 {
@@ -323,6 +324,75 @@ void ServerInformations::endComputing()
     mutex.unlock();
 }
 
+
+void ServerInformations::updateAudioAction(std::tuple<int, int> pos, enum Mateyak::action_type type)
+{
+    for (auto &action: audioAction) {
+        if (std::get<0>(action) == type) {
+            std::get<1>(action).emplace_back(std::get<0>(pos), std::get<1>(pos), std::make_shared<Mateyak::Audio>(type, *_systemAudio));
+            return;
+        }
+    }
+    std::tuple<short, std::vector<std::tuple<int, int, std::shared_ptr<Mateyak::Audio>>>> newAction = std::make_tuple(type, std::vector<std::tuple<int, int, std::shared_ptr<Mateyak::Audio>>>());
+    std::get<1>(newAction).emplace_back(std::get<0>(pos), std::get<1>(pos), std::make_shared<Mateyak::Audio>(type, *_systemAudio));
+    audioAction.emplace_back(newAction);
+}
+
+void ServerInformations::audioActionsHandler(Mateyak::Camera &camera)
+{
+    bool deleted;
+    for (auto &action: audioAction) {
+        check_audio_vector:
+        deleted = false;
+        for (auto &audio: std::get<1>(action)) {
+            if (!std::get<2>(audio)->_beingPlayed) {
+                std::get<2>(audio)->playSound();
+                std::get<2>(audio)->_beingPlayed = true;
+                std::get<2>(audio)->computeStereoAndVolume(camera._position, std::make_tuple(std::get<0>(audio), std::get<1>(audio)), (camera._target - camera._position).Normalize());
+            } else {
+                if (!std::get<2>(audio)->getState()) {
+                    std::get<1>(action).erase(std::get<1>(action).begin());
+                    deleted = true;
+                    break;
+                }
+                else {
+                    std::get<2>(audio)->computeStereoAndVolume(camera._position, std::make_tuple(std::get<0>(audio), std::get<1>(audio)), (camera._target - camera._position).Normalize());
+                }
+            }
+        }
+        if (deleted)
+            goto check_audio_vector;
+    }
+}
+
+ServerInformations::ServerInformations()
+{
+    FMOD_RESULT result;
+
+    result = FMOD::System_Create(&_systemAudio);
+    if (result != FMOD_OK)
+        throw std::runtime_error("FMOD error! (" + std::to_string(result) + ") " + FMOD_ErrorString(result));
+    result = _systemAudio->init(512, FMOD_INIT_NORMAL, nullptr);
+    if (result != FMOD_OK)
+        throw std::runtime_error("FMOD error! (" + std::to_string(result) + ") " + FMOD_ErrorString(result));
+
+    result = _systemAudio->createSound("assets/sounds/broadcast.wav", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::BROADCAST]);
+    if (result != FMOD_OK)
+        throw std::runtime_error("FMOD error! (" + std::to_string(result) + ") " + FMOD_ErrorString(result));
+    result = _systemAudio->createSound("assets/sounds/elevation_start.wav", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::ELEVATIONSTART]);
+    if (result != FMOD_OK)
+        throw std::runtime_error("FMOD error! (" + std::to_string(result) + ") " + FMOD_ErrorString(result));
+    result = _systemAudio->createSound("assets/sounds/elevation_end.wav", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::ELEVATIONEND]);
+    if (result != FMOD_OK)
+        throw std::runtime_error("FMOD error! (" + std::to_string(result) + ") " + FMOD_ErrorString(result));
+    result = _systemAudio->createSound("assets/sounds/level_up.wav", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::LEVELUP]);
+    if (result != FMOD_OK)
+        throw std::runtime_error("FMOD error! (" + std::to_string(result) + ") " + FMOD_ErrorString(result));
+    result = _systemAudio->createSound("assets/sounds/new_player.wav", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::NEWPLAYER]);
+    if (result != FMOD_OK)
+        throw std::runtime_error("FMOD error! (" + std::to_string(result) + ") " + FMOD_ErrorString(result));
+}
+
 void ServerInformations::setIncantationLevel(const std::string &name, int level)
 {
     for (auto &it : players) {
@@ -332,7 +402,6 @@ void ServerInformations::setIncantationLevel(const std::string &name, int level)
         }
     }
 }
-
 void ServerInformations::takeRessource(const std::string &name, int ressource)
 {
     int x = -1;
@@ -402,4 +471,19 @@ std::string ServerInformations::getCommand()
     std::string res = _commandQueue.front();
     _commandQueue.pop();
     return res;
+}
+
+ServerInformations::~ServerInformations()
+{
+    for (auto &action: audioAction) {
+        for (auto &audio: std::get<1>(action)) {
+            std::get<2>(audio)->stopSound();
+        }
+    }
+    Mateyak::audios[Mateyak::action_type::BROADCAST]->release();
+    Mateyak::audios[Mateyak::action_type::ELEVATIONSTART]->release();
+    Mateyak::audios[Mateyak::action_type::ELEVATIONEND]->release();
+    Mateyak::audios[Mateyak::action_type::LEVELUP]->release();
+    _systemAudio->close();
+    _systemAudio->release();
 }
