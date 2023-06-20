@@ -46,6 +46,8 @@ def elevate(self, send_cmd: bool = True, msg: str = None):
         if self.level == 8:
             my_print("Congratulations, you won !!!")
         self.shared_inventory = {}
+        self.leader = None
+        self.reader.empty_broadcast_queue()
     else:
         my_print("Error: could not elevate")
 
@@ -81,10 +83,14 @@ def check_requirements(self, inventory = None, tiles = None) -> bool:
         return False
     ground = self.get_items_on_ground(tiles)
     total = merge_dicts(inventory, ground)
-    if len(self.get_needed_stones(total)) != 0:
-        my_print("Not enough stones to evolve : %s" % self.get_needed_stones(total))
+    needed = self.get_needed_stones(total)
+    if len(needed) != 0:
+        my_print("Not enough stones to evolve, missing : [ ", end="")
+        for stone in needed:
+            my_print(stone.value, end=" ")
+        my_print("]")
         return False
-    if ground[Objects.PLAYER.value] < get_elevation_needs(self.level)[Objects.PLAYER]: # temporary fix to ensure that all 6 players are on the same tile, original solution : get_elevation_needs(self.level)[Objects.PLAYER]
+    if ground[Objects.PLAYER.value] < 6: # temporary fix to ensure that all 6 players are on the same tile, original solution : get_elevation_needs(self.level)[Objects.PLAYER]
         my_print("Not enough players to evolve.")
         return False
     return True

@@ -133,7 +133,12 @@ class Reader:
         tmp_queue = Queue()
         while not self.broadcast_queue.empty():
             msg = self.broadcast_queue.get()
-            if not msg[0].count("incantation") == 0:
+            if msg[0].count("incantation") == 0:
                 tmp_queue.put(msg)
         while not tmp_queue.empty():
             self.broadcast_queue.put(tmp_queue.get())
+
+    def empty_broadcast_queue(self):
+        """Empties the broadcast queue."""
+        while not self.broadcast_queue.empty():
+            self.broadcast_queue.get()
