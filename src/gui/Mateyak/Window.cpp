@@ -62,7 +62,8 @@ void Mateyak::Window::drawBox(float posX, float posY, float width, float height,
 
 void Mateyak::Window::startDrawing(Color color)
 {
-    timePass = GetFrameTime();
+    timePass = GetTime() - time;
+    time = GetTime();
     BeginDrawing();
     ClearBackground(color);
 }
