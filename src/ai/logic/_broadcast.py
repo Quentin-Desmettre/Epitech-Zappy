@@ -24,7 +24,7 @@ def walk_and_loot(self, direction: Directions) -> bool:
         return
     if is_object_on_tile(tiles, [], Objects.FOOD):
         self.send(CommandNames.TAKE, Objects.FOOD.value)
-    my_print("moving to other player")
+    my_print("Moving to other player", ignore_verbose=True)
     self.go_to_direction(direction)
     self.last_movement = time()
     if is_object_on_tile(tiles, [direction], Objects.FOOD):
@@ -63,7 +63,7 @@ def parse_message(self, msg: str, inventory = None) -> None:
             self.leader = sender
             my_print("New leader: %s" % sender)
         if self.leader != sender:
-            my_print("Not the leader !!!!!!!")
+            my_print("Not the leader !!!")
             return
         if direction == Directions.HERE:
             self.drop_elevation_stones(inventory)

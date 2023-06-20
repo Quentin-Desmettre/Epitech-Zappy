@@ -39,17 +39,18 @@ def get_items_on_ground(self, tiles = None) -> dict[str, int]:
 
 def elevate(self, send_cmd: bool = True, msg: str = None):
     if send_cmd:
+        my_print("Starting incantation to level %d" % (self.level + 1), ignore_verbose=True)
         self.send(CommandNames.INCANTATION)
     elif msg.startswith("Current level:"):
         self.level = int(msg.split(" ")[2])
-        my_print("Elevated to level %d !!!" % self.level)
+        my_print("Elevated to level %d !!!" % self.level, ignore_verbose=True)
         if self.level == 8:
-            my_print("Congratulations, you won !!!")
+            my_print("Congratulations, you won !!!", ignore_verbose=True)
         self.shared_inventory = {}
         self.leader = None
         self.reader.empty_broadcast_queue()
     else:
-        my_print("Error: could not elevate")
+        my_print("Error: could not elevate", ignore_verbose=True)
 
 
 def can_evolve(self, inventory: dict[str, int], tiles = None):
@@ -73,7 +74,7 @@ def drop_elevation_stones(self, inventory = None, to_not_send: Objects = None):
                 else:
                     self.send(CommandNames.BROADCAST, "dropped~|" + self.team + "~|" + stone + "~|" + str(self.level))
                     sleep(self.delta)
-    my_print("Dropped all stones needed to evolve.")
+    my_print("Dropped all stones needed to evolve.", ignore_verbose=True)
 
 
 def check_requirements(self, inventory = None, tiles = None) -> bool:

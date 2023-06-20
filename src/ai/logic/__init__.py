@@ -34,7 +34,7 @@ class Ai:
 
     def take_food(self, inventory: dict[str, int], tiles = None):
         """Takes food from the map until the player has 20 food."""
-        my_print("Looting food")
+        my_print("Looting food", ignore_verbose=True)
         if tiles is None:
             tiles = self.send(CommandNames.LOOK)
         if tiles is None:
@@ -51,7 +51,7 @@ class Ai:
 
     def take_stones(self, inventory: dict[str, int], tiles = None):
         """Takes stones from the map until the player has all the stones needed to evolve."""
-        my_print("Looting stones")
+        my_print("Looting stones", ignore_verbose=True)
         stone = None
         sucess = False
         needed = self.get_needed_stones(inventory)

@@ -1,8 +1,8 @@
 #!/bin/env python3
 
 from socket import AF_INET, SOCK_STREAM, socket
-from sys import argv
-from src.ai.utils import send_to_server, recv_from_server, my_print, set_color, Colors
+from sys import argv as sys_argv
+from src.ai.utils import send_to_server, recv_from_server, my_print, set_verbose, set_color, Colors
 from src.ai.commands import ElevationException, CommandNames
 from src.ai.logic import Ai
 
@@ -11,14 +11,16 @@ def print_usage(exit_code=84):
     my_print("""USAGE: ./zappy_ai -p port -n name -h machine
        port\tis the port number
        name\tis the name of the team
-       machine\tis the name of the machine; localhost by default""")
+       machine\tis the name of the machine; localhost by default""",
+       ignore_verbose=True)
+    exit(exit_code)
 
 
 def print_error(*values: object,
     sep: str | None = " ",
     end: str | None = "\n"):
     set_color(Colors.FAIL)
-    my_print(*values, sep=sep, end=end)
+    my_print(*values, sep=sep, end=end, ignore_verbose=True)
     exit(84)
 
 
@@ -26,6 +28,8 @@ def arg_handling():
     port = -1
     name = ""
     machine = "localhost"
+    set_verbose("--verbose" in sys_argv)
+    argv = [arg for arg in sys_argv if arg != "--verbose"]
     if len(argv) == 2 and argv[1] == "-help":
         print_usage(0)
     elif len(argv) != 7 and len(argv) != 5:
@@ -84,8 +88,11 @@ if __name__ == "__main__":
         main()
     except Exception as e:
         set_color(Colors.FAIL)
-        my_print(e)
+        my_print(e, ignore_verbose=True)
     except KeyboardInterrupt:
-        my_print("Interrupted")
-    except SystemExit:
-        my_print("Exiting...")
+        my_print("Interrupted", ignore_verbose=True)
+    except SystemExit as e:
+        if e.code != 84:
+            my_print("Exiting...", ignore_verbose=True)
+        else:
+            exit(e.code)
