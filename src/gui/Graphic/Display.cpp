@@ -149,21 +149,24 @@ void Graphic::drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam)
     // Get player inventory
     _serverInformations.addCommand(std::string("pin #" + std::to_string(cam.lastSelectedPlayer) + "\n"));
 
+    if (players.empty() || cam.lastSelectedPlayer >= players.size())
+        return;
+
     Mateyak::Window::drawBox(boxPosX, boxPosY, boxWidth, boxHeight, {0, 39, 97, 94});
-    Mateyak::Vec2f position = _serverInformations.getPlayers()[cam.lastSelectedPlayer]->_position;
+    Mateyak::Vec2f position = players[cam.lastSelectedPlayer]->_position;
 
     // Name + Position
-    Mateyak::Window::draw("Player: " + _serverInformations.getPlayers()[cam.lastSelectedPlayer]->getName() + " on tile (" + std::to_string((int)position.x) + ", " + std::to_string((int)position.y) + ")", boxPosX + 20, boxPosY + 20, 25, white);
+    Mateyak::Window::draw("Player: " + players[cam.lastSelectedPlayer]->getName() + " on tile (" + std::to_string((int)position.x) + ", " + std::to_string((int)position.y) + ")", boxPosX + 20, boxPosY + 20, 25, white);
 
     // Team
-    Mateyak::Window::draw("Team: " + _serverInformations.getPlayers()[cam.lastSelectedPlayer]->getTeam().getName(), boxPosX + 20, boxPosY + 50, 25, white);
+    Mateyak::Window::draw("Team: " + players[cam.lastSelectedPlayer]->getTeam().getName(), boxPosX + 20, boxPosY + 50, 25, white);
 
     // Level
-    Mateyak::Window::draw("Level: " + std::to_string(_serverInformations.getPlayers()[cam.lastSelectedPlayer]->getLevel()), boxPosX + 20, boxPosY + 80, 25, white);
+    Mateyak::Window::draw("Level: " + std::to_string(players[cam.lastSelectedPlayer]->getLevel()), boxPosX + 20, boxPosY + 80, 25, white);
 
     // Inventory
-    std::array<int, 7> inventory = _serverInformations.getPlayers()[cam.lastSelectedPlayer]->getInventory();
-    _serverInformations.getPlayers()[cam.lastSelectedPlayer]->ven.isSelected = true;
+    std::array<int, 7> inventory = players[cam.lastSelectedPlayer]->getInventory();
+    players[cam.lastSelectedPlayer]->ven.isSelected = true;
     boxPosY += 130;
     for (size_t i = 0; i < inventory.size(); i++) {
         Color color = Ressource::clr[i];
