@@ -107,8 +107,8 @@ void GuiClient::PlayerInventory(std::vector<std::string> parameters)
     std::string name = parameters[0];
     if (name[0] == '#')
         name.erase(0, 1);
-    int x = std::stoi(parameters[1]);
-    int y = std::stoi(parameters[2]);
+//    int x = std::stoi(parameters[1]);
+//    int y = std::stoi(parameters[2]);
 
     std::vector<int> res;
 
@@ -244,7 +244,9 @@ void GuiClient::PlayerIncantation(std::vector<std::string> parameters)
             continue;
 
         // TODO: Besoin de check ca ?? Pourquoi y a X Y ?
-        if ((*it)->_position.x != X || (*it)->_position.y != Y)
+        int posX = (*it)->ven.getPos().x / (10 / 3.f);
+        int posY = (*it)->ven.getPos().z / (10 / 3.f);
+        if (posX != X || posY != Y)
             continue;
 
         _serverInformations.setIncantationLevel(name, level);
@@ -265,7 +267,12 @@ void GuiClient::PlayerIncantationEnd(std::vector<std::string> parameters)
     int result = std::stoi(parameters[2]);
 
     for (auto &it : _serverInformations.getPlayers()) {
-        if ((*it)._position.x != X || (*it)._position.y != Y)
+        int posX = it->ven.getPos().x / (10 / 3.f);
+        int posY = it->ven.getPos().z / (10 / 3.f);
+
+        if (posX != X || posY != Y)
+            continue;
+        if (it->getState() != Player::STATE::INCANTING)
             continue;
 
         if (result == 1) {

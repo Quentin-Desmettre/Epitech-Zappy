@@ -13,7 +13,7 @@
 #include "Mateyak/Window.hpp"
 #include "venom.hpp"
 
-Map::Map(Mateyak::Vec2f size, float zoom):
+Map::Map(const Mateyak::Vec2f &size, float zoom):
     _size(size),
     map(size),
     clr(size),
@@ -37,6 +37,7 @@ Map::Map(Mateyak::Vec2f size, float zoom):
     _ground.setPos({0, -0.5, 0});
     _ground.setTexture(clr);
 
+    Venom::feet_pos.clear();
     Venom::feet_pos.resize(size.y);
     for (int i = 0; i < size.y; i++) {
         Venom::feet_pos[i].resize(size.x);
@@ -125,6 +126,8 @@ void Map::generateColor()
 
 Map::~Map()
 {
+    for (auto &_food : _foods)
+        delete _food;
 }
 
 Mateyak::Sprite Map::getMap() const

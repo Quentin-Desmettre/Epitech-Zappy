@@ -23,6 +23,7 @@ Venom::Venom(Mateyak::Vec2f pos, Mateyak::Vec2f mapSize, Color clr): mapSize(map
     _nextPosition.y = 0.75;
     level = 1;
     state = Player::STATE::SPAWNING;
+    isSelected = false;
 }
 
 Venom::~Venom()
@@ -83,7 +84,10 @@ void Venom::Draw_leg(Mateyak::Vec3f leg, int seed)
         for (size_t i = 0; i < triangles.size(); i++) {
             Mateyak::Triangle tr = triangles[i];
             float clr_mul = 1 - (float)i / (float)triangles.size();
-            Mateyak::Window::draw(tr, Color{u_char(_clr.r * clr_mul), u_char(_clr.g * clr_mul), u_char(_clr.b * clr_mul), (unsigned char)(2.55 * len)});
+            if (isSelected) {
+                Mateyak::Window::draw(tr, _clr);
+            } else
+                Mateyak::Window::draw(tr, Color{u_char(_clr.r * clr_mul), u_char(_clr.g * clr_mul), u_char(_clr.b * clr_mul), (unsigned char)(2.55 * len)});
         }
     }
 }
@@ -194,6 +198,12 @@ Mateyak::Vec3f Venom::getPos() const
 {
     return _pos;
 }
+
+Mateyak::Vec3f Venom::getNextPos() const
+{
+    return _nextPosition;
+}
+
 
 Mateyak::Vec3f &Venom::getPosition()
 {
