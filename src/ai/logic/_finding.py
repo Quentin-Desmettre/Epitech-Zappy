@@ -72,7 +72,7 @@ def get_object_path(object: Objects, tiles: list[list[str]]) -> list[Directions]
     return path
 
 
-def is_object_on_tile(tiles: list[list[str]] | None, directions: list[Directions], object: Objects) -> bool:
+def is_object_on_tile(tiles: list[list[str]], directions: list[Directions], object: Objects) -> bool:
     """Returns True if there is food on the given tile."""
     if len(directions) > 0 and directions[len(directions) - 1] != Directions.FORWARD:
         return False
@@ -81,7 +81,7 @@ def is_object_on_tile(tiles: list[list[str]] | None, directions: list[Directions
     return found
 
 
-def go_to_object(self, desired: Objects, tiles: list[list[str]] | None, loot_food = False) -> bool:
+def go_to_object(self, desired: Objects, tiles: list[list[str]] = None, loot_food = False) -> bool:
     """Take the shortest path to the desired object and loot it if possible."""
     if tiles is None:
         tiles = self.send(CommandNames.LOOK)
@@ -109,8 +109,8 @@ def loot_object(self, object: Objects, can_move_randomly: bool = True, tiles = N
         self.send(CommandNames.LOOK)
     if tiles is None:
         return False
-    if object.value in tiles[0] and (object == Objects.FOOD or Objects.PLAYER.value not in tiles[0]):
-        if self.send(CommandNames.TAKE, object.value) == "ko":
+    if object.value in tiles[0] and (object == Objects.FOOD or tiles[0].count(Objects.PLAYER.value) == 1):
+        if self.send(CommandNames.TAKE, object.value) == None:
             my_print("Error: could not loot %s" % object.name)
             return False
     elif self.go_to_object(object, tiles, loot_food) == False:

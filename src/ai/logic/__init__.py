@@ -65,7 +65,7 @@ class Ai:
         if self.can_evolve(inventory, self.send(CommandNames.LOOK)):
             self.drop_elevation_stones(inventory, stone)
         else:
-            self.send(CommandNames.BROADCAST, "lootedø§" + self.team + "ø§" + stone.value + "ø§" + str(self.level))
+            self.send(CommandNames.BROADCAST, "looted~|" + self.team + "~|" + stone.value + "~|" + str(self.level))
             sleep(self.delta)
 
     def handle_broadcast(self, msg, inventory: dict[str, int], tiles: list[list[str]]):
@@ -82,7 +82,7 @@ class Ai:
             self.drop_elevation_stones()
             self.elevate()
         else:
-            self.send(CommandNames.BROADCAST, "incantationø§" + self.team + "ø§" + str(self.level))
+            self.send(CommandNames.BROADCAST, "incantation~|" + self.team + "~|" + str(self.level))
             sleep(self.delta * 7)
 
     def make_decision(self):
