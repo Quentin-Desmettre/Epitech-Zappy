@@ -414,16 +414,16 @@ std::string ServerInformations::getCommand()
 
 void ServerInformations::updateTimeUnit()
 {
-    if (IsKeyDown(KEY_UP)) {
-        _newTimeUnit = (_newTimeUnit == -1) ? _timeUnit + 1 : _newTimeUnit + 1;
-        _newTimeUnit = (_newTimeUnit < 1) ? 1 : _newTimeUnit;
+    if (IsKeyReleased(KEY_UP)) {
+        _newTimeUnit = (_newTimeUnit == -1) ? _timeUnit + 10 : _newTimeUnit + 10;
+        _newTimeUnit = (_newTimeUnit < 1) ? 2 : _newTimeUnit;
 
         _timeUnit = _newTimeUnit;
         _lastKeyPressedTime = std::chrono::system_clock::now();
     }
-    if (IsKeyDown(KEY_DOWN)) {
-        _newTimeUnit = (_newTimeUnit == -1) ? _timeUnit - 1 : _newTimeUnit - 1;
-        _newTimeUnit = (_newTimeUnit < 1) ? 1 : _newTimeUnit;
+    if (IsKeyReleased(KEY_DOWN)) {
+        _newTimeUnit = (_newTimeUnit == -1) ? _timeUnit - 10 : _newTimeUnit - 10;
+        _newTimeUnit = (_newTimeUnit < 1) ? 2 : _newTimeUnit;
 
         _timeUnit = _newTimeUnit;
         _lastKeyPressedTime = std::chrono::system_clock::now();

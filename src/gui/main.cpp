@@ -51,6 +51,7 @@ void Graphic::loop()
         drawTileInformation(_win, _cam);
         drawPlayerInformation(_win, _cam);
         drawTimeUnit();
+        _serverInformations.updateTimeUnit();
         _serverInformations.endComputing();
         _win.endDrawing();
     }
@@ -77,7 +78,6 @@ bool Graphic::menu(std::string &ip, std::string &port) {
     functions.emplace_back("quit");
     float scale = 1.f;
 
-    SetTargetFPS(60);
     int loop = true;
 
     while (!WindowShouldClose() && loop) {
@@ -112,6 +112,7 @@ bool Graphic::menu(std::string &ip, std::string &port) {
         }
         _win.endDrawing();
     }
+
     for (auto &sprite : textures) {
         UnloadTexture(sprite);
     }
