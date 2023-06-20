@@ -88,6 +88,8 @@ void ServerInformations::setTile(int x, int y, std::vector<int> values)
     int number_to_erase;
     int number_to_add;
 
+    if (x < 0 || y < 0)
+        throw std::runtime_error("Error: setTile: x or y out of range");
     if (y >= static_cast<int>(map.size()) || x >= static_cast<int>(map[y].size())) {
         throw std::runtime_error("Error: setTile: x or y out of range");
     }
@@ -344,7 +346,9 @@ void ServerInformations::takeRessource(const std::string &name, int ressource)
             y = it->ven.getPos().z / (10 / 3.f);
         }
     }
-    if (x == -1 || y == -1)
+    if (y < 0 || x < 0)
+        return;
+    if (y >= static_cast<int>(map.size()) || x >= static_cast<int>(map[y].size()))
         return;
     for (size_t j = 0; j < map[y][x].size(); j++)
         if (map[y][x][j].type == ressource) {
@@ -364,7 +368,9 @@ void ServerInformations::dropRessource(const std::string &name, int ressource)
             y = it->ven.getPos().z / (10 / 3.f);
         }
     }
-    if (x == -1 || y == -1)
+    if (y < 0 || x < 0)
+        return;
+    if (y >= static_cast<int>(map.size()) || x >= static_cast<int>(map[y].size()))
         return;
     Mateyak::Vec2f pos = {static_cast<float>(x), static_cast<float>(y)};
     map[y][x].emplace_back(pos, ressource);
