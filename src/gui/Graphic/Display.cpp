@@ -128,13 +128,11 @@ void Graphic::drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam)
             playerSelected = i;
         }
     }
-    if (playerSelected == -1) {
-//        if (players.size() > 0)
-//            players[0]->ven.setState(Player::STATE::NONE);
-        //std::cout << "No player selected" << std::endl;
+
+    if (playerSelected != -1 || cam.lastSelectedPlayer == -1)
+        cam.lastSelectedPlayer = playerSelected;
+    if (cam.lastSelectedPlayer == -1)
         return;
-    }
-//    players[playerSelected]->ven.setState(Player::STATE::EGGHATCHING);
 
     // Display player information
     float boxPosY = _windowHeight - _windowHeight / 3 - 30;
@@ -143,21 +141,23 @@ void Graphic::drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam)
     float boxHeight = _windowHeight / 3 + 20;
     const Color white = {255, 255, 255, 255};
 
+    // Get player inventory
+    _serverInformations.addCommand(std::string("pin #" + std::to_string(cam.lastSelectedPlayer) + "\n"));
 
     Mateyak::Window::drawBox(boxPosX, boxPosY, boxWidth, boxHeight, {0, 39, 97, 94});
-    Mateyak::Vec2f position = _serverInformations.getPlayers()[playerSelected]->_position;
+    Mateyak::Vec2f position = _serverInformations.getPlayers()[cam.lastSelectedPlayer]->_position;
 
-    // Name
-    Mateyak::Window::draw("Player: " + _serverInformations.getPlayers()[playerSelected]->getName() + " on tile (" + std::to_string((int)position.x) + ", " + std::to_string((int)position.y) + ")", boxPosX + 20, boxPosY + 20, 25, white);
+    // Name + Position
+    Mateyak::Window::draw("Player: " + _serverInformations.getPlayers()[cam.lastSelectedPlayer]->getName() + " on tile (" + std::to_string((int)position.x) + ", " + std::to_string((int)position.y) + ")", boxPosX + 20, boxPosY + 20, 25, white);
 
     // Team
-    Mateyak::Window::draw("Team: " + _serverInformations.getPlayers()[playerSelected]->getTeam().getName(), boxPosX + 20, boxPosY + 50, 25, white);
+    Mateyak::Window::draw("Team: " + _serverInformations.getPlayers()[cam.lastSelectedPlayer]->getTeam().getName(), boxPosX + 20, boxPosY + 50, 25, white);
 
     // Level
-    Mateyak::Window::draw("Level: " + std::to_string(_serverInformations.getPlayers()[playerSelected]->getLevel()), boxPosX + 20, boxPosY + 80, 25, white);
+    Mateyak::Window::draw("Level: " + std::to_string(_serverInformations.getPlayers()[cam.lastSelectedPlayer]->getLevel()), boxPosX + 20, boxPosY + 80, 25, white);
 
     // Inventory
-    std::array<int, 7> inventory = _serverInformations.getPlayers()[playerSelected]->getInventory();
+    std::array<int, 7> inventory = _serverInformations.getPlayers()[cam.lastSelectedPlayer]->getInventory();
     boxPosY += 130;
     for (size_t i = 0; i < inventory.size(); i++) {
         Color color = Ressource::clr[i];

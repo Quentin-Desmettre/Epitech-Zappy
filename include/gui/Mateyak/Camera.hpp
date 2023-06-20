@@ -33,6 +33,7 @@ namespace Mateyak
             int _state;
             Vec2f _lastClickPos {-1, -1};
             Vec3f _lastClickDir {-1, -1, -1};
+            int lastSelectedPlayer = -1;
 
         private:
             Vec2f _oldCamPos;
