@@ -18,10 +18,11 @@ Venom::Venom(Mateyak::Vec2f pos, Mateyak::Vec2f mapSize, Color clr): mapSize(map
     _clr(clr)
 {
     rnd = {rand() % 100 / 100.f - 0.5f, 0, rand() % 100 / 100.f - 0.5f};
-    _pos = {(pos.x * 10 + 5) / 3.F, 0.75, (pos.y * 10 + 5) / 3.F};
+    _pos = {(pos.x * 10 + 5) / 3.F, 3, (pos.y * 10 + 5) / 3.F};
     _nextPosition = _pos;
+    _nextPosition.y = 0.75;
     level = 1;
-    state = Player::STATE::NONE;
+    state = Player::STATE::SPAWNING;
 }
 
 Venom::~Venom()
@@ -94,7 +95,7 @@ void Venom::move_ven(Camera camera)
     if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_RIGHT)) {
         vec = {camera.position.x - camera.target.x, 0, camera.position.z - camera.target.z};
         vec = vec.Normalize();
-        vec = vec * Mateyak::Window::timePass * 10.0;
+        vec = vec * Mateyak::Window::time * 15.0;
     }
     if (IsKeyDown(KEY_UP)) {
         _pos.x -= vec.x;
@@ -120,7 +121,12 @@ void Venom::move_ven(Camera camera)
     }
 }
 
-void Venom::move_ven()
+bool sameSign(float a, float b)
+{
+    return (a >= 0) ^ (b < 0);
+}
+
+void Venom::move_ven(int timeunit)
 {
     float norm = 0;
     Vector3 vec;
@@ -129,16 +135,15 @@ void Venom::move_ven()
         return;
     }
     vec = {_nextPosition.x - _pos.x, _pos.y, _nextPosition.z - _pos.z};
+    norm = sqrt(pow(vec.x, 2) + pow(vec.z, 2));
     if (std::abs(vec.x) > 3.334 || std::abs(vec.z) > 3.334) {
         vec = {-vec.x, vec.y, -vec.z};
     }
-    norm = sqrt(pow(vec.x, 2) + pow(vec.z, 2));
-
     if (norm < 0.1) {
         _pos = _nextPosition;
     } else {
-        _pos.x += vec.x / norm / 20.f;
-        _pos.z += vec.z / norm / 20.f;
+        _pos.x += (vec.x / norm) * Mateyak::Window::timePass * 22.0 * (timeunit / 100.0);
+        _pos.z += (vec.z / norm) * Mateyak::Window::timePass * 22.0 * (timeunit / 100.0);
     }
     if (_pos.x > mapSize.x * 10 / 3) {
         _pos.x -= mapSize.x * 10 / 3;
@@ -154,9 +159,8 @@ void Venom::move_ven()
     }
 }
 
-void Venom::draw_ven(int seed, const Mateyak::Camera& camera, int timeUnit)
+void Venom::draw_ven(int seed, const Mateyak::Camera& camera)
 {
-    std::cout << "timeUnit:" << timeUnit << std::endl;
     c_pos = camera._position;
     if (Utils::differenceAngle((c_pos - camera._target).Normalize(), (c_pos - _pos).Normalize()) > 45)
         return;
@@ -177,7 +181,6 @@ void Venom::draw_ven(int seed, const Mateyak::Camera& camera, int timeUnit)
     for (int i = minY; i <= maxY; i++) {
         for (int j = minX; j <= maxX; j++) {
             for (auto &it : feet_pos[j][i]) {
-//                DrawSphere(it, 0.2q, RED);
                 if ((it - _pos).len() < DIS) {
                     Draw_leg(it, seed + i * 1000);
                 }
@@ -197,7 +200,8 @@ Mateyak::Vec3f &Venom::getPosition()
     return _pos;
 }
 
-void Venom::setNextPos(const Mateyak::Vec3f &pos) {
+void Venom::setNextPos(const Mateyak::Vec3f &pos)
+{
     _pos = _nextPosition;
     _nextPosition = {(pos.x * 10 + 5) / 3.F, _pos.y, (pos.y * 10 + 5) / 3.F};
 }

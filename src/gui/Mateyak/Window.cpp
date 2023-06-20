@@ -2,6 +2,8 @@
 #include "Mateyak/Audio.hpp"
 
 double Mateyak::Window::timePass = 0;
+double Mateyak::Window::time = GetTime();
+
 
 Font Mateyak::Window::_font = GetFontDefault();
 
@@ -62,7 +64,8 @@ void Mateyak::Window::drawBox(float posX, float posY, float width, float height,
 
 void Mateyak::Window::startDrawing(Color color)
 {
-    timePass = GetFrameTime();
+    timePass = GetTime() - time;
+    time = GetTime();
     BeginDrawing();
     ClearBackground(color);
 }
