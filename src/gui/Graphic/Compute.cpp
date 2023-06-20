@@ -26,7 +26,6 @@ Graphic::Graphic(Mateyak::Vec2f mapSize, Mateyak::Vec2f windowSize, ServerInform
     _windowWidth(windowSize.x), _windowHeight(windowSize.y),
     _mapSize(mapSize),
     _win(_windowWidth, _windowHeight, "Zappy", 400),
-    _cam({5.0f, 5.0f, 5.0f}, {0.0f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, 45.0f),
     _map(mapSize * 10, 0.5),
     _cam({0.0f, 8.0f, 0.0f}, {mapSize.x * 5 / 3.f, 0.5f, mapSize.y * 5 / 3.f}, {0.0f, 1.0f, 0.0f}, 45.0f),
     _flat(GenMeshPoly(10, 10000.0f), Mateyak::Vec3f{-500, -1, -500}, 1.0f, BLACK),
