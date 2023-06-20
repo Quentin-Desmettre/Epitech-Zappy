@@ -1,6 +1,8 @@
 #include "Mateyak/Window.hpp"
 
 double Mateyak::Window::timePass = 0;
+double Mateyak::Window::time = GetTime();
+
 
 Font Mateyak::Window::_font = GetFontDefault();
 

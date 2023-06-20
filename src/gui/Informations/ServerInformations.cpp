@@ -51,7 +51,7 @@ void ServerInformations::updatePlayer(std::unique_ptr<Player> &player)
 {
     Player::STATE state = player->getState();
     if (state == Player::STATE::NONE) {
-        player->ven.move_ven();
+        player->ven.move_ven(_timeUnit);
         return;
     }
     if (state == Player::STATE::DEAD)

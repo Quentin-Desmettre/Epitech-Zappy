@@ -16,7 +16,6 @@ void Graphic::loop()
     _map.setShader(_shader);
     bool shaderEnabled = true;
     bool drawGrid = false;
-    int timeUnit = 0;
     _shader.setUniform("shaderEnabled", shaderEnabled);
 
     while (!WindowShouldClose() && _serverInformations.isRunning()) {
@@ -40,7 +39,7 @@ void Graphic::loop()
         timeUnit = _serverInformations.getTimeUnit();
         for (auto &it : _serverInformations.getPlayers()) {
             if (!it) continue;
-            it->ven.draw_ven(seed, _cam, timeUnit);
+            it->ven.draw_ven(seed, _cam);
             _serverInformations.updatePlayer(it);
         }
         if (drawGrid) {
