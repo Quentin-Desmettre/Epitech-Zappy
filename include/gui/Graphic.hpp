@@ -23,6 +23,7 @@ class Graphic {
         void drawTileInformation(Mateyak::Window &win, Mateyak::Camera &cam);
         void drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam);
         void setMapSize(const Mateyak::Vec2f &mapSize);
+        void drawTimeUnit();
 
     private:
         ServerInformations &_serverInformations;

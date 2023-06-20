@@ -97,6 +97,10 @@ void Graphic::drawTileInformation(Mateyak::Window &win, Mateyak::Camera &cam)
 
     Mateyak::Window::draw("Tile: (" + std::to_string((int)tileX) + ", " + std::to_string((int)tileY) + ")", boxPosX + 20, boxPosY + 20, 25, {255, 255, 255, 255});
 
+    win.begin3D(cam);
+    std::cout << ((tileX) * (10 / 3.f)) << std::endl;
+    Mateyak::Window::draw({(int(tileX) * (10 / 3.f)) + 5 / 3.f , 0.3, (int(tileY) * (10 / 3.f)) + 5 / 3.f}, {10 / 3.f, 10 / 3.f}, {255, 255, 255, 100});
+    win.end3D();
     boxPosY += 30;
     for (auto &it : tileResources) {
         std::string str = it.first + ": " + std::to_string(it.second.first);
@@ -120,6 +124,7 @@ void Graphic::drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam)
 
     for (size_t i = 0; i < players.size(); i++) {
         playerPos = players[i]->ven.getPos();
+        players[i]->ven.isSelected = false;
         playerPos.y = 0.3;
         diff = ((playerPos - camPos).Normalize() - dir).len();
         len = (playerPos - camPos).len();
@@ -158,6 +163,7 @@ void Graphic::drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam)
 
     // Inventory
     std::array<int, 7> inventory = _serverInformations.getPlayers()[cam.lastSelectedPlayer]->getInventory();
+    _serverInformations.getPlayers()[cam.lastSelectedPlayer]->ven.isSelected = true;
     boxPosY += 130;
     for (size_t i = 0; i < inventory.size(); i++) {
         Color color = Ressource::clr[i];
@@ -166,4 +172,10 @@ void Graphic::drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam)
         Mateyak::Window::draw(Ressource::resourceName[i] + ": " + std::to_string(inventory[i]), boxPosX + 20, boxPosY, 15, color);
         boxPosY += 20;
     }
+}
+
+void Graphic::drawTimeUnit()
+{
+    std::string str = "Time unit: " + std::to_string(_serverInformations.getTimeUnit());
+    Mateyak::Window::draw(str, 10, 35, 25, {255, 255, 255, 255});
 }

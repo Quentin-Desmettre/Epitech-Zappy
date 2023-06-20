@@ -88,6 +88,8 @@ void ServerInformations::setTile(int x, int y, std::vector<int> values)
     int number_to_erase;
     int number_to_add;
 
+    if (x < 0 || y < 0)
+        throw std::runtime_error("Error: setTile: x or y out of range");
     if (y >= static_cast<int>(map.size()) || x >= static_cast<int>(map[y].size())) {
         throw std::runtime_error("Error: setTile: x or y out of range");
     }
@@ -345,7 +347,9 @@ void ServerInformations::takeRessource(const std::string &name, int ressource)
             break;
         }
     }
-    if (x == -1 || y == -1)
+    if (y < 0 || x < 0)
+        return;
+    if (y >= static_cast<int>(map.size()) || x >= static_cast<int>(map[y].size()))
         return;
     for (size_t j = 0; j < map[y][x].size(); j++)
         if (map[y][x][j].type == ressource) {
@@ -366,7 +370,9 @@ void ServerInformations::dropRessource(const std::string &name, int ressource)
             break;
         }
     }
-    if (x == -1 || y == -1)
+    if (y < 0 || x < 0)
+        return;
+    if (y >= static_cast<int>(map.size()) || x >= static_cast<int>(map[y].size()))
         return;
     Mateyak::Vec2f pos = {static_cast<float>(x), static_cast<float>(y)};
     map[y][x].emplace_back(pos, ressource);
@@ -404,4 +410,29 @@ std::string ServerInformations::getCommand()
     std::string res = _commandQueue.front();
     _commandQueue.pop();
     return res;
+}
+
+void ServerInformations::updateTimeUnit()
+{
+    if (IsKeyDown(KEY_UP)) {
+        _newTimeUnit = (_newTimeUnit == -1) ? _timeUnit + 1 : _newTimeUnit + 1;
+        _newTimeUnit = (_newTimeUnit < 1) ? 1 : _newTimeUnit;
+
+        _timeUnit = _newTimeUnit;
+        _lastKeyPressedTime = std::chrono::system_clock::now();
+    }
+    if (IsKeyDown(KEY_DOWN)) {
+        _newTimeUnit = (_newTimeUnit == -1) ? _timeUnit - 1 : _newTimeUnit - 1;
+        _newTimeUnit = (_newTimeUnit < 1) ? 1 : _newTimeUnit;
+
+        _timeUnit = _newTimeUnit;
+        _lastKeyPressedTime = std::chrono::system_clock::now();
+    }
+
+    long elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - _lastKeyPressedTime).count();
+    if (_newTimeUnit != -1 && elapsedTime > 1000) {
+        addCommand("sst " + std::to_string(_newTimeUnit) + "\n");
+        _newTimeUnit = -1;
+        addCommand("sgt\n");
+    }
 }

@@ -50,6 +50,7 @@ void Graphic::loop()
         drawBroadCastMessage(_win);
         drawTileInformation(_win, _cam);
         drawPlayerInformation(_win, _cam);
+        drawTimeUnit();
         _serverInformations.endComputing();
         _win.endDrawing();
     }
