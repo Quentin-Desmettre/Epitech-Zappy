@@ -378,19 +378,19 @@ ServerInformations::ServerInformations()
     if (result != FMOD_OK)
         throw std::runtime_error("FMOD error! (" + std::to_string(result) + ") " + FMOD_ErrorString(result));
 
-    result = _systemAudio->createSound("assets/sounds/broadcast.ogg", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::BROADCAST]);
+    result = _systemAudio->createSound("assets/sounds/broadcast.mp3", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::BROADCAST]);
     if (result != FMOD_OK)
         throw std::runtime_error("FMOD error! (" + std::to_string(result) + ") " + FMOD_ErrorString(result));
-    result = _systemAudio->createSound("assets/sounds/elevation_start.ogg", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::ELEVATIONSTART]);
+    result = _systemAudio->createSound("assets/sounds/elevation_start.mp3", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::ELEVATIONSTART]);
     if (result != FMOD_OK)
         throw std::runtime_error("FMOD error! (" + std::to_string(result) + ") " + FMOD_ErrorString(result));
-    result = _systemAudio->createSound("assets/sounds/elevation_end.ogg", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::ELEVATIONEND]);
+    result = _systemAudio->createSound("assets/sounds/elevation_end.mp3", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::ELEVATIONEND]);
     if (result != FMOD_OK)
         throw std::runtime_error("FMOD error! (" + std::to_string(result) + ") " + FMOD_ErrorString(result));
-    result = _systemAudio->createSound("assets/sounds/level_up.ogg", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::LEVELUP]);
+    result = _systemAudio->createSound("assets/sounds/level_up.mp3", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::LEVELUP]);
     if (result != FMOD_OK)
         throw std::runtime_error("FMOD error! (" + std::to_string(result) + ") " + FMOD_ErrorString(result));
-    result = _systemAudio->createSound("assets/sounds/new_player.ogg", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::NEWPLAYER]);
+    result = _systemAudio->createSound("assets/sounds/new_player.mp3", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::NEWPLAYER]);
     if (result != FMOD_OK)
         throw std::runtime_error("FMOD error! (" + std::to_string(result) + ") " + FMOD_ErrorString(result));
 }
