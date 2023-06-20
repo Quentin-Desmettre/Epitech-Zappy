@@ -69,7 +69,7 @@ def drop_elevation_stones(self, inventory = None, to_not_send: Objects = None):
                 if to_not_send != None and stone == to_not_send.value:
                     to_not_send = None
                 else:
-                    self.send(CommandNames.BROADCAST, "droppedø§" + self.team + "ø§" + stone + "ø§" + str(self.level))
+                    self.send(CommandNames.BROADCAST, "dropped~|" + self.team + "~|" + stone + "~|" + str(self.level))
                     sleep(self.delta)
     my_print("Dropped all stones needed to evolve.")
 
