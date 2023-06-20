@@ -342,6 +342,7 @@ void ServerInformations::takeRessource(const std::string &name, int ressource)
         if (it->getName() == name) {
             x = it->ven.getPos().x / (10 / 3.f);
             y = it->ven.getPos().z / (10 / 3.f);
+            break;
         }
     }
     if (x == -1 || y == -1)
@@ -362,6 +363,7 @@ void ServerInformations::dropRessource(const std::string &name, int ressource)
         if (it->getName() == name) {
             x = it->ven.getPos().x / (10 / 3.f);
             y = it->ven.getPos().z / (10 / 3.f);
+            break;
         }
     }
     if (x == -1 || y == -1)

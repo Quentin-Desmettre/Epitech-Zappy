@@ -195,6 +195,12 @@ Mateyak::Vec3f Venom::getPos() const
     return _pos;
 }
 
+Mateyak::Vec3f Venom::getNextPos() const
+{
+    return _nextPosition;
+}
+
+
 Mateyak::Vec3f &Venom::getPosition()
 {
     return _pos;

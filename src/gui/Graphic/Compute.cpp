@@ -21,7 +21,14 @@ void Graphic::getTeamsPlace(Mateyak::Window &win)
     _boxSize = _maxSize * (_teamNumber / 4) + (_teamNumber % 4 > 0 ? _maxSize : 0);
 }
 
-Graphic::Graphic(Mateyak::Vec2f mapSize, Mateyak::Vec2f windowSize, ServerInformations &serverInformations) :
+void Graphic::setMapSize(const Mateyak::Vec2f &mapSize)
+{
+    _mapSize = mapSize;
+    _shader.setUniform("lightsPos", {mapSize.x * 5.f / 3.f, 20.0f, mapSize.y * 5.f / 3.f});
+    _map = Map(mapSize * 10, 0.5);
+}
+
+Graphic::Graphic(const Mateyak::Vec2f &mapSize, const Mateyak::Vec2f &windowSize, ServerInformations &serverInformations) :
     _serverInformations(serverInformations),
     _windowWidth(windowSize.x), _windowHeight(windowSize.y),
     _mapSize(mapSize),

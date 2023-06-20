@@ -13,14 +13,16 @@
 
 class Graphic {
     public:
-        Graphic(Mateyak::Vec2f mapSize, Mateyak::Vec2f windowSize, ServerInformations &serverInformations);
+        Graphic(const Mateyak::Vec2f &mapSize, const Mateyak::Vec2f &windowSize, ServerInformations &serverInformations);
         ~Graphic() = default;
         void loop();
+        bool menu(std::string &ip, std::string &port);
         void drawTeams();
         void getTeamsPlace(Mateyak::Window &win);
         void drawBroadCastMessage(Mateyak::Window &win);
         void drawTileInformation(Mateyak::Window &win, Mateyak::Camera &cam);
         void drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam);
+        void setMapSize(const Mateyak::Vec2f &mapSize);
 
     private:
         ServerInformations &_serverInformations;
