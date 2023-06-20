@@ -94,7 +94,7 @@ void Venom::move_ven(Camera camera)
     if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_RIGHT)) {
         vec = {camera.position.x - camera.target.x, 0, camera.position.z - camera.target.z};
         vec = vec.Normalize();
-        vec = vec * Mateyak::Window::timePass * 10.0;
+        vec = vec * Mateyak::Window::time * 15.0;
     }
     if (IsKeyDown(KEY_UP)) {
         _pos.x -= vec.x;
@@ -120,7 +120,12 @@ void Venom::move_ven(Camera camera)
     }
 }
 
-void Venom::move_ven()
+bool sameSign(float a, float b)
+{
+    return (a >= 0) ^ (b < 0);
+}
+
+void Venom::move_ven(int timeunit)
 {
     float norm = 0;
     Vector3 vec;
@@ -129,16 +134,15 @@ void Venom::move_ven()
         return;
     }
     vec = {_nextPosition.x - _pos.x, _pos.y, _nextPosition.z - _pos.z};
+    norm = sqrt(pow(vec.x, 2) + pow(vec.z, 2));
     if (std::abs(vec.x) > 3.334 || std::abs(vec.z) > 3.334) {
         vec = {-vec.x, vec.y, -vec.z};
     }
-    norm = sqrt(pow(vec.x, 2) + pow(vec.z, 2));
-
     if (norm < 0.1) {
         _pos = _nextPosition;
     } else {
-        _pos.x += vec.x / norm / 20.f;
-        _pos.z += vec.z / norm / 20.f;
+        _pos.x += (vec.x / norm) * Mateyak::Window::timePass * 22.0 * (timeunit / 100.0);
+        _pos.z += (vec.z / norm) * Mateyak::Window::timePass * 22.0 * (timeunit / 100.0);
     }
     if (_pos.x > mapSize.x * 10 / 3) {
         _pos.x -= mapSize.x * 10 / 3;
@@ -154,7 +158,7 @@ void Venom::move_ven()
     }
 }
 
-void Venom::draw_ven(int seed, const Mateyak::Camera& camera, int timeUnit)
+void Venom::draw_ven(int seed, const Mateyak::Camera& camera)
 {
     c_pos = camera._position;
     if (Utils::differenceAngle((c_pos - camera._target).Normalize(), (c_pos - _pos).Normalize()) > 45)
@@ -176,7 +180,6 @@ void Venom::draw_ven(int seed, const Mateyak::Camera& camera, int timeUnit)
     for (int i = minY; i <= maxY; i++) {
         for (int j = minX; j <= maxX; j++) {
             for (auto &it : feet_pos[j][i]) {
-//                DrawSphere(it, 0.2q, RED);
                 if ((it - _pos).len() < DIS) {
                     Draw_leg(it, seed + i * 1000);
                 }
