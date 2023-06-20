@@ -16,8 +16,9 @@ int count_same_level(player_t *player, map_tile_t *tile, bool check_incant_id)
 
     do {
         pl = players->data;
-        if (pl->level == player->level && !pl->is_freezed &&
-        (!check_incant_id || pl->incant_id == player->incant_id))
+        if (pl->level == player->level &&
+        ((!check_incant_id && !pl->is_freezed) ||
+        (check_incant_id && pl->incant_id == player->incant_id)))
             nb_same_level++;
         players = players->next;
     } while (players != tile->players);
@@ -28,11 +29,20 @@ bool can_level_up(player_t *player, map_tile_t *tile, bool check_incant_id)
 {
     int nb_same_level = count_same_level(player, tile, check_incant_id);
 
-    if (requirements_for_level[player->level][0] < nb_same_level)
+    if (requirements_for_level[player->level][0] > nb_same_level) {
+        debug("Cannot level up, expected at least %d players of "
+            "same level, got %d\n",
+            requirements_for_level[player->level][0], nb_same_level);
         return false;
-    for (int i = 1; i < NB_RESOURCE; i++)
-        if (tile->resources[i] < requirements_for_level[player->level][i])
+    }
+    for (int i = 1; i < NB_RESOURCE; i++) {
+        if (tile->resources[i] < requirements_for_level[player->level][i]) {
+            debug("Cannot level up, expected at least %d %s, got %d\n",
+                requirements_for_level[player->level][i],
+                ressources_names[i], tile->resources[i]);
             return false;
+        }
+    }
     return true;
 }
 

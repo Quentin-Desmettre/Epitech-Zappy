@@ -90,6 +90,7 @@ void do_action(action_t *action, server_t *server)
     client_t *cli = action->cli;
     size_t len = 3;
 
+    debug("Doing action %s for player %d\n", action->data.name, cli->data->id);
     resp = action->data.handler(action, server, cli->data);
     if (resp.type == KO)
         answer = my_strdup("ko\n");

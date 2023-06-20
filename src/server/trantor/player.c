@@ -7,8 +7,9 @@
 
 #include "trantor.h"
 #include "utility/garbage_collector.h"
+#include "server.h"
 
-player_t *create_player(trantor_t *trantor, egg_t *egg)
+player_t *create_player(trantor_t *trantor, egg_t *egg, void *cli)
 {
     static int player_id = 0;
     player_t *p = my_calloc(sizeof(player_t), 1);
@@ -19,6 +20,7 @@ player_t *create_player(trantor_t *trantor, egg_t *egg)
     p->level = 1;
     p->x = egg->x;
     p->y = egg->y;
+    p->client = cli;
     p->dir = random() % NB_DIR;
     p->inventory[FOOD] = BASE_FOOD;
     p->team = egg->team;

@@ -28,22 +28,33 @@ void clear_trailing_newlines(char *str)
     }
 }
 
+char *get_debug_time_str(void)
+{
+    time_t t = time(NULL);
+    struct tm *tm = localtime(&t);
+
+    return my_asprintf("[DEBUG %02d:%02d:%02d.%03d ms ] ",
+        tm->tm_hour, tm->tm_min, tm->tm_sec,
+        (int)(clock() * 1000 / CLOCKS_PER_SEC));
+}
+
 void debug(const char *format, ...)
 {
     va_list ap;
-    char *str = NULL;
-    size_t tmp;
-    char *final_format = str_concat(&tmp, 2, "[DEBUG] ", format);
+    char *formated = NULL;
+    char *final_str;
 
     if (!*get_is_debug())
         return;
     va_start(ap, format);
-    if (vasprintf(&str, final_format, ap) == -1) {
+    if (vasprintf(&formated, format, ap) == -1) {
         perror("vasprintf");
         exit(84);
     }
     va_end(ap);
-    clear_trailing_newlines(str);
-    safe_write(2, str, strlen(str));
-    free(str);
+    final_str = get_debug_time_str();
+    str_append(&final_str, formated);
+    free(formated);
+    clear_trailing_newlines(final_str);
+    safe_write(2, final_str, strlen(final_str));
 }
