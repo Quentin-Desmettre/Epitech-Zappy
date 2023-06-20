@@ -21,6 +21,7 @@ class Graphic {
         void drawBroadCastMessage(Mateyak::Window &win);
         void drawTileInformation(Mateyak::Window &win, Mateyak::Camera &cam);
         void drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam);
+        void drawTimeUnit();
 
     private:
         ServerInformations &_serverInformations;

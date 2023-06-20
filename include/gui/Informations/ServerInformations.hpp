@@ -18,6 +18,7 @@
 #include "Ressource.hpp"
 #include <memory>
 #include <queue>
+#include <chrono>
 
 typedef std::vector<std::vector<std::vector<Ressource>>> ZappyMap;
 
@@ -79,6 +80,8 @@ class ServerInformations
         std::string getCommand();
         bool hasCommand() const;
 
+        void updateTimeUnit();
+
     private:
         Mateyak::Vec2f mapSize {0, 0};
         ZappyMap map;
@@ -87,6 +90,9 @@ class ServerInformations
         std::vector<Message> broadCastMessage{};
         std::mutex mutex;
         int _timeUnit = 0;
+        int _newTimeUnit = -1;
+        std::chrono::time_point<std::chrono::system_clock> _lastKeyPressedTime;
+
         bool _serverRunning = true;
 
         std::queue<std::string> _commandQueue;

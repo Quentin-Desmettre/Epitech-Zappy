@@ -97,5 +97,6 @@ void GuiClient::compute()
         } catch (std::exception &e) {
             std::cout << e.what() << std::endl;
         }
+        _serverInformations.updateTimeUnit();
     }
 }
