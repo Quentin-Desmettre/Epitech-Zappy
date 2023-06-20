@@ -8,6 +8,7 @@
 #include "Informations/ServerInformations.hpp"
 #include <algorithm>
 #include <iterator>
+#include <iostream>
 
 void Message::FormatMessage(int maxLineSize)
 {
@@ -354,8 +355,9 @@ void ServerInformations::audioActionsHandler(Mateyak::Camera &camera)
                     deleted = true;
                     break;
                 }
-                else
+                else {
                     std::get<2>(audio)->computeStereoAndVolume(camera._position, std::make_tuple(std::get<0>(audio), std::get<1>(audio)), (camera._target - camera._position).Normalize());
+                }
             }
         }
         if (deleted)
