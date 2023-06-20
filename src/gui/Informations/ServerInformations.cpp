@@ -89,6 +89,8 @@ void ServerInformations::setTile(int x, int y, std::vector<int> values)
     int number_to_erase;
     int number_to_add;
 
+    if (x < 0 || y < 0)
+        throw std::runtime_error("Error: setTile: x or y out of range");
     if (y >= static_cast<int>(map.size()) || x >= static_cast<int>(map[y].size())) {
         throw std::runtime_error("Error: setTile: x or y out of range");
     }
@@ -376,19 +378,19 @@ ServerInformations::ServerInformations()
     if (result != FMOD_OK)
         throw std::runtime_error("FMOD error! (" + std::to_string(result) + ") " + FMOD_ErrorString(result));
 
-    result = _systemAudio->createSound("assets/sounds/broadcast.wav", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::BROADCAST]);
+    result = _systemAudio->createSound("assets/sounds/broadcast.ogg", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::BROADCAST]);
     if (result != FMOD_OK)
         throw std::runtime_error("FMOD error! (" + std::to_string(result) + ") " + FMOD_ErrorString(result));
-    result = _systemAudio->createSound("assets/sounds/elevation_start.wav", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::ELEVATIONSTART]);
+    result = _systemAudio->createSound("assets/sounds/elevation_start.ogg", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::ELEVATIONSTART]);
     if (result != FMOD_OK)
         throw std::runtime_error("FMOD error! (" + std::to_string(result) + ") " + FMOD_ErrorString(result));
-    result = _systemAudio->createSound("assets/sounds/elevation_end.wav", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::ELEVATIONEND]);
+    result = _systemAudio->createSound("assets/sounds/elevation_end.ogg", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::ELEVATIONEND]);
     if (result != FMOD_OK)
         throw std::runtime_error("FMOD error! (" + std::to_string(result) + ") " + FMOD_ErrorString(result));
-    result = _systemAudio->createSound("assets/sounds/level_up.wav", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::LEVELUP]);
+    result = _systemAudio->createSound("assets/sounds/level_up.ogg", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::LEVELUP]);
     if (result != FMOD_OK)
         throw std::runtime_error("FMOD error! (" + std::to_string(result) + ") " + FMOD_ErrorString(result));
-    result = _systemAudio->createSound("assets/sounds/new_player.wav", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::NEWPLAYER]);
+    result = _systemAudio->createSound("assets/sounds/new_player.ogg", FMOD_DEFAULT, nullptr, &Mateyak::audios[Mateyak::action_type::NEWPLAYER]);
     if (result != FMOD_OK)
         throw std::runtime_error("FMOD error! (" + std::to_string(result) + ") " + FMOD_ErrorString(result));
 }
@@ -402,6 +404,7 @@ void ServerInformations::setIncantationLevel(const std::string &name, int level)
         }
     }
 }
+
 void ServerInformations::takeRessource(const std::string &name, int ressource)
 {
     int x = -1;
@@ -411,9 +414,12 @@ void ServerInformations::takeRessource(const std::string &name, int ressource)
         if (it->getName() == name) {
             x = it->ven.getPos().x / (10 / 3.f);
             y = it->ven.getPos().z / (10 / 3.f);
+            break;
         }
     }
-    if (x == -1 || y == -1)
+    if (y < 0 || x < 0)
+        return;
+    if (y >= static_cast<int>(map.size()) || x >= static_cast<int>(map[y].size()))
         return;
     for (size_t j = 0; j < map[y][x].size(); j++)
         if (map[y][x][j].type == ressource) {
@@ -431,9 +437,12 @@ void ServerInformations::dropRessource(const std::string &name, int ressource)
         if (it->getName() == name) {
             x = it->ven.getPos().x / (10 / 3.f);
             y = it->ven.getPos().z / (10 / 3.f);
+            break;
         }
     }
-    if (x == -1 || y == -1)
+    if (y < 0 || x < 0)
+        return;
+    if (y >= static_cast<int>(map.size()) || x >= static_cast<int>(map[y].size()))
         return;
     Mateyak::Vec2f pos = {static_cast<float>(x), static_cast<float>(y)};
     map[y][x].emplace_back(pos, ressource);
@@ -471,6 +480,31 @@ std::string ServerInformations::getCommand()
     std::string res = _commandQueue.front();
     _commandQueue.pop();
     return res;
+}
+
+void ServerInformations::updateTimeUnit()
+{
+    if (IsKeyReleased(KEY_UP)) {
+        _newTimeUnit = (_newTimeUnit == -1) ? _timeUnit + 10 : _newTimeUnit + 10;
+        _newTimeUnit = (_newTimeUnit < 1) ? 2 : _newTimeUnit;
+
+        _timeUnit = _newTimeUnit;
+        _lastKeyPressedTime = std::chrono::system_clock::now();
+    }
+    if (IsKeyReleased(KEY_DOWN)) {
+        _newTimeUnit = (_newTimeUnit == -1) ? _timeUnit - 10 : _newTimeUnit - 10;
+        _newTimeUnit = (_newTimeUnit < 1) ? 2 : _newTimeUnit;
+
+        _timeUnit = _newTimeUnit;
+        _lastKeyPressedTime = std::chrono::system_clock::now();
+    }
+
+    long elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - _lastKeyPressedTime).count();
+    if (_newTimeUnit != -1 && elapsedTime > 1000) {
+        addCommand("sst " + std::to_string(_newTimeUnit) + "\n");
+        _newTimeUnit = -1;
+        addCommand("sgt\n");
+    }
 }
 
 ServerInformations::~ServerInformations()

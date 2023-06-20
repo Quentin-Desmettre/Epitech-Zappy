@@ -15,10 +15,33 @@ if (APPLE) # Mac OS X
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-field-initializers -Wno-unused-command-line-argument")
 endif ()
 
+add_custom_target( unZip ALL)
+add_custom_command(TARGET unZip PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_SOURCE_DIR}/fmod
+        COMMAND ${CMAKE_COMMAND} -E tar xzvf ${CMAKE_SOURCE_DIR}/fmod.tar.gz
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        DEPENDS ${CMAKE_SOURCE_DIR}/fmod.tar.gz
+        COMMENT "Unpacking abc.zip"
+        VERBATIM)
+
 include_directories(include)
 include_directories(include/gui)
 include_directories(include/server)
-include_directories(fmod/include)
+
+if (APPLE)
+    include_directories(fmod/inc)
+    set(FMOD_INCLUDE_DIR "fmod/inc")
+    set(FMOD_LIBRARY "fmod/lib")
+else ()
+    include_directories(fmod/include)
+    set(FMOD_INCLUDE_DIR "fmod/include")
+    set(FMOD_LIBRARY "fmod/libs")
+endif ()
+
+set(FMOD_LIBRARIES "-lfmod")
+
+include_directories(${FMOD_INCLUDE_DIR})
+link_directories(${FMOD_LIBRARY})
 
 find_package(raylib QUIET)
 include_directories(${RAYLIB_INCLUDE_DIRS})
@@ -32,13 +55,6 @@ endif ()
 if (NOT raylib_FOUND)
     message(FATAL_ERROR "Please install raylib!\nsudo apt install libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev -y\ngit clone https://github.com/raysan5/raylib.git raylib\ncd raylib\nmkdir build && cd build\ncmake -DBUILD_SHARED_LIBS=ON ..\nmake\nsudo make install\ncd ../../\nrm -rf raylib")
 endif ()
-
-set(FMOD_INCLUDE_DIR "fmod/include")
-set(FMOD_LIBRARY "fmod/libs")
-set(FMOD_LIBRARIES "-lfmod")
-
-include_directories(${FMOD_INCLUDE_DIR})
-link_directories(${FMOD_LIBRARY})
 
 add_executable(zappy_gui
         src/gui/Map.cpp
@@ -125,8 +141,10 @@ if(MATH_LIBRARY)
 endif()
 set_target_properties(zappy_server PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
-if (NOT APPLE)
+add_dependencies(zappy_server unZip)
+add_dependencies(zappy_gui unZip)
 
+if (NOT APPLE)
 #add_executable(server_tests
 #        ./tests/server/test_tile_handling.c
 #        ./tests/server/test_tile_handling2.c

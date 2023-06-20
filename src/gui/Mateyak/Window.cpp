@@ -89,3 +89,8 @@ void Mateyak::Window::draw(const Map &map)
 {
     draw(map.getGround());
 }
+
+void Mateyak::Window::draw(const Mateyak::Vec3f& posCenter, const Mateyak::Vec2f& size, Color clr)
+{
+    DrawPlane(posCenter, {size.x, size.y}, clr);
+}

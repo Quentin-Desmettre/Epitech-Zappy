@@ -27,7 +27,7 @@ union color_u {
 
 class Map {
     public:
-        Map(Mateyak::Vec2f size, float zoom = 1.f);
+        Map(const Mateyak::Vec2f &size, float zoom = 1.f);
         void generate();
         void generateColor();
         ~Map();
