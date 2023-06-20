@@ -13,8 +13,8 @@ bool cmp_cli_food(void *cli, void *food)
     return cli == ((food_timeout_t *)food)->cli;
 }
 
-void delete_ai_from_server(server_t *server, client_t *cli,
-                            bool has_disconnect)
+void delete_ai_from_server(server_t *server,
+    client_t *cli, bool has_disconnect)
 {
     player_t *player = cli->data;
 
@@ -22,7 +22,8 @@ void delete_ai_from_server(server_t *server, client_t *cli,
         safe_write(cli->fd, "dead\n", 5);
     if (!player->is_from_egg) {
         create_egg(random() % server->trantor->width,
-                    random() % server->trantor->height, false, player->team);
+            random() % server->trantor->height,
+            false, player->team)->player_id = player->id;
     }
     for (int i = 0; i < server->action_count; i++) {
         if (server->actions[i]->cli != cli)

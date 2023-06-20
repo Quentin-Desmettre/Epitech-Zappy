@@ -21,41 +21,6 @@ const gui_cmd_t GUI_HANDLERS[] = {
         {"sst", &gui_time_change_handler},
 };
 
-/*
- * Upon connection of a GUI, send it:
- *
- * - The map size
- * - The time unit
- * - The tiles content
- * - The team names
- * - The players
- * - The eggs
- *
- */
-static char *get_gui_connected_answer(server_t *server)
-{
-    size_t len;
-    char *answer =
-    str_concat_free(&len, 7, gui_map_size_handler(server, "msz"),
-    my_strdup("\n"), gui_time_request_handler(server, "sgt"), my_strdup("\n"),
-    gui_tiles_content_handler(server, "mct"), my_strdup("\n"),
-    gui_team_names_handler(server, "tna"));
-    list_t *start = server->clients;
-    client_t *cli;
-    player_t *player;
-
-    do {
-        cli = start->data;
-        player = cli->data;
-        if (cli->state == AI)
-            str_append_free(&answer, &len, get_gui_message(PLAYER_CONNECTION,
-                player->id, player->x, player->y, player->dir,
-                player->level, player->team_name));
-        start = start->next;
-    } while (start != server->clients);
-    return answer;
-}
-
 team_t *get_team_by_name(trantor_t *trantor, const char *team)
 {
     list_t *tmp = trantor->teams;
