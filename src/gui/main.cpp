@@ -13,7 +13,7 @@ void Graphic::loop()
 {
     int seed = rand();
     int viewPos = _shader.getUniformLocation("viewPos");
-    _map.setShader(_shader);
+    _map->setShader(_shader);
     bool shaderEnabled = true;
     bool drawGrid = false;
     _shader.setUniform("shaderEnabled", shaderEnabled);
@@ -31,11 +31,11 @@ void Graphic::loop()
         _win.startDrawing();
         ClearBackground(Color{255 / 10, 255 / 20, 255 / 20, 255});
         _win.begin3D(_cam);
-        Mateyak::Window::draw(_map);
+        Mateyak::Window::draw(*_map);
         Mateyak::Window::draw(_flat);
         Venom::fpsHandler();
         _serverInformations.startComputing();
-        _map.update(_serverInformations);
+        _map->update(_serverInformations);
         for (auto &it : _serverInformations.getPlayers()) {
             if (!it) continue;
             it->ven.draw_ven(seed, _cam);
