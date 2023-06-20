@@ -18,8 +18,11 @@ std::string GuiClient::getInformations()
         bytesReceived = _socket.read_some(boost::asio::buffer(response));
         for (size_t i = 0; i < bytesReceived; i++)
             buf += response[i];
-        if (bytesReceived == 0)
+        if (bytesReceived == 0) {
+            _serverInformations.setRunning(false);
+            _loop = false;
             throw std::runtime_error("Server disconnected");
+        }
     } while (bytesReceived == 1024);
     return buf;
 }

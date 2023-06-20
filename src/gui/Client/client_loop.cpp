@@ -26,21 +26,18 @@ void GuiClient::parseOutput(std::string re) {
             {"ebo", &GuiClient::EggConnection},
             {"edi", &GuiClient::EggDeath},
             {"sgt", &GuiClient::ServerTimeUnit},
-            /*
-            {"pdr", &GuiClient::PlayerDropRessource},
             {"pgt", &GuiClient::PlayerTakeRessource},
-            {"eht", &GuiClient::EggHatching},
-            {"smg", &GuiClient::ServerMessage},
+            {"pdr", &GuiClient::PlayerDropRessource},
             {"seg", &GuiClient::ServerEndGame},
-            {"suc", &GuiClient::ServerUnknownCommand},
-            {"sbp", &GuiClient::ServerBadParameter},*/
+            /*
+                {"smg", &GuiClient::ServerMessage},
+                {"suc", &GuiClient::ServerUnknownCommand},
+                {"sbp", &GuiClient::ServerBadParameter},
+             */
     };
     std::vector<std::string> res = splitStrings(re, "\n");
 
     _serverInformations.startComputing();
-
-    for (auto &s : res)
-        std::cout << s << std::endl;
 
     for (auto &resp : res) {
         std::stringstream ss(resp);
@@ -79,28 +76,26 @@ void GuiClient::compute()
     fd_set read_fds;
     fd_set write_fds;
 
-    try {
-        while (_loop) {
-            if (!_socket.is_open())
-                break;
+    while (_loop) {
+        if (!_socket.is_open())
+            break;
             resetFds(read_fds, socket_descriptor);
             resetFds(write_fds, socket_descriptor);
             select(socket_descriptor + 1, &read_fds, &write_fds, NULL, NULL);
+        try {
             if (FD_ISSET(socket_descriptor, &read_fds)) {
                 resp = getInformations();
                 parseOutput(resp);
             }
-            if (FD_ISSET(socket_descriptor, &write_fds)) {
-                //verify _serverInformations._commandIsEmpty == false
+            if (FD_ISSET(socket_descriptor, &write_fds) && _serverInformations.hasCommand()) {
                 _serverInformations.startComputing();
+                std::string command = _serverInformations.getCommand();
                 _serverInformations.endComputing();
-                //sendCommand();
-                //_socket.write_some(boost::asio::buffer(command));
+                _socket.write_some(boost::asio::buffer(command));
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        } catch (std::exception &e) {
+            std::cout << e.what() << std::endl;
         }
-    } catch (std::exception &e) {
-        std::cout << e.what() << std::endl;
     }
-    _serverInformations.setRunning(false);
 }
