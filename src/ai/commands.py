@@ -1,6 +1,6 @@
 from enum import Enum
 from regex import Pattern, compile, match
-from src.ai.utils import on, create_command_parsers
+from src.ai.utils import on, create_command_parsers, my_print
 
 command_parsers = {}
 
@@ -16,7 +16,7 @@ class Objects(Enum):
     PLAYER = "player"
 
 
-def get_elevation_needs(current_level: int) -> dict[Objects, int]:
+def get_elevation_needs(current_level: int) -> dict[Objects, int]: # pragma: no cover
     tab = [
         {
             Objects.PLAYER: 1,
@@ -121,7 +121,7 @@ def get_regexes(cmd: CommandNames) -> list[Pattern]:
     return [compile(regex_str) for regex_str in PossibleResponsesRegex[cmd.name].value]
 
 
-class ElevationException(Exception):
+class ElevationException(Exception): # pragma: no cover
     """Exception raised to catch elevation message."""
 
     def __init__(self, msg: str) -> None:
@@ -143,6 +143,8 @@ class Command:
                 self.type = CommandNames.FORWARD
         else:
             self.type = cmd
+        if self.type not in command_parsers:
+            raise NotImplementedError("Command %s not implemented" % self.type)
         self.arg = arg
 
     def __str__(self) -> str:
@@ -179,7 +181,7 @@ class Command:
         for reg in PossibleResponsesRegex.LOOK.value:
             if match(reg, result):
                 matched = True
-        if not matched:
+        if not matched or result == "ko":
             raise ValueError("Invalid response %s for command %s" % (result, self.type))
         if result == "[]":
             return []
@@ -194,7 +196,7 @@ class Command:
         for reg in PossibleResponsesRegex.INVENTORY.value:
             if match(reg, result):
                 matched = True
-        if not matched:
+        if not matched or result == "ko":
             raise ValueError("Invalid response %s for command %s" % (result, self.type))
         result = result.strip()[1:-1].split(",")
         result = [obj.strip().split(" ") for obj in result]
@@ -253,7 +255,13 @@ class Command:
     def parse_response(self, response: str):
         if self.type not in command_parsers:
             raise NotImplementedError("Command %s not implemented" % self.type)
-        return command_parsers[self.type](self, response)
-
+        try:
+            response = command_parsers[self.type](self, response)
+            if response == "ko":
+                return None
+        except ValueError as e:
+            my_print(e)
+            return None
+        return response
 
 command_parsers = create_command_parsers(Command)

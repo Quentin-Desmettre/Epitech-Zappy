@@ -28,7 +28,7 @@ Venom::Venom(Mateyak::Vec2f pos, Mateyak::Vec2f mapSize, Color clr): mapSize(map
 
 Venom::~Venom()
 {
-    UnloadTexture(this->texture);
+    //UnloadTexture(this->texture);
 }
 
 void Venom::Draw_leg(Mateyak::Vec3f leg, int seed)

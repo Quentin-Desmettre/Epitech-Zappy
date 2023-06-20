@@ -19,6 +19,7 @@
     #include "utility/garbage_collector.h"
 
     #define INT64_MAX 9223372036854775807LL
+    #define INT32_MAX 2147483647
     #define GRAPHIC_COMMAND "GRAPHIC"
     #define ERR_NO_CMD "ko\n"
     #define AI_MAX_COMMANDS 10
@@ -226,13 +227,13 @@ void do_level_up(map_tile_t *tile, player_t *player, server_t *server);
 bool *get_is_debug(void);
 void sort_actions(server_t *server);
 
-void unfreeze_players(server_t *server, map_tile_t *tile, player_t *player);
-
-void send_to_elevated_clients(server_t *server, char *mess, player_t *player);
+void unfreeze_players(server_t *server, list_t *players);
 
 void freeze_player(player_t *player, int incant_id);
-void freeze_players(map_tile_t *tile, player_t *player);
+void freeze_players(list_t *players);
 char *get_gui_connected_answer(server_t *server);
+
+void pop_waitlist(server_t *server, client_t *cli);
 
 UNUSED static const int requirements_for_level[8][7] = {
         {}, // UNUSED

@@ -126,6 +126,8 @@ void Map::generateColor()
 
 Map::~Map()
 {
+    for (auto &_food : _foods)
+        delete _food;
 }
 
 Mateyak::Sprite Map::getMap() const
