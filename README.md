@@ -1,12 +1,12 @@
 # ZAPPY - EPITECH 2022-2023
 
 ### Authors
-- [**Quentin Desmettre**]
-- [**Paulin Leclercq**]
-- [**Edgar Lecuyer**]
-- [**Ewen Talleux**]
-- [**Noa Trachez**]
-- [**Clément Vandeville**]
+- [**Quentin Desmettre**](https://github.com/Quentin-Desmettre)
+- [**Paulin Leclercq**](https://github.com/Paulin-Leclercq)
+- [**Edgar Lecuyer**](https://github.com/EdgarLec)
+- [**Ewen Talleux**](https://github.com/TalleuxEwen)
+- [**Noa Trachez**](https://github.com/Noa-Trachez)
+- [**Clément Vandeville**](https://github.com/MajicBiche)
 
 ### Description
 Zappy is a project that aims to create a game in which you have to survive on a planet with your team. You will have to collect resources, food in order to evolve or to be the last team alive.
