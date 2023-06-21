@@ -88,10 +88,16 @@ void Graphic::DrawIp(std::string &ip, int &textActive)
 bool Graphic::menu(std::string &ip, std::string &port, bool isError) {
     Image startImage = LoadImage("assets/GuiMenu/start.png");
     Image quitImage = LoadImage("assets/GuiMenu/quit.png");
+    Image controlsImage = LoadImage("assets/GuiMenu/controls.png");
+    Image controlMenu = LoadImage("assets/GuiMenu/menu.png");
     Image bg = LoadImage("assets/GuiMenu/vid.gif");
+
+
 
     ImageResize(&startImage, 120, 50);
     ImageResize(&quitImage, 120, 50);
+    ImageResize(&controlsImage, 120, 50);
+    ImageResize(&controlMenu, _windowWidth, _windowHeight);
     std::vector<Texture2D> textures;
     std::vector<Vector2> positions;
     std::vector<std::string> functions;
@@ -107,6 +113,15 @@ bool Graphic::menu(std::string &ip, std::string &port, bool isError) {
     textures.emplace_back(LoadTextureFromImage(quitImage));
     positions.emplace_back(Vector2{_windowWidth / 2 - textures[2].width / 2 + 150, _windowHeight / 2 + 40});
     functions.emplace_back("quit");
+
+    textures.emplace_back(LoadTextureFromImage(controlsImage));
+    positions.emplace_back(Vector2{30, 30});
+    functions.emplace_back("help");
+
+    textures.emplace_back(LoadTextureFromImage(controlMenu));
+    positions.emplace_back(Vector2{0, 0});
+    functions.emplace_back("none");
+
     float scale = 1.f;
     int textActive = 0;
 
@@ -115,7 +130,19 @@ bool Graphic::menu(std::string &ip, std::string &port, bool isError) {
     while (!WindowShouldClose() && loop) {
         _win.startDrawing();
         ClearBackground(BLACK);
+
+        if (onControlMenu) {
+            DrawTextureEx(textures[4], positions[4], 0.0f, scale, WHITE);
+            if (IsKeyPressed(KEY_BACKSPACE)) {
+                onControlMenu = false;
+            }
+            _win.endDrawing();
+            continue;
+        }
+
         for (size_t i = 0; i < textures.size(); i++) {
+            if (i == 4) continue;
+
             Color spriteTint = WHITE;
             bool isMouseOnSprite = CheckCollisionPointRec(GetMousePosition(),
             {positions[i].x, positions[i].y, static_cast<float>(textures[i].width), static_cast<float>(textures[i].height)});
@@ -131,6 +158,9 @@ bool Graphic::menu(std::string &ip, std::string &port, bool isError) {
                         }
                         if (functions[i] == "quit") {
                             loop = false;
+                        }
+                        if (functions[i] == "help") {
+                            onControlMenu = true;
                         }
                     }
                     else

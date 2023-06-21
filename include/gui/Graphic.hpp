@@ -50,6 +50,8 @@ private:
         FMOD::Channel *_channel;
         bool shaderEnabled;
         bool drawGrid;
+
+        bool onControlMenu = false;
 };
 
 #endif //EPITECH_ZAPPY_GRAPHIC_HPP
