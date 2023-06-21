@@ -9,9 +9,6 @@
 class Venom
 {
 private:
-    Model models;
-    Mesh mesh;
-    Texture2D texture;
     Mateyak::Vec3f _pos;
     Mateyak::Vec3f _nextPosition;
     Mateyak::Vec3f c_pos;
@@ -21,7 +18,6 @@ private:
     int level;
     int state;
     static int nbLegs;
-    static int nbBigLegs;
     static int circlePerLeg;
     static int pointPerCircle;
     static bool usePerlin;

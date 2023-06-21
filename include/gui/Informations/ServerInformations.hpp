@@ -85,11 +85,13 @@ class ServerInformations
         bool hasCommand() const;
 
         void updateTimeUnit();
+        void setWinner(const std::string &teamName);
 
     private:
         FMOD::System *_systemAudio;
         Mateyak::Vec2f mapSize {0, 0};
         ZappyMap map;
+        std::string _winner;
         std::vector<Team> teams{};
         std::vector<std::unique_ptr<Player>> players{};
         std::vector<Message> broadCastMessage{};

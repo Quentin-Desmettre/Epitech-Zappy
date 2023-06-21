@@ -9,9 +9,6 @@
 #include "Utils3d.hpp"
 #include "ErrorHandling.hpp"
 
-#define MAX_PORT_LENGTH 6
-#define MAX_IP_LENGTH 16
-
 void Graphic::loop()
 {
     int seed = rand();
@@ -51,126 +48,14 @@ void Graphic::loop()
         _serverInformations.audioActionsHandler(_cam);
         DrawFPS(10, 10);
         drawTeams();
-        drawBroadCastMessage(_win);
-        drawTileInformation(_win, _cam);
-        drawPlayerInformation(_win, _cam);
+        drawBroadCastMessage();
+        drawTileInformation(_cam);
+        drawPlayerInformation(_cam);
         drawTimeUnit();
         _serverInformations.updateTimeUnit();
         _serverInformations.endComputing();
         _win.endDrawing();
     }
-}
-
-void Graphic::DrawPort(std::string &port, int &textActive)
-{
-    if (textActive == 1) {
-        if (IsKeyPressed(KEY_BACKSPACE)) {
-            if (!port.empty()) port.erase(port.size() - 1);
-        }
-        int key = GetCharPressed();
-        if ((key > 0) && ((key >= '0' && key <= '9'))) {
-            if (textActive == 1 && port.size() < MAX_PORT_LENGTH - 1)
-                port += (char)key;
-        }
-    }
-
-    DrawText("Enter a port:", 10, 10, 20, DARKGRAY);
-    DrawRectangleLines(10, 40, _charSize.x * MAX_PORT_LENGTH, _charSize.y, DARKGRAY);
-    DrawText((port + (textActive == 1 ? '|' : '\0')).c_str(), 15, 40, 20, MAROON);
-}
-
-void Graphic::DrawIp(std::string &ip, int &textActive)
-{
-    if (textActive == 2) {
-        if (IsKeyPressed(KEY_BACKSPACE)) {
-            if (!ip.empty()) ip.erase(ip.size() - 1);
-        }
-        int key = GetCharPressed();
-        if ((key > 0) && ((key >= '0' && key <= '9') || key == '.')) {
-            if (ip.size() < MAX_IP_LENGTH - 1)
-                ip += (char)key;
-        }
-    }
-
-    DrawText("Enter a ip:", 10, 100, 20, DARKGRAY);
-    DrawRectangleLines(10, 130, _charSize.x * MAX_IP_LENGTH, _charSize.y, DARKGRAY);
-    DrawText((ip + (textActive == 2 ? '|' : '\0')).c_str(), 15, 130, 20, MAROON);
-}
-
-bool Graphic::menu(std::string &ip, std::string &port, bool isError) {
-    Image image = LoadImage("assets/GuiMenu/button.png");
-    Image bg = LoadImage("assets/GuiMenu/vid.gif");
-    ImageResize(&image, 200, 100);
-    std::vector<Texture2D> textures;
-    std::vector<Vector2> positions;
-    std::vector<std::string> functions;
-
-    textures.emplace_back(LoadTextureFromImage(bg));
-    positions.emplace_back(Vector2{0, 0});
-    functions.emplace_back("none");
-
-    textures.emplace_back(LoadTextureFromImage(image));
-    positions.emplace_back(Vector2{_windowWidth / 2 - textures[1].width / 2, _windowHeight / 1.4f - textures[1].height / 2});
-    functions.emplace_back("start");
-
-    textures.emplace_back(LoadTextureFromImage(image));
-    positions.emplace_back(Vector2{_windowWidth / 2 - textures[2].width / 2, _windowHeight / 1.4f - textures[2].height / 2 + 150});
-    functions.emplace_back("quit");
-    float scale = 1.f;
-    int textActive = 0;
-
-    int loop = true;
-
-    while (!WindowShouldClose() && loop) {
-        _win.startDrawing();
-        ClearBackground(BLACK);
-        for (size_t i = 0; i < textures.size(); i++) {
-            Color spriteTint = WHITE;
-            bool isMouseOnSprite = CheckCollisionPointRec(GetMousePosition(),
-            {positions[i].x, positions[i].y, static_cast<float>(textures[i].width), static_cast<float>(textures[i].height)});
-
-            if (functions[i] != "none") {
-                if (isMouseOnSprite) {
-                    if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-                        spriteTint = RED;
-                    } else if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
-                        if (functions[i] == "start") {
-                            _win.endDrawing();
-                            return true;
-                        }
-                        if (functions[i] == "quit") {
-                            loop = false;
-                        }
-                    }
-                    else
-                        spriteTint = YELLOW;
-                } else {
-                    spriteTint = WHITE;
-                }
-            }
-            DrawTextureEx(textures[i], positions[i], 0.0f, scale, spriteTint);
-        }
-
-        if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
-            bool isMouseOnRec = CheckCollisionPointRec(GetMousePosition(),
-            {20, 40, static_cast<float>(_charSize.x * MAX_PORT_LENGTH), _charSize.y});
-            textActive = isMouseOnRec;
-            bool isMouseOnRec2 = CheckCollisionPointRec(GetMousePosition(),
-            {20, 130, static_cast<float>(_charSize.x * MAX_IP_LENGTH), _charSize.y});
-            textActive = isMouseOnRec2 ? 2 : textActive;
-        }
-        DrawPort(port, textActive);
-        DrawIp(ip, textActive);
-        if (isError == 1) {
-            DrawText("Please verify the ip and port\nAnd if the server is launch", 10, 200, 20, RED);
-        }
-        _win.endDrawing();
-    }
-
-    for (auto &sprite : textures) {
-        UnloadTexture(sprite);
-    }
-    return false;
 }
 
 void run_with_parameter(int ac, char **av)

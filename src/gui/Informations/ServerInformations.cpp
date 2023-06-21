@@ -286,6 +286,12 @@ void ServerInformations::EggDeath(const std::string &eggName)
 
 void ServerInformations::setTimeUnit(int timeUnit)
 {
+    if (timeUnit <= 0)
+        throw std::runtime_error("Time unit can't be negative or null");
+    if (timeUnit > 200) {
+        addCommand("sst 200\n");
+        addCommand("sgt\n");
+    }
     _timeUnit = timeUnit;
 }
 
@@ -486,8 +492,7 @@ void ServerInformations::updateTimeUnit()
 {
     if (IsKeyReleased(KEY_UP)) {
         _newTimeUnit = (_newTimeUnit == -1) ? _timeUnit + 10 : _newTimeUnit + 10;
-        _newTimeUnit = (_newTimeUnit < 1) ? 2 : _newTimeUnit;
-
+        _newTimeUnit = (_newTimeUnit > 200) ? 200 : _newTimeUnit;
         _timeUnit = _newTimeUnit;
         _lastKeyPressedTime = std::chrono::system_clock::now();
     }
@@ -505,6 +510,11 @@ void ServerInformations::updateTimeUnit()
         _newTimeUnit = -1;
         addCommand("sgt\n");
     }
+}
+
+void ServerInformations::setWinner(const std::string &teamName)
+{
+    _winner = teamName;
 }
 
 ServerInformations::~ServerInformations()

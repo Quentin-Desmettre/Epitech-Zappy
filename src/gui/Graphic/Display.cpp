@@ -25,16 +25,13 @@ void Graphic::drawTeams()
     }
 }
 
-void Graphic::drawBroadCastMessage(Mateyak::Window &win)
+void Graphic::drawBroadCastMessage()
 {
     float boxPosY = _windowHeight - _windowHeight / 3 - 30;
     float boxWidth = _windowWidth / 3 - 20;
     float boxHeight = _windowHeight / 3 + 20;
 
     Mateyak::Window::drawBox(10, boxPosY, boxWidth, boxHeight, {0, 39, 97, 94});
-
-    if (_charSize.x == 0 && _charSize.y == 0)
-        _charSize = MeasureTextEx(win._font, "Z", 15, 1);
 
     int maxCharInLine;
     float maxLineNumber = (boxHeight) / (_charSize.y + 5);
@@ -64,15 +61,12 @@ void Graphic::drawBroadCastMessage(Mateyak::Window &win)
 
 }
 
-void Graphic::drawTileInformation(Mateyak::Window &win, Mateyak::Camera &cam)
+void Graphic::drawTileInformation(Mateyak::Camera &cam)
 {
     float boxPosY = _windowHeight - _windowHeight / 3 - 30;
     float boxPosX = _windowWidth - (_windowWidth / 3 - 20) - 20;
     float boxWidth = _windowWidth / 3 - 10;
     float boxHeight = _windowHeight / 3 + 20;
-
-    if (_charSize.x == 0 && _charSize.y == 0)
-        _charSize = MeasureTextEx(win._font, "Z", 15, 1);
 
     float tileY = cam._lastClickPos.y;
     float tileX = cam._lastClickPos.x;
@@ -97,9 +91,9 @@ void Graphic::drawTileInformation(Mateyak::Window &win, Mateyak::Camera &cam)
 
     Mateyak::Window::draw("Tile: (" + std::to_string((int)tileX) + ", " + std::to_string((int)tileY) + ")", boxPosX + 20, boxPosY + 20, 25, {255, 255, 255, 255});
 
-    win.begin3D(cam);
+    _win.begin3D(cam);
     Mateyak::Window::draw({(int(tileX) * (10 / 3.f)) + 5 / 3.f , 0.3, (int(tileY) * (10 / 3.f)) + 5 / 3.f}, {10 / 3.f, 10 / 3.f}, {255, 255, 255, 100});
-    win.end3D();
+    _win.end3D();
     boxPosY += 30;
     for (auto &it : tileResources) {
         std::string str = it.first + ": " + std::to_string(it.second.first);
@@ -110,7 +104,7 @@ void Graphic::drawTileInformation(Mateyak::Window &win, Mateyak::Camera &cam)
     }
 }
 
-void Graphic::drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam)
+void Graphic::drawPlayerInformation(Mateyak::Camera &cam)
 {
     int playerSelected = -1;
     float min = 0.5f;
@@ -148,7 +142,7 @@ void Graphic::drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam)
     // Get player inventory
     _serverInformations.addCommand(std::string("pin #" + std::to_string(cam.lastSelectedPlayer) + "\n"));
 
-    if (players.empty() || cam.lastSelectedPlayer >= players.size())
+    if (players.empty() || static_cast<size_t>(cam.lastSelectedPlayer) >= players.size())
         return;
 
     Mateyak::Window::drawBox(boxPosX, boxPosY, boxWidth, boxHeight, {0, 39, 97, 94});
@@ -184,6 +178,12 @@ void Graphic::drawTimeUnit()
 
 Graphic::~Graphic()
 {
+    for (auto &sprite : _textures) {
+        UnloadTexture(sprite);
+    }
+    for (auto &sprite : _menuImage) {
+        UnloadImage(sprite);
+    }
     _channel->stop();
     _sound->release();
     _system->close();
