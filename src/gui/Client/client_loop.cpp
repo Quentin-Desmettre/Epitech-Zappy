@@ -52,7 +52,9 @@ void GuiClient::parseOutput(std::string re) {
         if (commands.find(command) != commands.end()) {
             try {
                 std::invoke(commands[command], this, parameters);
-            } catch (std::exception &e) {}
+            } catch (std::exception &e) {
+                std::cerr << "Error: " << e.what() << std::endl;
+            }
         } else
             std::cout << "token: " << command << std::endl;
     }
@@ -97,7 +99,6 @@ void GuiClient::compute()
            std::this_thread::sleep_for(std::chrono::milliseconds(100));
        }
     } catch (std::exception &e) {
-        std::cout << e.what() << std::endl;
         _serverInformations.setRunning(false);
         _loop = false;
     }

@@ -6,7 +6,45 @@
 */
 
 #include "Graphic.hpp"
+#include "Utils3d.hpp"
 #include <map>
+
+bool Graphic::loop()
+{
+    int seed = rand();
+    int viewPos = _shader.getUniformLocation("viewPos");
+    _map->setShader(_shader);
+    _shader.setUniform("shaderEnabled", shaderEnabled);
+
+    while (!WindowShouldClose() && _serverInformations.isRunning()) {
+        handleEvent();
+        if (IsKeyPressed(KEY_ESCAPE))
+            return true;
+        _shader.setUniform(viewPos, _cam._position);
+        _cam.Update();
+        _win.startDrawing(Color{255 / 10, 255 / 20, 255 / 20, 255});
+        _win.begin3D(_cam);
+        Mateyak::Window::draw(*_map);
+        Mateyak::Window::draw(_flat);
+        Venom::fpsHandler();
+        if (drawGrid)
+            Utils::drawGrid(_mapSize, 10 / 3.F, {0, 0, 0});
+        _serverInformations.startComputing();
+        _map->update(_serverInformations);
+        for (auto &it : _serverInformations.getPlayers()) {
+            if (!it) continue;
+            it->ven.draw_ven(seed, _cam);
+            _serverInformations.updatePlayer(it);
+        }
+        _win.end3D();
+        _serverInformations.audioActionsHandler(_cam);
+        DrawInfo();
+        _serverInformations.updateTimeUnit();
+        _serverInformations.endComputing();
+        _win.endDrawing();
+    }
+    return !WindowShouldClose();
+}
 
 void Graphic::drawTeams()
 {

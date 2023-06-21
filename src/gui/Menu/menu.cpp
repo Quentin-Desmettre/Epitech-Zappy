@@ -65,11 +65,16 @@ void Graphic::initMenu()
     _menuImage.emplace_back(LoadImage("assets/GuiMenu/controls.png"));
     _menuImage.emplace_back(LoadImage("assets/GuiMenu/menu.png"));
 
+    for (auto &it : _menuImage)
+        if (it.data == nullptr)
+            throw std::runtime_error("Error: Could not load image");
+
     ImageResize(&_menuImage[BUTTON_START], 120, 50);
     ImageResize(&_menuImage[BUTTON_QUIT], 120, 50);
     ImageResize(&_menuImage[BUTTON_CONTROLS], 120, 50);
-    ImageResize(&_menuImage[MENU], _windowWidth, _windowHeight);
-    ImageCrop(&_menuImage[BG], Rectangle{0, 0, _windowWidth, _windowHeight});
+    ImageResize(&_menuImage[BG], static_cast<int>(_windowWidth), static_cast<int>(_windowHeight));
+    ImageResize(&_menuImage[MENU], static_cast<int>(_windowWidth), static_cast<int>(_windowHeight));
+
 
     _textures.emplace_back(LoadTextureFromImage(_menuImage[BG]));
     _positions.emplace_back(Vector2{0, 0});
@@ -125,6 +130,7 @@ bool Graphic::DrawTextMenu(int &loop)
             }
             if (_functions[i] == "help") {
                 onControlMenu = true;
+                SetExitKey(KEY_BACKSPACE);
             }
         }
 
@@ -133,19 +139,19 @@ bool Graphic::DrawTextMenu(int &loop)
     return false;
 }
 
-bool Graphic::menu(std::string &ip, std::string &port, bool isError) {
-    initMenu();
+bool Graphic::menu(std::string &ip, std::string &port, bool isError, const std::string &winner) {
     int textActive = 0;
-
     int loop = true;
 
+    initMenu();
     while (!WindowShouldClose() && loop) {
         _win.startDrawing(WHITE);
 
         if (onControlMenu) {
             DrawTextureEx(_textures[MENU], _positions[MENU], 0.0f, 1.0f, WHITE);
-            if (IsKeyPressed(KEY_BACKSPACE)) {
+            if (IsKeyDown(KEY_ESCAPE) && onControlMenu) {
                 onControlMenu = false;
+                SetExitKey(KEY_ESCAPE);
             }
             _win.endDrawing();
             continue;
@@ -167,6 +173,9 @@ bool Graphic::menu(std::string &ip, std::string &port, bool isError) {
         DrawIp(ip, textActive);
         if (isError == 1) {
             DrawText(std::string("No Zappy server found at " + ip + " : " + port + " !\nCheck if the server you are trying to reach is online !").c_str(), 20, _windowHeight - 80, 20, RED);
+        }
+        if (!winner.empty()) {
+            DrawText(winner.c_str(), _windowWidth / 2 - (winner.size() * _charSize.y) / 5, _windowHeight / 3 - 20, 20, GREEN);
         }
         _win.endDrawing();
     }
