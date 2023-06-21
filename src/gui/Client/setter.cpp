@@ -244,8 +244,8 @@ void GuiClient::PlayerIncantation(std::vector<std::string> parameters)
             continue;
 
         // TODO: Besoin de check ca ?? Pourquoi y a X Y ?
-        int posX = (*it)->ven.getPos().x / (10 / 3.f);
-        int posY = (*it)->ven.getPos().z / (10 / 3.f);
+        int posX = (*it)->ven.getNextPos().x / (10 / 3.f);
+        int posY = (*it)->ven.getNextPos().z / (10 / 3.f);
         if (posX != X || posY != Y)
             continue;
 
@@ -267,8 +267,8 @@ void GuiClient::PlayerIncantationEnd(std::vector<std::string> parameters)
     int result = std::stoi(parameters[2]);
 
     for (auto &it : _serverInformations.getPlayers()) {
-        int posX = it->ven.getPos().x / (10 / 3.f);
-        int posY = it->ven.getPos().z / (10 / 3.f);
+        int posX = it->ven.getNextPos().x / (10 / 3.f);
+        int posY = it->ven.getNextPos().z / (10 / 3.f);
 
         if (posX != X || posY != Y)
             continue;
@@ -277,7 +277,7 @@ void GuiClient::PlayerIncantationEnd(std::vector<std::string> parameters)
 
         if (result == 1) {
             _serverInformations.setPlayerState((*it).getName(), Player::STATE::NONE);
-            _serverInformations.setPlayerLevel((*it).getName(), (*it).incantationLevel);
+            _serverInformations.setPlayerLevel((*it).getName(), (*it).incantationLevel + 1);
             _serverInformations.setIncantationLevel((*it).getName(), -1);
         } else {
             _serverInformations.setPlayerState((*it).getName(), Player::STATE::NONE);
@@ -326,5 +326,11 @@ void GuiClient::PlayerDropRessource(std::vector<std::string> parameters)
 
 void GuiClient::ServerEndGame(std::vector<std::string> parameters)
 {
+    if (parameters.size() != 1) {
+        std::cerr << "ServerEndGame: invalid number of parameters" << std::endl;
+        return;
+    }
+    std::string teamName = parameters[0];
+    _serverInformations.setWinner(teamName);
     _serverInformations.setRunning(false);
 }

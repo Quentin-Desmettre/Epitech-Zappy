@@ -40,8 +40,11 @@ void send_to_gui(server_t *server, char *msg, bool free_msg)
     client_t *cli;
 
     debug("Sending to GUIs: %s\n", msg);
-    if (!tmp)
+    if (!tmp) {
+        if (free_msg)
+            my_free(msg);
         return;
+    }
     do {
         cli = (client_t *)tmp->data;
         if (cli->state == GUI)

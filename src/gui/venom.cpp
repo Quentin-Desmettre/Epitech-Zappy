@@ -146,8 +146,8 @@ void Venom::move_ven(int timeunit)
     if (norm < 0.1) {
         _pos = _nextPosition;
     } else {
-        _pos.x += (vec.x / norm) * Mateyak::Window::timePass * 22.0 * (timeunit / 100.0);
-        _pos.z += (vec.z / norm) * Mateyak::Window::timePass * 22.0 * (timeunit / 100.0);
+        _pos.x += (vec.x / norm) * Mateyak::Window::timePass * 25.0 * (timeunit / 100.0);
+        _pos.z += (vec.z / norm) * Mateyak::Window::timePass * 25.0 * (timeunit / 100.0);
     }
     if (_pos.x > mapSize.x * 10 / 3) {
         _pos.x -= mapSize.x * 10 / 3;
@@ -246,7 +246,7 @@ void Venom::fpsHandler() {
             usePerlin = false;
         }
     }
-    if (fps > 60) {
+    if (fps > 120) {
         if (!usePerlin) {
             usePerlin = true;
         } else if (circlePerLeg < 15) {
@@ -257,8 +257,6 @@ void Venom::fpsHandler() {
             pointPerCircle++;
         } else if (circlePerLeg < 30) {
             circlePerLeg++;
-        } if (nbLegs < 5) {
-            nbLegs++;
         }
     }
 }
@@ -272,7 +270,8 @@ void Venom::setLevel(int level)
     this->level = level;
 }
 
-void Venom::setState(int state) {
+void Venom::setState(int state)
+{
     this->state = state;
 }
 
