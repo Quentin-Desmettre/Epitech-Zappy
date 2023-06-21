@@ -56,5 +56,5 @@ void debug(const char *format, ...)
     str_append(&final_str, formated);
     free(formated);
     clear_trailing_newlines(final_str);
-    safe_write(2, final_str, strlen(final_str));
+    safe_write_free(2, final_str);
 }

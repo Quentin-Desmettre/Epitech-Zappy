@@ -42,14 +42,18 @@ static void clear_action(server_t *server, action_t *action,
 {
     action_t *new_action;
     struct timespec now;
+    int index;
 
     do_action(action, server);
+    for (index = 0; index < server->action_count; index++)
+        if (server->actions[index] == action)
+            break;
+    memmove(server->actions + index, server->actions + index + 1,
+        sizeof(action_t *) * (server->action_count - index - 1));
     my_free(action);
-    server->action_count--;
-    (*i)--;
     cli->data->current_action = NULL;
-    memmove(server->actions, server->actions + 1,
-        sizeof(action_t *) * server->action_count);
+    server->action_count--;
+    sort_actions(server);
     if (!cli->data->buffered_actions)
         return;
     new_action = cli->data->buffered_actions->data;
@@ -73,6 +77,7 @@ void handle_actions(server_t *server)
         if (cli->data->is_freezed)
             continue;
         clear_action(server, server->actions[i - 1], cli, &i);
+        i = 0;
         if (!cli->data->buffered_actions)
             continue;
         pop_waitlist(server, cli);

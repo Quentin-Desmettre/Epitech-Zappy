@@ -40,14 +40,31 @@ trantor_t *init_trantor(int width, int height,
     return trantor;
 }
 
-static void destroy_map(dim_list_t *map)
+static void destroy_map(dim_list_t *map, int width, int height)
 {
-    my_free(map);
+    dim_list_t *row = map;
+    dim_list_t *col;
+    dim_list_t *next;
+    map_tile_t *tile;
+
+    for (int i = 0; i < height; i++) {
+        col = row->data;
+        for (int j = 0; j < width; j++) {
+            tile = col->data;
+            my_free(tile);
+            next = col->next;
+            my_free(col);
+            col = next;
+        }
+        next = row->next;
+        my_free(row);
+        row = next;
+    }
 }
 
 void destroy_trantor(trantor_t *trantor)
 {
     free_list(&trantor->teams, destroy_team);
-    destroy_map(trantor->map);
+    destroy_map(trantor->map, trantor->width, trantor->height);
     my_free(trantor);
 }

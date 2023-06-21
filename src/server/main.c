@@ -11,10 +11,18 @@
 #include "utility/strings.h"
 #include <signal.h>
 
+server_t **get_server(void)
+{
+    static server_t *server = NULL;
+
+    return &server;
+}
+
 void handle_sig(int sig)
 {
     (void)sig;
     debug("Signal received, shutting down server\n", 38);
+    destroy_server(*get_server());
     exit(0);
 }
 
@@ -38,6 +46,7 @@ int main(int ac, char **av)
         }
         return 84;
     }
+    *get_server() = server;
     srandom(time(NULL));
     handle_all_sigs();
     run_server(server);

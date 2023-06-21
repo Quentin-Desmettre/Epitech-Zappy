@@ -37,5 +37,7 @@ void destroy_player(trantor_t *trantor, player_t *player)
     remove_if(&player->team->players, player, NULL, NULL);
     remove_if(&get_tile_by_pos(trantor->map, player->x, player->y)->players,
         player, NULL, NULL);
+    destroy_action(player->current_action);
+    free_list(&player->buffered_actions, destroy_action);
     my_free(player);
 }

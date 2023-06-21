@@ -53,7 +53,7 @@ static size_t offset_of_arg(int arg)
 static void fetch_team_names(args_t *args, int ac, char **av)
 {
     free_str_array(args->names);
-    args->names = my_calloc(1, sizeof(char *));
+    args->names = NULL;
     optind--;
     while (optind < ac && av[optind][0] != '-') {
         append_str_array(&args->names, my_strdup(av[optind]));

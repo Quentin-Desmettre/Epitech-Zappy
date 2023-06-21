@@ -40,8 +40,7 @@ int try_select(int fd_max, fd_set *read_fds,
     int ret = select(fd_max, read_fds, write_fds, NULL, timeout);
 
     if (ret == -1) {
-        perror("select");
-        exit(84);
+        return ret;
     }
     return ret;
 }
