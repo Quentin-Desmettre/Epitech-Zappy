@@ -41,7 +41,9 @@ Graphic::Graphic(const Mateyak::Vec2f &mapSize, const Mateyak::Vec2f &windowSize
     _win(_windowWidth, _windowHeight, "Zappy", 400),
     _cam({0.0f, 8.0f, 0.0f}, {mapSize.x * 5 / 3.f, 0.5f, mapSize.y * 5 / 3.f}, {0.0f, 1.0f, 0.0f}, 45.0f),
     _flat(GenMeshPoly(10, 10000.0f), Mateyak::Vec3f{-500, -1, -500}, 1.0f, BLACK),
-    _shader("src/gui/shader/base_lighting.vs", "src/gui/shader/test.fs")
+    _shader("src/gui/shader/base_lighting.vs", "src/gui/shader/test.fs"),
+    shaderEnabled(true),
+    drawGrid(false)
 {
     _map = std::make_unique<Map>(mapSize * 10, 0.5);
     _shader.setUniform("fogDensity", 0.015f);

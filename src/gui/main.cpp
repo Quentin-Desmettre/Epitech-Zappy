@@ -12,31 +12,26 @@
 #define MAX_PORT_LENGTH 6
 #define MAX_IP_LENGTH 16
 
-void Graphic::loop()
+bool Graphic::loop()
 {
     int seed = rand();
     int viewPos = _shader.getUniformLocation("viewPos");
     _map->setShader(_shader);
-    bool shaderEnabled = true;
-    bool drawGrid = false;
     _shader.setUniform("shaderEnabled", shaderEnabled);
 
     while (!WindowShouldClose() && _serverInformations.isRunning()) {
-        if (IsKeyPressed(KEY_F1)) {
-            shaderEnabled = !shaderEnabled;
-            _shader.setUniform("shaderEnabled", shaderEnabled);
-        }
-        if (IsKeyPressed(KEY_F2)) {
-            drawGrid = !drawGrid;
-        }
+        handleEvent();
+        if (IsKeyPressed(KEY_ESCAPE))
+            return true;
         _shader.setUniform(viewPos, _cam._position);
         _cam.Update();
-        _win.startDrawing();
-        ClearBackground(Color{255 / 10, 255 / 20, 255 / 20, 255});
+        _win.startDrawing(Color{255 / 10, 255 / 20, 255 / 20, 255});
         _win.begin3D(_cam);
         Mateyak::Window::draw(*_map);
         Mateyak::Window::draw(_flat);
         Venom::fpsHandler();
+        if (drawGrid)
+            Utils::drawGrid(_mapSize, 10 / 3.F, {0, 0, 0});
         _serverInformations.startComputing();
         _map->update(_serverInformations);
         for (auto &it : _serverInformations.getPlayers()) {
@@ -44,21 +39,14 @@ void Graphic::loop()
             it->ven.draw_ven(seed, _cam);
             _serverInformations.updatePlayer(it);
         }
-        if (drawGrid) {
-            Utils::drawGrid(_mapSize, 10 / 3.F, {0, 0, 0});
-        }
         _win.end3D();
+        DrawInfo();
         _serverInformations.audioActionsHandler(_cam);
-        DrawFPS(10, 10);
-        drawTeams();
-        drawBroadCastMessage(_win);
-        drawTileInformation(_win, _cam);
-        drawPlayerInformation(_win, _cam);
-        drawTimeUnit();
         _serverInformations.updateTimeUnit();
         _serverInformations.endComputing();
         _win.endDrawing();
     }
+    return false;
 }
 
 void Graphic::DrawPort(std::string &port, int &textActive)
@@ -201,6 +189,7 @@ void run_without_parameters()
     std::string port = "4242";
     Graphic graphic({0, 0}, {1920 / 1.3, 1080 / 1.3}, serverInformations);
     int needToContinue;
+    bool backMenu = false;
     bool error = false;
 
     while (true) {
@@ -213,16 +202,22 @@ void run_without_parameters()
             client.CheckValidServer();
             graphic.setMapSize(serverInformations.getMapSize());
             std::thread t(&GuiClient::compute, &client);
-            graphic.loop();
+            SetExitKey(0);
+            if (graphic.loop()) {
+                backMenu = 1;
+                SetExitKey(KEY_ESCAPE);
+            }
             client.stop();
             t.join();
         } catch (const std::exception& ex) {
             needToContinue = 1;
         }
         if (needToContinue) {
-           error = true;
+            error = true;
             continue;
         }
+        if (backMenu)
+            continue;
         return;
     }
 }
