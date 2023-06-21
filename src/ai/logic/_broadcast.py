@@ -31,29 +31,7 @@ def walk_and_loot(self, direction: Directions) -> bool:
         self.send(CommandNames.TAKE, Objects.FOOD.value)
 
 
-def add_to_uuids(self, uuid):
-    """Adds a message to the list of messages."""
-    if len(self.messages_uuids) > 1000:
-        self.messages_uuids.pop(0)
-    self.messages_uuids.append(uuid)
-
-
-def parse_message(self, msg: str, inventory = None) -> None:
-    """Parses a broadcast response."""
-    splitted = msg.split(', ')
-    direction = Directions(int(splitted[0].split(' ')[1]))
-    msg = splitted[1].strip()
-    if msg.count(self.team) == 0 and msg.count("ø") == 0:
-        self.send(CommandNames.BROADCAST, msg + "ø")
-        return
-    uuid = msg.split('|~')
-    sender = uuid[0]
-    msg = uuid[2]
-    if self.messages_uuids.count(uuid[1]) > 0 or sender == self.id:
-        if sender == self.id:
-            my_print("My message, ignoring...")
-        return
-    self.add_to_uuids(uuid[0])
+def choose_action(self, inventory, msg: str, sender: str, direction: Directions):
     if msg.count("looted") > 0 and msg.endswith(str(self.level)):
         add_to_shared_inventory(self, msg.split('~|')[2], 1)
     elif msg.count("dropped") > 0 and msg.endswith(str(self.level)):
@@ -69,3 +47,32 @@ def parse_message(self, msg: str, inventory = None) -> None:
             self.drop_elevation_stones(inventory)
         else:
             self.walk_and_loot(direction)
+
+
+def add_to_uuids(self, uuid):
+    """Adds a message to the list of messages."""
+    if len(self.messages_uuids) > 1000:
+        self.messages_uuids.pop(0)
+    self.messages_uuids.append(uuid)
+
+
+def parse_message(self, msg: str, inventory = None) -> None:
+    """Parses a broadcast response."""
+    try:
+        splitted = msg.split(', ')
+        direction = Directions(int(splitted[0].split(' ')[1]))
+        msg = splitted[1].strip()
+        if msg.count(self.team) == 0 and msg.count("ø") == 0:
+            self.send(CommandNames.BROADCAST, msg + "ø")
+            return
+        uuid = msg.split('|~')
+        sender = uuid[0]
+        msg = uuid[2]
+        if self.messages_uuids.count(uuid[1]) > 0 or sender == self.id:
+            if sender == self.id:
+                my_print("My message, ignoring...")
+            return
+        self.add_to_uuids(uuid[0])
+        self.choose_action(inventory, msg, sender, direction)
+    except:
+        my_print("Error while parsing broadcast : %s" % msg)

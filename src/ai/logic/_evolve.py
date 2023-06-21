@@ -91,7 +91,10 @@ def check_requirements(self, inventory = None, tiles = None) -> bool:
             my_print(stone.value, end=" ")
         my_print("]")
         return False
-    if ground[Objects.PLAYER.value] < 6: # temporary fix to ensure that all 6 players are on the same tile, original solution : get_elevation_needs(self.level)[Objects.PLAYER]
+    minimum = get_elevation_needs(self.level)[Objects.PLAYER]
+    if self.fast_mode:
+        minimum = 6
+    if ground[Objects.PLAYER.value] < minimum:
         my_print("Not enough players to evolve.")
         return False
     return True
