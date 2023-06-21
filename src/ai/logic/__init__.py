@@ -9,16 +9,17 @@ from src.ai.reader import Reader
 class Ai:
     """Artificial intelligence class."""
 
-    def __init__(self, server: socket, team: str) -> None:
+    def __init__(self, server: socket, team: str, fast_mode: bool = False) -> None:
         self.id = str(uuid4())
         self.leader = None
         self.team = team
-        self.shared_inventory = {}
         self.level = 1
-        self.last_movement = time()
         self.delta = 0
         self.messages_uuids = []
+        self.shared_inventory = {}
+        self.last_movement = time()
         self.can_send = True
+        self.fast_mode = fast_mode
         self.reader = Reader(server, team)
 
     def send(self, cmd: CommandNames, arg: str | None = None):
@@ -28,13 +29,13 @@ class Ai:
         return self.reader.send(cmd, arg)
 
     from ._finding import loot_object, go_to_object
-    from ._broadcast import parse_message, walk_and_loot, add_to_uuids
+    from ._broadcast import parse_message, walk_and_loot, add_to_uuids, choose_action
     from ._movement import move_randomly, go_to_direction
     from ._evolve import get_needed_stones, can_evolve, elevate, drop_elevation_stones, check_requirements, get_items_on_ground
 
     def take_food(self, inventory: dict[str, int], tiles = None):
         """Takes food from the map until the player has 20 food."""
-        my_print("Looting food")
+        my_print("Looting food", ignore_verbose=True)
         if tiles is None:
             tiles = self.send(CommandNames.LOOK)
         if tiles is None:
@@ -51,7 +52,7 @@ class Ai:
 
     def take_stones(self, inventory: dict[str, int], tiles = None):
         """Takes stones from the map until the player has all the stones needed to evolve."""
-        my_print("Looting stones")
+        my_print("Looting stones", ignore_verbose=True)
         stone = None
         sucess = False
         needed = self.get_needed_stones(inventory)

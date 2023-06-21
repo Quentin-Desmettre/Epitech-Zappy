@@ -16,13 +16,17 @@ class Colors:
 
 parser_funcs_names = []
 current_color = Colors.HEADER
+is_verbose = False
 
 
 def my_print(*values: object,
     sep: str | None = " ",
-    end: str | None = "\n") -> None:
+    end: str | None = "\n",
+    ignore_verbose = False) -> None:
     """Prints a message with a color."""
-    global current_color
+    global current_color, is_verbose
+    if not is_verbose and not ignore_verbose:
+        return
     if current_color is not None:
         print(current_color, end="")
     print(*values, sep=sep, end=end)
@@ -34,6 +38,12 @@ def set_color(color: Colors | None) -> None:
     """Sets the color for the next printed messages."""
     global current_color
     current_color = color
+
+
+def set_verbose(new_verbose: bool) -> None:
+    """Sets the color for the next printed messages."""
+    global is_verbose
+    is_verbose = new_verbose
 
 
 def on(command):
@@ -79,7 +89,7 @@ def recv_from_server(server: socket.socket) -> str:
     while not msg.endswith("\n"):
         msg += server.recv(1).decode()
     if msg == "dead\n":
-        my_print("You died")
+        my_print("You died", ignore_verbose=True)
         exit(0)
     my_print("Received: %s" % msg, end="")
     msg = msg[:-1]
