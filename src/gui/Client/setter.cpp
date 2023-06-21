@@ -17,7 +17,6 @@ void GuiClient::setMapSize(std::vector<std::string> parameters)
     int y = std::stoi(parameters[1]);
 
     _serverInformations.setMapSize(x, y);
-    std::cout << "setMapSize: " << parameters[0] << " " << parameters[1] << std::endl;
 }
 
 void GuiClient::setMapTiles(std::vector<std::string> parameters)
@@ -43,7 +42,6 @@ void GuiClient::setTeamNames(std::vector<std::string> parameters)
     }
 
     _serverInformations.addTeam(parameters[0]);
-    std::cout << "addTeamNames: " << parameters[0] << std::endl;
 }
 
 void GuiClient::NewPlayer(std::vector<std::string> parameters)

@@ -65,6 +65,10 @@ void Graphic::initMenu()
     _menuImage.emplace_back(LoadImage("assets/GuiMenu/controls.png"));
     _menuImage.emplace_back(LoadImage("assets/GuiMenu/menu.png"));
 
+    for (auto &it : _menuImage)
+        if (it.data == nullptr)
+            throw std::runtime_error("Error: Could not load image");
+
     ImageResize(&_menuImage[BUTTON_START], 120, 50);
     ImageResize(&_menuImage[BUTTON_QUIT], 120, 50);
     ImageResize(&_menuImage[BUTTON_CONTROLS], 120, 50);
@@ -135,11 +139,10 @@ bool Graphic::DrawTextMenu(int &loop)
 }
 
 bool Graphic::menu(std::string &ip, std::string &port, bool isError) {
-    initMenu();
     int textActive = 0;
-
     int loop = true;
 
+    initMenu();
     while (!WindowShouldClose() && loop) {
         _win.startDrawing(WHITE);
 

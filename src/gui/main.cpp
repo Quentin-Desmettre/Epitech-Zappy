@@ -120,10 +120,15 @@ int main(int ac, char **av)
           run_with_parameter(ac, av);
        }
     } catch (const std::exception& ex) {
-        std::cerr << "Exception: " << ex.what() << std::endl;
-        std::cout << "USAGE:\t./zappy_ai -p port -h machine" << std::endl;
-        std::cout << "\tport\tis the port number" << std::endl;
-        std::cout << "\tmachine\tis the name of the machine; localhost by default" << std::endl;
+        std::string error = ex.what();
+        if (error == "Connection failed") {
+            std::cerr << "Please verify if the server is started" << std::endl;
+        } else {
+            std::cerr << "Exception: " << ex.what() << std::endl;
+            std::cout << "USAGE:\t./zappy_ai -p port -h machine" << std::endl;
+            std::cout << "\tport\tis the port number" << std::endl;
+            std::cout << "\tmachine\tis the name of the machine; localhost by default" << std::endl;
+        }
     }
     return 0;
 }
