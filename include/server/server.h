@@ -229,6 +229,8 @@ void accept_client(server_t *server);
 void do_level_up(map_tile_t *tile, player_t *player, server_t *server);
 bool *get_is_debug(void);
 void sort_actions(server_t *server);
+void send_message(const action_t *action, server_t *server, player_t *player,
+    const client_t *client);
 
 void unfreeze_players(server_t *server, list_t *players);
 
