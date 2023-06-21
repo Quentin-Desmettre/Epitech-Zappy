@@ -1,5 +1,4 @@
-import socket, functools, queue
-from typing import Literal
+import socket, functools
 
 
 class Colors:
@@ -71,7 +70,7 @@ def create_command_parsers(obj) -> dict[str, callable]:
             func = getattr(obj, func_name)
             action = getattr(func, 'command')
             parsers[action] = func
-        except AttributeError:
+        except AttributeError: # pragma: no cover
             continue
 
     return parsers

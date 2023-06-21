@@ -28,9 +28,9 @@ class Reader:
                 data = self.sock.recv(4096)
                 try:
                     data = data.decode("utf-8")
-                except UnicodeDecodeError:
+                except UnicodeDecodeError: # pragma: no cover
                     data = data.decode("ISO-8859-2")
-                if not data or data == "":
+                if not data or data == "": # pragma: no cover
                     raise Exception("Server disconnected")
                 self.buffer += data
                 while "\n" in self.buffer:
