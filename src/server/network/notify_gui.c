@@ -63,7 +63,8 @@ char *va_get_gui_message(enum gui_event event, va_list args)
 
     if (!format_str)
         return NULL;
-    vasprintf(&msg, format_str, args);
+    if (vasprintf(&msg, format_str, args) == -1)
+        return NULL;
     dup = my_strdup(msg);
     free(msg);
     return dup;

@@ -30,23 +30,6 @@ void dim_append_node(dim_list_t **begin, void *data)
     node->under = NULL;
 }
 
-void dim_remove_node(dim_list_t **begin, int offset, void (*freer)(void *))
-{
-    dim_list_t *s = *begin;
-
-    if (!s)
-        return;
-    for (int i = 0; i < offset; i++)
-        s = s->next;
-    dim_remove_if_remove_node(begin, &s, freer);
-}
-
-void dim_free_list(dim_list_t **list, void (*freer)(void *))
-{
-    while (*list)
-        dim_remove_node(list, 0, freer);
-}
-
 int dim_list_size(dim_list_t *list, enum dimension dim)
 {
     int size = 0;
@@ -62,10 +45,4 @@ int dim_list_size(dim_list_t *list, enum dimension dim)
             s = s->over;
     } while (s != list);
     return size;
-}
-
-void dim_push_to_front(dim_list_t **begin, void *data)
-{
-    dim_append_node(begin, data);
-    *begin = (*begin)->prev;
 }

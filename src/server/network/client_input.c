@@ -39,18 +39,20 @@ static void put_in_ring_buffer(char buffer[MAX_BUFFER_SIZE + 1],
     buffer[*buf_len] = '\0';
 }
 
-static bool fetch_client_data(client_t *cli)
+static bool fetch_client_data(client_t *cli, bool *has_disconnect)
 {
     int bytes = bytes_available(cli->fd);
     char *tmp_buf;
 
-    if (bytes == 0)
+    if (bytes == 0) {
+        *has_disconnect = true;
+        return false;
+    }
+    if (bytes == -1)
         return false;
     tmp_buf = my_calloc(bytes, sizeof(char));
-    if (read(cli->fd, tmp_buf, bytes) == -1) {
-        perror("read");
-        exit(84);
-    }
+    if (read(cli->fd, tmp_buf, bytes) == -1)
+        return false;
     put_in_ring_buffer(cli->buffer, &cli->buffer_size, tmp_buf, bytes);
     my_free(tmp_buf);
     return true;
@@ -73,9 +75,13 @@ static void handle_client_input(server_t *server, client_t *cli)
 {
     char **args;
     int nb_args;
+    bool has_disconnect = false;
 
-    if (!fetch_client_data(cli))
-        return disconnect_client(server, cli, true);
+    if (!fetch_client_data(cli, &has_disconnect)) {
+        if (has_disconnect)
+            disconnect_client(server, cli, true);
+        return;
+    }
     if (strchr(cli->buffer, '\n') == NULL)
         return;
     args = split_on(cli->buffer, "\n", &nb_args);

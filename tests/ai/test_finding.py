@@ -5,6 +5,7 @@ from tests.ai.globals import ai, server
 from src.ai.logic._finding import generate_heat_map, get_path_from_index,\
 get_index_from_path, get_object_path, is_object_on_tile, go_to_object, loot_object
 from src.ai.commands import Objects, Directions
+from src.ai.utils import set_verbose
 
 
 class FindingTester(TestCase):
@@ -14,6 +15,7 @@ class FindingTester(TestCase):
         self.ai = ai
         sys.stdout = open("finding_output", "w+", buffering=1)
         self.output = open("finding_output", "r+")
+        set_verbose(True)
 
     def tearDown(self):
         global server

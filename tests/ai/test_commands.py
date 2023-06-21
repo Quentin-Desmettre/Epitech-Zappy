@@ -2,7 +2,8 @@ import sys
 from os import remove
 from unittest import TestCase
 from tests.ai.globals import ai, server
-from src.ai.commands import Objects, Directions, Command, CommandNames
+from src.ai.commands import Directions, Command, CommandNames
+from src.ai.utils import set_verbose
 
 
 class CommandTester(TestCase):
@@ -10,8 +11,9 @@ class CommandTester(TestCase):
     def setUp(self):
         global ai
         self.ai = ai
-        sys.stdout = open("finding_output", "w+", buffering=1)
-        self.output = open("finding_output", "r+")
+        sys.stdout = open("command_output", "w+", buffering=1)
+        self.output = open("command_output", "r+")
+        set_verbose(True)
 
     def tearDown(self):
         global server
@@ -19,17 +21,17 @@ class CommandTester(TestCase):
         sys.stdout.close()
         sys.stdout = sys.__stdout__
         self.output.close()
-        remove("finding_output")
+        remove("command_output")
 
     def test_invalid_commands(self):
         try:
             Command(Directions.TOP_LEFT)
-            self.fail("Invalid command did not raise exception")
+            self.fail("Invalid command did not raise exception") # pragma: no cover
         except ValueError as e:
             self.assertEqual(str(e), "Invalid direction %s" % Directions.TOP_LEFT)
         try:
             Command("azertyuiop")
-            self.fail("Invalid command did not raise exception")
+            self.fail("Invalid command did not raise exception") # pragma: no cover
         except NotImplementedError as e:
             self.assertEqual(str(e), "Command azertyuiop not implemented")
 
@@ -39,12 +41,12 @@ class CommandTester(TestCase):
             Command(Directions.LEFT)
             Command(Directions.RIGHT)
             Command(Directions.RIGHT)
-        except ValueError:
+        except ValueError: # pragma: no cover
             self.fail("Command raised exception")
         for cmd in CommandNames:
             try:
                 Command(cmd)
-            except ValueError:
+            except ValueError: # pragma: no cover
                 self.fail("Command raised exception")
 
     def test_invalid_parsers(self):

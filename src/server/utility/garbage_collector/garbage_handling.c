@@ -16,7 +16,6 @@ s_list_t **malloc_stack(void)
 
 void flush_garbage(void)
 {
-    return;
     s_list_t *next;
     s_list_t *head = *(malloc_stack());
 

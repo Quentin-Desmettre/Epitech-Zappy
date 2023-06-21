@@ -39,7 +39,7 @@ Test(ai_handlers, connect_nbr_only_one_team)
     int nb_slots = rand() % 100;
     char *nb_slots_str;
     asprintf(&nb_slots_str, "%d", nb_slots);
-    team_t *team = create_team("team1", nb_slots);
+    team_t *team = create_team("team1", nb_slots, 10, 10);
     player_t player = {.team_name = "team1", .team = team};
     ai_cmd_response_t resp = ai_connect_nbr_handler(NULL, NULL, &player);
 
@@ -66,7 +66,7 @@ Test(ai_handlers, connect_nbr_multiple_teams)
             {.team_name = "team3"}
     };
     for (int i = 0; i < 3; i++) {
-        team_t *t = create_team(players[i].team_name, nb_slots[i]);
+        team_t *t = create_team(players[i].team_name, nb_slots[i], 10, 10);
         players[i].team = t;
     }
 

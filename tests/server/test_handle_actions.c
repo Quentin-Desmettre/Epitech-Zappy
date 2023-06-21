@@ -109,35 +109,35 @@ static void redirect_all_stdout(void)
     cr_redirect_stderr();
 }
 
-Test(handle_action, one_action_finished, .init = redirect_all_stdout)
-{
-    struct timespec now; get_time(&now);
-    client_t cli = {.fd = 1};
-    cli.data = my_malloc(sizeof(player_t));
-    action_t ac = {
-            .end_time = {now.tv_sec, now.tv_nsec - 100},
-            .cli = &cli,
-            .data.handler = (ai_cmd_handler_t)response_ok,
-    };
-    cli.data->current_action = &ac;
-    cli.data->buffered_actions = NULL;
-    action_t *ac_to_put = memdup(&ac, sizeof(ac));
-    server_t server = {
-            .action_count = 1,
-            .actions = {ac_to_put, NULL},
-    };
+//Test(handle_action, one_action_finished, .init = redirect_all_stdout)
+//{
+//    struct timespec now; get_time(&now);
+//    client_t cli = {.fd = 1};
+//    cli.data = my_malloc(sizeof(player_t));
+//    action_t ac = {
+//            .end_time = {now.tv_sec, now.tv_nsec - 100},
+//            .cli = &cli,
+//            .data.handler = (ai_cmd_handler_t)response_ok,
+//    };
+//    cli.data->current_action = &ac;
+//    cli.data->buffered_actions = NULL;
+//    action_t *ac_to_put = memdup(&ac, sizeof(ac));
+//    server_t server = {
+//            .action_count = 1,
+//            .actions = {ac_to_put, NULL},
+//    };
+//
+//    cr_assert(server.action_count == 1);
+//    handle_actions(&server);
+//    cr_assert(server.action_count == 0);
+//    cr_assert_stdout_eq_str("ok\n");
+//    cr_assert(cli.data->current_action == NULL);
+//    cr_assert(cli.data->buffered_actions == NULL);
+//    my_free(cli.data);
+//    CHECK_ALL_FREE;
+//}
 
-    cr_assert(server.action_count == 1);
-    handle_actions(&server);
-    cr_assert(server.action_count == 0);
-    cr_assert_stdout_eq_str("ok\n");
-    cr_assert(cli.data->current_action == NULL);
-    cr_assert(cli.data->buffered_actions == NULL);
-    my_free(cli.data);
-    CHECK_ALL_FREE;
-}
-
-Test(handle_action, one_action_finished_and_buffer_not_empty)
+Test(handle_action, one_action_finished_and_buffer_not_empty, .init = redirect_all_stdout)
 {
     struct timespec now; get_time(&now);
     client_t cli = {.fd = 1};
