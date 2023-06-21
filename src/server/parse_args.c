@@ -63,16 +63,22 @@ static void fetch_team_names(args_t *args, int ac, char **av)
 
 bool check_opt(int opt, args_t *args, int ac, char **av)
 {
-    if (opt == '?') {
-        reset_args(args, false);
-        return false;
+    switch (opt) {
+        case '?':
+            reset_args(args, false);
+            return false;
+        case 'v':
+            *get_is_debug() = true;
+            break;
+        case 'n':
+            fetch_team_names(args, ac, av);
+            break;
+        case 'h':
+            args->help = true;
+            break;
+        default:
+            *(int *)((char *) args + offset_of_arg(opt)) = atoi(optarg);
     }
-    if (opt == 'v') {
-        *get_is_debug() = true;
-    } else if (opt == 'n') {
-        fetch_team_names(args, ac, av);
-    } else
-        *(int *)((char *) args + offset_of_arg(opt)) = atoi(optarg);
     return true;
 }
 

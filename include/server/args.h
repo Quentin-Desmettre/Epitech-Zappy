@@ -19,7 +19,7 @@
     #define DEFAULT_WIDTH 10
     #define DEFAULT_HEIGHT 10
     #define DEFAULT_SLOTS 3
-    #define ARGS_STR "p:x:y:n:c:f:v"
+    #define ARGS_STR "p:x:y:n:c:f:vh"
     #define SIZE_T_MAX ((size_t)-1)
     #define IS_FREQ_VALID(freq) ((freq) >= MIN_FREQ && (freq) <= MAX_FREQ)
 
@@ -47,6 +47,7 @@ typedef struct args {
     char **names;
     int slots;
     int freq;
+    bool help;
 } args_t;
 
 extern const arg_offset_t ARG_OFFSET[];
