@@ -166,9 +166,12 @@ Test(do_action_pre_check, pre_check_succeeded)
 
 Test(do_action, check_failed, .init = redirect_all_stdout)
 {
+    player_t player = {
+            .id = 0,
+    };
     client_t cli = {
             .fd = 1,
-            .data = NULL
+            .data = &player
     };
     action_t ac = {
             .data.handler = (ai_cmd_handler_t)&check_failed,
@@ -182,9 +185,12 @@ Test(do_action, check_failed, .init = redirect_all_stdout)
 
 Test(do_action, check_succeeded, .init = redirect_all_stdout)
 {
+    player_t player = {
+            .id = 0,
+    };
     client_t cli = {
             .fd = 1,
-            .data = NULL
+            .data = &player
     };
     action_t ac = {
             .data.handler = (ai_cmd_handler_t)&check_succeeded,
@@ -198,9 +204,12 @@ Test(do_action, check_succeeded, .init = redirect_all_stdout)
 
 Test(do_action, check_ok_string, .init = redirect_all_stdout)
 {
+    player_t player = {
+            .id = 0,
+    };
     client_t cli = {
             .fd = 1,
-            .data = NULL
+            .data = &player
     };
     action_t ac = {
             .data.handler = (ai_cmd_handler_t)&check_ok_string,

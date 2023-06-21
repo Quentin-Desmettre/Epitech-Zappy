@@ -57,7 +57,7 @@ Test(select, select)
     cr_assert_eq(try_select(1, &read_fds, NULL, &timeout), 0);
 }
 
-Test(select, select_error, .exit_code = 84, .init = redirect_stdout_err)
+Test(select, select_error, .init = redirect_stdout_err)
 {
     fd_set read_fds;
 

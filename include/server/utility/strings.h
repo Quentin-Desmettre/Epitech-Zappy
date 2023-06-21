@@ -36,7 +36,7 @@ int try_select(int fd_max, fd_set *read_fds,
                 fd_set *write_fds, struct timeval *timeout);
 bool is_timespec_less(struct timespec *t1, struct timespec *t2);
 bool is_timespec_equal(struct timespec *t1, struct timespec *t2);
-struct timespec get_end_time(int ticks, int freq, struct timespec now);
+struct timespec get_end_time(double ticks, int freq, struct timespec now);
 struct timeval timespec_diff(struct timespec a, struct timespec b);
 char *my_asprintf(const char *format, ...);
 void str_append(char **str, char *append);

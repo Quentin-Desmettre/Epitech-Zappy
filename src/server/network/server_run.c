@@ -6,7 +6,6 @@
 */
 
 #include "server.h"
-#include <stdio.h>
 #include <sys/socket.h>
 #include "utility/strings.h"
 #include <string.h>

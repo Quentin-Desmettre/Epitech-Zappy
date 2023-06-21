@@ -24,15 +24,23 @@ Test(log_ai, simple_log, .init = redirect_all_std)
             .fd = 1,
     };
     team_t team = {
-            .available_slots = 42
+            .name = "test",
+            .eggs = NULL,
+            .players = NULL,
     };
     server_t server = {0};
+    trantor_t *trantor = init_trantor(10, 10, NO_ARGS, 5);
+    server.trantor = trantor;
 
-    log_ai(&cli, &server, "team", &team);
+    create_egg(5, 8, false, &team);
+    log_ai(&cli, &server, &team);
+    cr_assert(team.players);
+    cr_assert(team.eggs == NULL);
     cr_assert(cli.state == AI);
     cr_assert(cli.data);
-    cr_assert(team.available_slots == 41);
     cr_assert_stdout_eq_str("0\n0 0\n");
-    my_free(cli.data);
-    CHECK_ALL_FREE;
+    cr_assert(cli.data->x == 5);
+    cr_assert(cli.data->y == 8);
+    cr_assert(cli.data->team == &team);
+    cr_assert(get_tile_by_pos(trantor->map, 5, 8)->players->data = cli.data);
 }

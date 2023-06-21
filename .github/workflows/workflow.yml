@@ -99,11 +99,13 @@ jobs:
 
       - name: Run tests and annotate coverage
         run: |
-          ./tests.sh
-          line_cov=$(  gcovr --exclude tests     | tail -n 2 | head -n 1 | sed -n 's/.* \([0-9]\+%$\)/\1/p')
-          branch_cov=$(gcovr --exclude tests -b  | tail -n 2 | head -n 1 | sed -n 's/.* \([0-9]\+%$\)/\1/p')
-          echo "::notice title='Line coverage'::$line_cov"
-          echo "::notice title='Branch coverage'::$branch_cov"
+          ./tests.sh > output
+          line_cov=$(  head -n 1 output | sed -n 's/.* \([0-9]\+%$\)/\1/p')
+          branch_cov=$(head -n 2 output | sed -n 's/.* \([0-9]\+%$\)/\1/p')
+          ai_cov=$(    head -n 3 output | sed -n 's/.* \([0-9]\+%$\)/\1/p')
+          echo "::notice title=Server - Line coverage::$line_cov"
+          echo "::notice title=Server - Branch coverage::$branch_cov"
+          echo "::notice title=AI - Coverage::$ai_cov"
 
       - name: Push to Epitech
         uses: pixta-dev/repository-mirroring-action@v1

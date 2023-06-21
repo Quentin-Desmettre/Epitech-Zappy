@@ -12,6 +12,8 @@
     #include "utility/garbage_collector.h"
 
     // Defaults
+    #define MIN_FREQ 1
+    #define MAX_FREQ 10000
     #define DEFAULT_PORT 4242
     #define DEFAULT_FREQ 100
     #define DEFAULT_WIDTH 10
@@ -19,7 +21,7 @@
     #define DEFAULT_SLOTS 3
     #define ARGS_STR "p:x:y:n:c:f:v"
     #define SIZE_T_MAX ((size_t)-1)
-    #define IS_FREQ_VALID(freq) ((freq) >= 2 && (freq) <= 10000)
+    #define IS_FREQ_VALID(freq) ((freq) >= MIN_FREQ && (freq) <= MAX_FREQ)
 
 extern const char *DEFAULT_TEAMS[];
 
