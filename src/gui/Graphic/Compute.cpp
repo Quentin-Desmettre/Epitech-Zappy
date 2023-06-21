@@ -9,8 +9,7 @@
 
 void Graphic::getTeamsPlace(Mateyak::Window &win)
 {
-    static bool isFirstTime = true;
-    _charSize = MeasureTextEx(win._font, "Z", isFirstTime ? 20 : 15, 1);
+    _charSize = MeasureTextEx(win._font, "Z", 15, 1);
 
     for (auto &it : _serverInformations.getTeams()) {
         it.getName();
@@ -22,7 +21,6 @@ void Graphic::getTeamsPlace(Mateyak::Window &win)
     }
     _teamNumber = _serverInformations.getTeams().size();
     _boxSize = _maxSize * (_teamNumber / 4) + (_teamNumber % 4 > 0 ? _maxSize : 0);
-    isFirstTime = false;
 }
 
 void Graphic::setMapSize(const Mateyak::Vec2f &mapSize)

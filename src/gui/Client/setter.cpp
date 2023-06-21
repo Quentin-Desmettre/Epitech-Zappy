@@ -326,5 +326,11 @@ void GuiClient::PlayerDropRessource(std::vector<std::string> parameters)
 
 void GuiClient::ServerEndGame(std::vector<std::string> parameters)
 {
+    if (parameters.size() != 1) {
+        std::cerr << "ServerEndGame: invalid number of parameters" << std::endl;
+        return;
+    }
+    std::string teamName = parameters[0];
+    _serverInformations.setWinner(teamName);
     _serverInformations.setRunning(false);
 }
