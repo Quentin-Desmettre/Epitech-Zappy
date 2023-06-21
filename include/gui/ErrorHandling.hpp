@@ -10,6 +10,7 @@
 
 #include <exception>
 #include <string>
+#include "Graphic.hpp"
 
 class ErrorHandling {
 public:
@@ -25,11 +26,16 @@ public:
     std::string getPort() const;
     std::string getIp() const;
     ~ErrorHandling() = default;
+    void RunningLoop(const std::string &ip, const std::string &port, Graphic &graphic, bool &backMenu);
+    void run_without_parameters();
+    void run_with_parameter(int ac, char **av);
+    void Run();
 private:
     int _ac;
     char **_av;
     std::string _port;
     std::string _ip;
+    ServerInformations serverInformations;
 };
 
 
