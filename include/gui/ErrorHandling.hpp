@@ -28,7 +28,7 @@ public:
     ~ErrorHandling() = default;
     void RunningLoop(const std::string &ip, const std::string &port, Graphic &graphic, bool &backMenu);
     void run_without_parameters();
-    void run_with_parameter(int ac, char **av);
+    void run_with_parameter();
     void Run();
 private:
     int _ac;

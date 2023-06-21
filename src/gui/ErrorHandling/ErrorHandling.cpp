@@ -56,11 +56,9 @@ void ErrorHandling::run_without_parameters()
     }
 }
 
-void ErrorHandling::run_with_parameter(int ac, char **av)
+void ErrorHandling::run_with_parameter()
 {
-    ErrorHandling errorHandling(ac, av);
-    errorHandling.parse();
-    GuiClient client(serverInformations, errorHandling.getIp(), errorHandling.getPort());
+    GuiClient client(serverInformations, getIp(), getPort());
     client.CheckValidServer();
     Mateyak::Vec2f mapSize = serverInformations.getMapSize();
     Graphic graphic(mapSize, {1920 / 1.3, 1080 / 1.3}, serverInformations);
@@ -119,6 +117,6 @@ void ErrorHandling::Run()
     if (_ac == 1) {
         run_without_parameters();
     } else {
-        run_with_parameter(_ac, _av);
+        run_with_parameter();
     }
 }
