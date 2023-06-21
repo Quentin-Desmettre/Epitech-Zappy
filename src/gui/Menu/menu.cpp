@@ -56,8 +56,8 @@ void Graphic::initMenu()
     _menuImage.emplace_back(LoadImage("assets/GuiMenu/button.png"));
     _menuImage.emplace_back(LoadImage("assets/GuiMenu/button.png"));
     _menuImage.emplace_back(LoadImage("assets/GuiMenu/bg.png"));
-    ImageResize(&_menuImage[BUTTON_START], 200, 100);
-    ImageResize(&_menuImage[BUTTON_QUIT], 200, 100);
+    ImageResize(&_menuImage[BUTTON_START], 120, 50);
+    ImageResize(&_menuImage[BUTTON_QUIT], 120, 50);
     ImageCrop(&_menuImage[BG], Rectangle{0, 0, _windowWidth, _windowHeight});
 
     _textures.emplace_back(LoadTextureFromImage(_menuImage[BG]));
@@ -65,11 +65,11 @@ void Graphic::initMenu()
     _functions.emplace_back("bg");
 
     _textures.emplace_back(LoadTextureFromImage(_menuImage[BUTTON_START]));
-    _positions.emplace_back(Vector2{_windowWidth / 2 - _textures[1].width / 2, _windowHeight / 1.4f - _textures[1].height / 2});
+    _positions.emplace_back(Vector2{_windowWidth / 2 - _textures[BUTTON_START].width / 2 - 80, _windowHeight / 2 + 40});
     _functions.emplace_back("start");
 
     _textures.emplace_back(LoadTextureFromImage(_menuImage[BUTTON_QUIT]));
-    _positions.emplace_back(Vector2{_windowWidth / 2 - _textures[2].width / 2, _windowHeight / 1.4f - _textures[2].height / 2 + 150});
+    _positions.emplace_back(Vector2{_windowWidth / 2 - _textures[BUTTON_QUIT].width / 2 + 150, _windowHeight / 2 + 40});
     _functions.emplace_back("quit");
     isInit = true;
 }
@@ -128,7 +128,7 @@ bool Graphic::menu(std::string &ip, std::string &port, bool isError) {
         DrawPort(port, textActive);
         DrawIp(ip, textActive);
         if (isError == 1) {
-            DrawText("Please verify the ip and port\nAnd if the server is launch", 10, 200, 20, RED);
+            DrawText(std::string("No Zappy server found at " + ip + " : " + port + " !\nCheck if the server you are trying to reach is online !").c_str(), 20, _windowHeight - 80, 20, RED);
         }
         _win.endDrawing();
     }

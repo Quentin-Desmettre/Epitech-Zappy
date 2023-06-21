@@ -17,7 +17,7 @@ class Graphic {
     public:
         Graphic(const Mateyak::Vec2f &mapSize, const Mateyak::Vec2f &windowSize, ServerInformations &serverInformations);
         ~Graphic();
-        void loop();
+        bool loop();
         bool menu(std::string &ip, std::string &port, bool isError);
         void drawTeams();
         void getTeamsPlace(Mateyak::Window &win);
@@ -30,6 +30,8 @@ class Graphic {
         void DrawIp(std::string &ip, int &textActive);
         bool DrawTextMenu(int &loop);
         void initMenu();
+        void DrawInfo();
+        void handleEvent();
 
     private:
         ServerInformations &_serverInformations;
@@ -53,6 +55,8 @@ class Graphic {
         std::vector<Texture2D> _textures{};
         std::vector<Vector2> _positions;
         std::vector<std::string> _functions;
+        bool shaderEnabled;
+        bool drawGrid;
 };
 
 #endif //EPITECH_ZAPPY_GRAPHIC_HPP
