@@ -22,35 +22,34 @@ list_t **packet_waitlist(void)
     return &list;
 }
 
-static void set_socket_blocking(int fd, bool block)
+static bool set_socket_blocking(int fd, bool block)
 {
     int flags = fcntl(fd, F_GETFL, 0);
 
     if (flags == -1) {
-        perror("fcntl");
-        exit(84);
+        return false;
     }
     if (block)
         flags &= ~O_NONBLOCK;
     else
         flags |= O_NONBLOCK;
     if (fcntl(fd, F_SETFL, flags) == -1) {
-        perror("fcntl");
-        exit(84);
+        return false;
     }
+    return true;
 }
 
 static void *try_write(int fd, const void *data, size_t size)
 {
     ssize_t res;
 
-    set_socket_blocking(fd, false);
-    res = write(fd, data, size);
-    set_socket_blocking(fd, true);
-    if (res < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
-        perror("write");
+    if (!set_socket_blocking(fd, false))
         return NULL;
-    }
+    res = write(fd, data, size);
+    if (!set_socket_blocking(fd, true))
+        return NULL;
+    if (res < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
+        return NULL;
     res = NULL_IF_NEG(res);
     if ((size_t)res != size)
         return create_packet(fd, data + res, size - res);
@@ -89,6 +88,8 @@ void safe_write(int fd, void *data, size_t size)
     FD_ZERO(&set);
     FD_SET(fd, &set);
     select_rval = try_select(fd + 1, NULL, &set, &timeout);
+    if (select_rval == -1)
+        return;
     if (select_rval == 0)
         return append_node(packet_waitlist(), create_packet(fd, data, size));
     tmp = try_write(fd, data, size);

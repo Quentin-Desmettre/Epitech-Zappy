@@ -38,12 +38,7 @@ void get_time(struct timespec *timeout)
 int try_select(int fd_max, fd_set *read_fds,
                 fd_set *write_fds, struct timeval *timeout)
 {
-    int ret = select(fd_max, read_fds, write_fds, NULL, timeout);
-
-    if (ret == -1) {
-        return ret;
-    }
-    return ret;
+    return select(fd_max, read_fds, write_fds, NULL, timeout);
 }
 
 bool is_timespec_less(struct timespec *t1, struct timespec *t2)

@@ -20,7 +20,7 @@ bool *get_is_debug(void)
 
 void clear_trailing_newlines(char *str)
 {
-    int len = strlen(str);
+    size_t len = strlen(str);
 
     while (len >= 2 && str[len - 1] == '\n' && str[len - 2] == '\n') {
         str[len - 1] = '\0';
@@ -48,8 +48,8 @@ void debug(const char *format, ...)
         return;
     va_start(ap, format);
     if (vasprintf(&formated, format, ap) == -1) {
-        perror("vasprintf");
-        exit(84);
+        va_end(ap);
+        return;
     }
     va_end(ap);
     final_str = get_debug_time_str();

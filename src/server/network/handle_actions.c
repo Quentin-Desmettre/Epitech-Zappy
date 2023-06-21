@@ -38,7 +38,7 @@ void put_action_in_waitlist(server_t *server, action_t *action)
 }
 
 static void clear_action(server_t *server, action_t *action,
-                            client_t *cli, int *i)
+                            client_t *cli)
 {
     action_t *new_action;
     struct timespec now;
@@ -76,7 +76,7 @@ void handle_actions(server_t *server)
             break;
         if (cli->data->is_freezed)
             continue;
-        clear_action(server, server->actions[i - 1], cli, &i);
+        clear_action(server, server->actions[i - 1], cli);
         i = 0;
         if (!cli->data->buffered_actions)
             continue;

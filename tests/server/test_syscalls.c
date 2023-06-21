@@ -29,9 +29,9 @@ Test(bytes_available, bytes_available)
     cr_assert_eq(bytes_available(fd), 4);
 }
 
-Test(bytes_available, bytes_available_invalid_fd, .exit_code = 84, .init = redirect_stdout_err)
+Test(bytes_available, bytes_available_invalid_fd, .init = redirect_stdout_err)
 {
-    bytes_available(-1);
+    cr_assert(bytes_available(-1) == -1);
 }
 
 Test(get_time, get_time)

@@ -89,8 +89,10 @@ add_custom_command(TARGET zappy_gui PRE_BUILD
 )
 
 add_executable(zappy_server
+        src/server/network/server_run_utils.c
         src/server/network/notify_gui.c
         src/server/network/check_food.c
+        src/server/network/gui_connected_answer.c
         src/server/network/ai_log_handler.c
         src/server/network/client.c
         src/server/network/handle_actions.c
@@ -108,8 +110,10 @@ add_executable(zappy_server
         src/server/trantor/trantor_init.c
         src/server/trantor/ai_handlers/ai_handlers2.c
         src/server/trantor/ai_handlers/incantation.c
+        src/server/trantor/ai_handlers/incantation_utils.c
         src/server/trantor/ai_handlers/ai_handlers1.c
         src/server/trantor/ai_handlers/fork.c
+        src/server/trantor/ai_handlers/ai_handlers3.c
         src/server/trantor/ai_handlers/freeze.c
         src/server/trantor/tile_handling3.c
         src/server/trantor/gui_handling/handlers2.c
@@ -117,22 +121,21 @@ add_executable(zappy_server
         src/server/trantor/gui_handling/handlers3.c
         src/server/trantor/team.c
         src/server/parse_args.c
+        src/server/check_args_validity.c
         src/server/utility/strings2.c
+        src/server/utility/debug_print.c
         src/server/utility/str_array.c
         src/server/utility/time.c
-        src/server/utility/str_to_word_array.c
         src/server/utility/str_array_2.c
         src/server/utility/linked_list/remove_if.c
-        src/server/utility/linked_list/multi_dimensional_linked_list/dim_remove_if.c
         src/server/utility/linked_list/multi_dimensional_linked_list/dim_liked_list.c
         src/server/utility/linked_list/linked_list.c
         src/server/utility/safe_write/packet.c
         src/server/utility/safe_write/my_write.c
         src/server/utility/garbage_collector/garbage_handling.c
         src/server/utility/garbage_collector/my_malloc.c
-        src/server/utility/strings.c src/server/network/server_run_utils.c src/server/trantor/ai_handlers/incantation_utils.c src/server/utility/debug_print.c
-        src/server/check_args_validity.c
-        src/server/network/gui_connected_answer.c src/server/trantor/ai_handlers/ai_handlers3.c)
+        src/server/utility/strings.c
+)
 
 find_library(MATH_LIBRARY m)
 
@@ -170,6 +173,7 @@ add_executable(server_tests
         src/server/trantor/ai_handlers/incantation_utils.c
         src/server/trantor/ai_handlers/ai_handlers1.c
         src/server/trantor/ai_handlers/fork.c
+        src/server/trantor/ai_handlers/ai_handlers3.c
         src/server/trantor/ai_handlers/freeze.c
         src/server/trantor/tile_handling3.c
         src/server/trantor/gui_handling/handlers2.c
@@ -182,10 +186,8 @@ add_executable(server_tests
         src/server/utility/debug_print.c
         src/server/utility/str_array.c
         src/server/utility/time.c
-        src/server/utility/str_to_word_array.c
         src/server/utility/str_array_2.c
         src/server/utility/linked_list/remove_if.c
-        src/server/utility/linked_list/multi_dimensional_linked_list/dim_remove_if.c
         src/server/utility/linked_list/multi_dimensional_linked_list/dim_liked_list.c
         src/server/utility/linked_list/linked_list.c
         src/server/utility/safe_write/packet.c

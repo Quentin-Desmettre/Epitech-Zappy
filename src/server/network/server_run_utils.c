@@ -15,8 +15,8 @@ void accept_client(server_t *server)
 
     cli->fd = accept(server->fd, NULL, NULL);
     if (cli->fd == -1) {
-        perror("accept");
-        exit(84);
+        my_free(cli);
+        return;
     }
     cli->state = CONNECTED;
     append_node(&server->clients, cli);

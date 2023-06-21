@@ -13,6 +13,8 @@ void *create_packet(int fd, const void *data, size_t size)
 {
     packet_t *packet = my_malloc(sizeof(packet_t));
 
+    if (!packet)
+        return NULL;
     packet->fd = fd;
     packet->data = memdup(data, size);
     packet->size = size;
