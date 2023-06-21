@@ -70,6 +70,8 @@ action_t *create_action(const char *cmd, void *client, int f)
     char *argument = strchr(cmd, ' ');
     char *cmd_name = argument ? strndup(cmd, argument - cmd) : strdup(cmd);
 
+    if (!cmd_name)
+        return NULL;
     for (int i = 0; AI_ACTIONS[i].name; i++) {
         if (strcmp(cmd_name, AI_ACTIONS[i].name) != 0)
             continue;

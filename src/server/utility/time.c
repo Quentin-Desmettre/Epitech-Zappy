@@ -5,21 +5,22 @@
 ** time
 */
 
+#include "server.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <sys/ioctl.h>
 #include "utility/strings.h"
 #include <stdbool.h>
 
-struct timespec get_end_time(int ticks, int freq, struct timespec now)
+struct timespec get_end_time(double ticks, int freq, struct timespec now)
 {
+    double duration = ticks / freq;
     struct timespec tmp = {
-            now.tv_sec + ticks / freq,
-            now.tv_nsec + (ticks % freq) * 1000000000L / freq
+            now.tv_sec + (time_t)duration,
+            now.tv_nsec + (time_t)((duration - (time_t)(duration)) * S_TO_NS)
     };
 
-    if (tmp.tv_nsec >= 1000000000L) {
+    while (tmp.tv_nsec >= 1000000000L) {
         tmp.tv_sec++;
         tmp.tv_nsec -= 1000000000L;
     }
@@ -37,12 +38,7 @@ void get_time(struct timespec *timeout)
 int try_select(int fd_max, fd_set *read_fds,
                 fd_set *write_fds, struct timeval *timeout)
 {
-    int ret = select(fd_max, read_fds, write_fds, NULL, timeout);
-
-    if (ret == -1) {
-        return ret;
-    }
-    return ret;
+    return select(fd_max, read_fds, write_fds, NULL, timeout);
 }
 
 bool is_timespec_less(struct timespec *t1, struct timespec *t2)

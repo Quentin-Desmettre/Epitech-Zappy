@@ -31,10 +31,8 @@ int bytes_available(int fd)
 {
     int bytes_available = 0;
 
-    if (ioctl(fd, FIONREAD, &bytes_available) == -1) {
-        perror("ioctl");
-        exit(84);
-    }
+    if (ioctl(fd, FIONREAD, &bytes_available) == -1)
+        return -1;
     return (bytes_available);
 }
 

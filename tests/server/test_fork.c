@@ -12,23 +12,27 @@
 
 Test(create_egg, create_two_eggs)
 {
-    team_t *team = my_calloc(sizeof(team_t), 1);
+    team_t *team = create_team("hello", 0, 10, 10);
 
-    cr_assert_eq(create_egg(team), 0);
-    cr_assert_eq(team->eggs, 1);
-    cr_assert_neq(team->egg_numbers, NULL);
-    cr_assert_eq(team->egg_numbers->next, team->egg_numbers);
-    cr_assert_eq((int)(long)team->egg_numbers->data, 0);
+    egg_t *egg = create_egg(5, 6, false, team);
+    cr_assert(egg->is_forked == false);
+    cr_assert(egg->x == 5);
+    cr_assert(egg->y == 6);
+    cr_assert(egg->team == team);
+    cr_assert(egg->id == 0);
+    cr_assert(egg->player_id == 0);
+    cr_assert(list_size(team->eggs) == 1);
+    cr_assert(team->eggs->data == egg);
 
-    cr_assert_eq(create_egg(team), 1);
-    cr_assert_eq(team->eggs, 2);
-    cr_assert_neq(team->egg_numbers->next, NULL);
-    cr_assert_eq(team->egg_numbers->next->next, team->egg_numbers);
-    cr_assert_eq((int)(long)team->egg_numbers->data, 0);
-    cr_assert_eq((int)(long)team->egg_numbers->next->data, 1);
-    my_free(team->egg_numbers->next);
-    my_free(team->egg_numbers);
-    my_free(team);
+    egg = create_egg(10, 10, true, team);
+    cr_assert(egg->is_forked == true);
+    cr_assert(egg->x == 10);
+    cr_assert(egg->y == 10);
+    cr_assert(egg->team == team);
+    cr_assert(egg->id == 1);
+    cr_assert(egg->player_id == 0);
+    cr_assert(list_size(team->eggs) == 2);
+    cr_assert(team->eggs->next->data == egg);
 }
 
 Test(ai_fork_handler, create_an_egg_and_notify_gui)
@@ -39,8 +43,6 @@ Test(ai_fork_handler, create_an_egg_and_notify_gui)
 
     player.team = team;
     cr_assert_eq(ai_fork_handler(NULL, &server, &player).type, OK);
-    my_free(team->egg_numbers);
-    my_free(team);
 }
 
 Test(ai_fork_pre_check, create_an_egg_and_notify_gui)
@@ -53,5 +55,4 @@ Test(ai_fork_pre_check, create_an_egg_and_notify_gui)
     ai_cmd_response_t resp = ai_fork_pre_check(NULL, &server, &player);
     cr_assert_eq(resp.type, TEXT);
     cr_assert_str_eq(resp.data, "");
-    my_free(team);
 }

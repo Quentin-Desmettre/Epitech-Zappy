@@ -24,9 +24,13 @@
     #define ERR_NO_CMD "ko\n"
     #define AI_MAX_COMMANDS 10
 
+    #define LEVEL_MAX 8
+    #define NB_MAX_LEVEL_TO_WIN 6
+
 // -20 In case you want to open other file descriptors
     #define MAX_CLIENTS (FD_SETSIZE - 20)
     #define MAX_BUFFER_SIZE 4096
+    #define S_TO_NS 1000000000L
 
     #define WELCOME_MESSAGE "WELCOME\n"
     #define UNUSED __attribute__((unused))
@@ -247,6 +251,9 @@ static inline void destroy_action(void *action)
     my_free((char *)((action_t *)action)->arg);
     my_free(action);
 }
+
+void update_server_freq(server_t *server, int new_freq);
+double get_action_progress(action_t *action, struct timespec now);
 
 UNUSED static const int requirements_for_level[8][7] = {
         {}, // UNUSED

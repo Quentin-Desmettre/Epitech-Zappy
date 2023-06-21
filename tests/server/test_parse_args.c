@@ -245,10 +245,6 @@ const arg_test_t tests[] = {
 
         // Too small frequency
         {
-            .args = {"./zappy_server", "-f", "1", NULL},
-            .valid = false,
-        },
-        {
             .args = {"./zappy_server", "-f", "0", NULL},
             .valid = false,
         },

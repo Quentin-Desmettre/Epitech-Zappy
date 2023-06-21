@@ -70,6 +70,6 @@ char *gui_time_change_handler(server_t *server, const char *cmd)
         return ERROR_CODE;
     if (!IS_FREQ_VALID(new_freq))
         return ERROR_CODE;
-    server->params.freq = new_freq;
-    return my_asprintf("sst %d", server->params.freq);
+    update_server_freq(server, new_freq);
+    return gui_time_request_handler(server, "sgt");
 }

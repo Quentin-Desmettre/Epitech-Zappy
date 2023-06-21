@@ -10,7 +10,7 @@
 egg_t *create_egg(int x, int y, bool is_forked, team_t *team)
 {
     static int egg_id = 0;
-    egg_t *egg = my_malloc(sizeof(egg_t));
+    egg_t *egg = my_calloc(sizeof(egg_t), 1);
 
     egg->x = x;
     egg->y = y;
