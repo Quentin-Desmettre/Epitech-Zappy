@@ -246,7 +246,7 @@ void Venom::fpsHandler() {
             usePerlin = false;
         }
     }
-    if (fps > 60) {
+    if (fps > 120) {
         if (!usePerlin) {
             usePerlin = true;
         } else if (circlePerLeg < 15) {
@@ -257,8 +257,6 @@ void Venom::fpsHandler() {
             pointPerCircle++;
         } else if (circlePerLeg < 30) {
             circlePerLeg++;
-        } if (nbLegs < 5) {
-            nbLegs++;
         }
     }
 }
