@@ -30,7 +30,7 @@ void ErrorHandling::run_without_parameters()
 {
     std::string ip = "127.0.0.1";
     std::string port = "4242";
-    Graphic graphic({0, 0}, {1920, 1080}, serverInformations);
+    Graphic graphic({0, 0}, {1920 / 1.2, 1080 / 1.2}, serverInformations);
     int needToContinue;
     bool backMenu = false;
     bool error = false;
@@ -64,7 +64,7 @@ void ErrorHandling::run_with_parameter()
 {
     GuiClient client(serverInformations, getIp(), getPort());
     client.CheckValidServer();
-    Graphic graphic(serverInformations.getMapSize(), {1920, 1080}, serverInformations);
+    Graphic graphic(serverInformations.getMapSize(), {1920 / 1.2, 1080 / 1.2}, serverInformations);
     std::thread t(&GuiClient::compute, &client);
     graphic.loop();
     client.stop();

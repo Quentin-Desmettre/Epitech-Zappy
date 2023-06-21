@@ -72,8 +72,9 @@ void Graphic::initMenu()
     ImageResize(&_menuImage[BUTTON_START], 120, 50);
     ImageResize(&_menuImage[BUTTON_QUIT], 120, 50);
     ImageResize(&_menuImage[BUTTON_CONTROLS], 120, 50);
-    ImageResize(&_menuImage[MENU], _windowWidth, _windowHeight);
-    ImageCrop(&_menuImage[BG], Rectangle{0, 0, _windowWidth, _windowHeight});
+    ImageResize(&_menuImage[BG], static_cast<int>(_windowWidth), static_cast<int>(_windowHeight));
+    ImageResize(&_menuImage[MENU], static_cast<int>(_windowWidth), static_cast<int>(_windowHeight));
+
 
     _textures.emplace_back(LoadTextureFromImage(_menuImage[BG]));
     _positions.emplace_back(Vector2{0, 0});
