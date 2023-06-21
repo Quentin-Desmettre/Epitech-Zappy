@@ -125,6 +125,7 @@ bool Graphic::DrawTextMenu(int &loop)
             }
             if (_functions[i] == "help") {
                 onControlMenu = true;
+                SetExitKey(KEY_BACKSPACE);
             }
         }
 
@@ -144,8 +145,9 @@ bool Graphic::menu(std::string &ip, std::string &port, bool isError) {
 
         if (onControlMenu) {
             DrawTextureEx(_textures[MENU], _positions[MENU], 0.0f, 1.0f, WHITE);
-            if (IsKeyPressed(KEY_BACKSPACE)) {
+            if (IsKeyDown(KEY_ESCAPE) && onControlMenu) {
                 onControlMenu = false;
+                SetExitKey(KEY_ESCAPE);
             }
             _win.endDrawing();
             continue;
