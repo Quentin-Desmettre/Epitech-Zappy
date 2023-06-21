@@ -1,8 +1,8 @@
 import random
-from src.ai.commands import Command, CommandNames, Directions
+from src.ai.commands import CommandNames, Directions
 
 
-def move_randomly(self):
+def move_randomly(self): # pragma: no cover
     """Moves and turns the player randomly."""
     rand = random.randint(1, 3)
     if rand == 1:
@@ -30,10 +30,10 @@ def go_to_direction(self, direction: Directions) -> None:
             self.go_to_direction(Directions.RIGHT)
         else:
             self.go_to_direction(Directions.LEFT)
-    elif direction == Directions.BOTTOM_RIGHT or direction == Directions.BOTTOM_LEFT:
-        self.go_to_direction(Directions.BACKWARD)
-        if direction == Directions.BOTTOM_RIGHT:
-            self.go_to_direction(Directions.LEFT)
-        else:
-            self.go_to_direction(Directions.RIGHT)
+    elif direction == Directions.BOTTOM_RIGHT:
+        self.go_to_direction(Directions.RIGHT)
+        self.go_to_direction(Directions.RIGHT)
+    elif direction == Directions.BOTTOM_LEFT:
+        self.go_to_direction(Directions.LEFT)
+        self.go_to_direction(Directions.LEFT)
 
