@@ -12,8 +12,8 @@ class BroadcastTester(TestCase):
     def setUp(self):
         global ai
         self.ai = ai
-        sys.stdout = open("utils_output", "w+", buffering=1)
-        self.output = open("utils_output", "r+")
+        sys.stdout = open("broadcast_output", "w+", buffering=1)
+        self.output = open("broadcast_output", "r+")
         set_verbose(True)
 
     def tearDown(self):
@@ -22,7 +22,7 @@ class BroadcastTester(TestCase):
         sys.stdout.close()
         sys.stdout = sys.__stdout__
         self.output.close()
-        remove("utils_output")
+        remove("broadcast_output")
 
     def test_shared_inventory(self):
         add_to_shared_inventory(self.ai, "test", 3)
