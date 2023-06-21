@@ -50,7 +50,7 @@ static void clear_action(server_t *server, action_t *action,
             break;
     memmove(server->actions + index, server->actions + index + 1,
         sizeof(action_t *) * (server->action_count - index - 1));
-    my_free(action);
+    destroy_action(action);
     cli->data->current_action = NULL;
     server->action_count--;
     sort_actions(server);
