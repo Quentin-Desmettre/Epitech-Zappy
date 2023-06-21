@@ -72,6 +72,8 @@ def main():
                 ai.elevate(False, exception.msg)
                 exception = None
                 continue
+            set_color(None)
+            my_print("Making decision")
             ai.make_decision()
         except ElevationException as e:
             exception = e

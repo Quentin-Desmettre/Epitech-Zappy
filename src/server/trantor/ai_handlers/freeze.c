@@ -62,5 +62,4 @@ void unfreeze_players(server_t *server, list_t *players)
         player = tmp->data;
         unfreeze_player(server, player, player->incant_id);
     }
-    sort_actions(server);
 }
