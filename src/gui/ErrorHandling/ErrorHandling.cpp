@@ -45,6 +45,6 @@ std::string ErrorHandling::getPort() const
 std::string ErrorHandling::getIp() const
 {
     if (_ip.empty())
-        return std::string("localhost");
+        return std::string("127.0.0.1");
     return _ip;
 }

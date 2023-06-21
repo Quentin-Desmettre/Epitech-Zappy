@@ -17,15 +17,21 @@ class Graphic {
     public:
         Graphic(const Mateyak::Vec2f &mapSize, const Mateyak::Vec2f &windowSize, ServerInformations &serverInformations);
         ~Graphic();
-        void loop();
-        bool menu(std::string &ip, std::string &port);
+        bool loop();
+        bool menu(std::string &ip, std::string &port, bool isError);
         void drawTeams();
         void getTeamsPlace(Mateyak::Window &win);
-        void drawBroadCastMessage(Mateyak::Window &win);
-        void drawTileInformation(Mateyak::Window &win, Mateyak::Camera &cam);
-        void drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam);
+        void drawBroadCastMessage();
+        void drawTileInformation(Mateyak::Camera &cam);
+        void drawPlayerInformation(Mateyak::Camera &cam);
         void setMapSize(const Mateyak::Vec2f &mapSize);
         void drawTimeUnit();
+        void DrawPort(std::string &port, int &textActive);
+        void DrawIp(std::string &ip, int &textActive);
+        bool DrawTextMenu(int &loop);
+        void initMenu();
+        void DrawInfo();
+        void handleEvent();
 
     private:
         ServerInformations &_serverInformations;
@@ -44,6 +50,15 @@ class Graphic {
         FMOD::System *_system;
         FMOD::Sound *_sound;
         FMOD::Channel *_channel;
+
+        std::vector<Image> _menuImage{};
+        std::vector<Texture2D> _textures{};
+        std::vector<Vector2> _positions;
+        std::vector<std::string> _functions;
+        bool shaderEnabled;
+        bool drawGrid;
+
+        bool onControlMenu = false;
 };
 
 #endif //EPITECH_ZAPPY_GRAPHIC_HPP

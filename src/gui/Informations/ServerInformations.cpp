@@ -52,6 +52,8 @@ void ServerInformations::setRunning(bool running)
 void ServerInformations::updatePlayer(std::unique_ptr<Player> &player)
 {
     Player::STATE state = player->getState();
+    player->ven.setLevel(player->getLevel());
+    player->ven.setState(player->getState());
     if (state == Player::STATE::NONE) {
         player->ven.move_ven(_timeUnit);
         return;
@@ -69,8 +71,6 @@ void ServerInformations::updatePlayer(std::unique_ptr<Player> &player)
         removePlayer(player->getName());
         return;
     }
-    player->ven.setLevel(player->getLevel());
-    player->ven.setState(player->getState());
 }
 
 void ServerInformations::setMapSize(int x, int y)
@@ -286,6 +286,12 @@ void ServerInformations::EggDeath(const std::string &eggName)
 
 void ServerInformations::setTimeUnit(int timeUnit)
 {
+    if (timeUnit <= 0)
+        throw std::runtime_error("Time unit can't be negative or null");
+    if (timeUnit > 200) {
+        addCommand("sst 200\n");
+        addCommand("sgt\n");
+    }
     _timeUnit = timeUnit;
 }
 
@@ -365,6 +371,23 @@ void ServerInformations::audioActionsHandler(Mateyak::Camera &camera)
         if (deleted)
             goto check_audio_vector;
     }
+}
+
+void ServerInformations::clear()
+{
+    mapSize = {0, 0};
+    map = {};
+    _winner = "";
+    teams.clear();
+    players.clear();
+    broadCastMessage.clear();
+    _timeUnit = 0;
+    _newTimeUnit = -1;
+    _lastKeyPressedTime = std::chrono::system_clock::now();
+    _serverRunning = true;
+    audioAction.clear();
+    while (!_commandQueue.empty())
+        _commandQueue.pop();
 }
 
 ServerInformations::ServerInformations()
@@ -486,8 +509,7 @@ void ServerInformations::updateTimeUnit()
 {
     if (IsKeyReleased(KEY_UP)) {
         _newTimeUnit = (_newTimeUnit == -1) ? _timeUnit + 10 : _newTimeUnit + 10;
-        _newTimeUnit = (_newTimeUnit < 1) ? 2 : _newTimeUnit;
-
+        _newTimeUnit = (_newTimeUnit > 200) ? 200 : _newTimeUnit;
         _timeUnit = _newTimeUnit;
         _lastKeyPressedTime = std::chrono::system_clock::now();
     }
@@ -505,6 +527,11 @@ void ServerInformations::updateTimeUnit()
         _newTimeUnit = -1;
         addCommand("sgt\n");
     }
+}
+
+void ServerInformations::setWinner(const std::string &teamName)
+{
+    _winner = teamName;
 }
 
 ServerInformations::~ServerInformations()
