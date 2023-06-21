@@ -2,7 +2,7 @@ import sys
 from os import remove
 from unittest import TestCase
 from tests.ai.globals import ai, server
-from src.ai.commands import Objects, Directions, Command, CommandNames
+from src.ai.commands import CommandNames
 from src.ai.utils import set_verbose
 
 
@@ -11,8 +11,8 @@ class ReaderTester(TestCase):
     def setUp(self):
         global ai
         self.reader = ai.reader
-        sys.stdout = open("finding_output", "w+", buffering=1)
-        self.output = open("finding_output", "r+")
+        sys.stdout = open("reader_output", "w+", buffering=1)
+        self.output = open("reader_output", "r+")
         set_verbose(True)
 
     def tearDown(self):
@@ -21,7 +21,7 @@ class ReaderTester(TestCase):
         sys.stdout.close()
         sys.stdout = sys.__stdout__
         self.output.close()
-        remove("finding_output")
+        remove("reader_output")
 
     def test_sending_message(self):
         global server
