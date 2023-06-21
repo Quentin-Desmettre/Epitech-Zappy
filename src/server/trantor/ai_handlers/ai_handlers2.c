@@ -12,25 +12,27 @@
 ai_cmd_response_t ai_broadcast_handler(action_t *action,
     server_t *server, player_t *player)
 {
-    int direction;
     client_t *client;
     list_t *list_client = server->clients;
     player_t *player_dest;
-    char *msg;
 
     do {
         client = list_client->data;
-        if (client->state == AI) {
-            player_dest = client->data;
-            direction = find_direction(player, player_dest, server->trantor);
-            msg = my_asprintf("message %d, %s\n", direction, action->arg);
-            safe_write_free(client->fd, msg);
+        if (client->state != AI) {
+            list_client = list_client->next;
+            continue;
         }
+        player_dest = client->data;
+        if (player_dest == player) {
+            list_client = list_client->next;
+            continue;
+        }
+        send_message(action, server, player, client);
         list_client = list_client->next;
     } while (list_client != server->clients);
     notify_gui(server, BROADCAST, player->id, action->arg);
     return AI_CMD_RESPONSE_OK;
-};
+}
 
 ai_cmd_response_t ai_set_handler(action_t *action,
     server_t *server, player_t *player)
