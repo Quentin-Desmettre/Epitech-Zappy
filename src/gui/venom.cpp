@@ -146,8 +146,8 @@ void Venom::move_ven(int timeunit)
     if (norm < 0.1) {
         _pos = _nextPosition;
     } else {
-        _pos.x += (vec.x / norm) * Mateyak::Window::timePass * 22.0 * (timeunit / 100.0);
-        _pos.z += (vec.z / norm) * Mateyak::Window::timePass * 22.0 * (timeunit / 100.0);
+        _pos.x += (vec.x / norm) * Mateyak::Window::timePass * 25.0 * (timeunit / 100.0);
+        _pos.z += (vec.z / norm) * Mateyak::Window::timePass * 25.0 * (timeunit / 100.0);
     }
     if (_pos.x > mapSize.x * 10 / 3) {
         _pos.x -= mapSize.x * 10 / 3;
