@@ -74,9 +74,9 @@ void Graphic::DrawPort(std::string &port, int &textActive)
         }
     }
 
-    DrawText("Enter a port:", 10, 10, 20, DARKGRAY);
-    DrawRectangleLines(10, 40, _charSize.x * MAX_PORT_LENGTH, _charSize.y, DARKGRAY);
-    DrawText((port + (textActive == 1 ? '|' : '\0')).c_str(), 15, 40, 20, MAROON);
+    DrawText("Enter a port:", _windowWidth / 2 - 160, _windowHeight / 2 - 100, 20, DARKGRAY);
+    DrawRectangleLines(_windowWidth / 2 + 50, _windowHeight / 2 - 100, _charSize.x * MAX_PORT_LENGTH, _charSize.y, DARKGRAY);
+    DrawText((port + (textActive == 1 ? '|' : '\0')).c_str(), _windowWidth / 2 + 65, _windowHeight / 2 - 100, 20, MAROON);
 }
 
 void Graphic::DrawIp(std::string &ip, int &textActive)
@@ -92,15 +92,18 @@ void Graphic::DrawIp(std::string &ip, int &textActive)
         }
     }
 
-    DrawText("Enter a ip:", 10, 100, 20, DARKGRAY);
-    DrawRectangleLines(10, 130, _charSize.x * MAX_IP_LENGTH, _charSize.y, DARKGRAY);
-    DrawText((ip + (textActive == 2 ? '|' : '\0')).c_str(), 15, 130, 20, MAROON);
+    DrawText("Enter a ip:", _windowWidth / 2 - 160, _windowHeight / 2 - 50, 20, DARKGRAY);
+    DrawRectangleLines(_windowWidth / 2 + 50, _windowHeight / 2 - 50, _charSize.x * MAX_IP_LENGTH, _charSize.y, DARKGRAY);
+    DrawText((ip + (textActive == 2 ? '|' : '\0')).c_str(), _windowWidth / 2 + 65, _windowHeight / 2 - 50, 20, MAROON);
 }
 
 bool Graphic::menu(std::string &ip, std::string &port, bool isError) {
-    Image image = LoadImage("assets/GuiMenu/button.png");
+    Image startImage = LoadImage("assets/GuiMenu/start.png");
+    Image quitImage = LoadImage("assets/GuiMenu/quit.png");
     Image bg = LoadImage("assets/GuiMenu/vid.gif");
-    ImageResize(&image, 200, 100);
+
+    ImageResize(&startImage, 120, 50);
+    ImageResize(&quitImage, 120, 50);
     std::vector<Texture2D> textures;
     std::vector<Vector2> positions;
     std::vector<std::string> functions;
@@ -109,12 +112,12 @@ bool Graphic::menu(std::string &ip, std::string &port, bool isError) {
     positions.emplace_back(Vector2{0, 0});
     functions.emplace_back("none");
 
-    textures.emplace_back(LoadTextureFromImage(image));
-    positions.emplace_back(Vector2{_windowWidth / 2 - textures[1].width / 2, _windowHeight / 1.4f - textures[1].height / 2});
+    textures.emplace_back(LoadTextureFromImage(startImage));
+    positions.emplace_back(Vector2{_windowWidth / 2 - textures[1].width / 2 - 80, _windowHeight / 2 + 40});
     functions.emplace_back("start");
 
-    textures.emplace_back(LoadTextureFromImage(image));
-    positions.emplace_back(Vector2{_windowWidth / 2 - textures[2].width / 2, _windowHeight / 1.4f - textures[2].height / 2 + 150});
+    textures.emplace_back(LoadTextureFromImage(quitImage));
+    positions.emplace_back(Vector2{_windowWidth / 2 - textures[2].width / 2 + 150, _windowHeight / 2 + 40});
     functions.emplace_back("quit");
     float scale = 1.f;
     int textActive = 0;
@@ -153,16 +156,18 @@ bool Graphic::menu(std::string &ip, std::string &port, bool isError) {
 
         if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
             bool isMouseOnRec = CheckCollisionPointRec(GetMousePosition(),
-            {20, 40, static_cast<float>(_charSize.x * MAX_PORT_LENGTH), _charSize.y});
+            {_windowWidth / 2 + 65, _windowHeight / 2 - 100, static_cast<float>(_charSize.x * MAX_PORT_LENGTH), _charSize.y});
             textActive = isMouseOnRec;
             bool isMouseOnRec2 = CheckCollisionPointRec(GetMousePosition(),
-            {20, 130, static_cast<float>(_charSize.x * MAX_IP_LENGTH), _charSize.y});
+            {_windowWidth / 2 + 65, _windowHeight / 2 - 50, static_cast<float>(_charSize.x * MAX_IP_LENGTH), _charSize.y});
             textActive = isMouseOnRec2 ? 2 : textActive;
         }
+        DrawText(std::string("Zappy").c_str(), _windowWidth / 2 - 90, 50, 80, RED);
+        DrawRectangleLines(_windowWidth / 2 - 200, _windowHeight / 2 - 200, 480, 350, DARKGRAY);
         DrawPort(port, textActive);
         DrawIp(ip, textActive);
         if (isError == 1) {
-            DrawText("Please verify the ip and port\nAnd if the server is launch", 10, 200, 20, RED);
+            DrawText(std::string("No Zappy server found at " + ip + " : " + port + " !\nCheck if the server you are trying to reach is online !").c_str(), 20, _windowHeight - 80, 20, RED);
         }
         _win.endDrawing();
     }
