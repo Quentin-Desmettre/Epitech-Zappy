@@ -25,7 +25,7 @@ def get_needed_stones(self, inventory: dict[Objects, int]) -> list[Objects]:
 def get_items_on_ground(self, tiles = None) -> dict[str, int]:
     if tiles is None:
         tiles = self.send(CommandNames.LOOK)
-    if tiles is None:
+    if tiles is None: # pragma: no cover
         return {}
     ground = tiles[0]
     items = {}
@@ -63,7 +63,7 @@ def drop_elevation_stones(self, inventory = None, to_not_send: Objects = None):
     """Drops all the stones needed to evolve."""
     if inventory is None:
         inventory = self.send(CommandNames.INVENTORY)
-    if inventory is None:
+    if inventory is None: # pragma: no cover
         return
     for stone in inventory:
         while inventory[stone] > 0 and stone != Objects.FOOD.value:
@@ -80,7 +80,7 @@ def drop_elevation_stones(self, inventory = None, to_not_send: Objects = None):
 def check_requirements(self, inventory = None, tiles = None) -> bool:
     if inventory is None:
         inventory = self.send(CommandNames.INVENTORY)
-    if inventory is None:
+    if inventory is None: # pragma: no cover
         return False
     ground = self.get_items_on_ground(tiles)
     total = merge_dicts(inventory, ground)

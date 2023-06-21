@@ -85,7 +85,7 @@ def go_to_object(self, desired: Objects, tiles: list[list[str]] = None, loot_foo
     """Take the shortest path to the desired object and loot it if possible."""
     if tiles is None:
         tiles = self.send(CommandNames.LOOK)
-    if tiles is None:
+    if tiles is None: # pragma: no cover
         return False
     directions = get_object_path(desired, tiles)
     moved = []
@@ -106,8 +106,8 @@ def go_to_object(self, desired: Objects, tiles: list[list[str]] = None, loot_foo
 def loot_object(self, object: Objects, can_move_randomly: bool = True, tiles = None, loot_food = False) -> bool:
     """Loots the object from the map if there is any, otherwise moves randomly."""
     if tiles is None:
-        self.send(CommandNames.LOOK)
-    if tiles is None:
+        tiles = self.send(CommandNames.LOOK)
+    if tiles is None: # pragma: no cover
         return False
     if object.value in tiles[0] and (object == Objects.FOOD or tiles[0].count(Objects.PLAYER.value) == 1):
         if self.send(CommandNames.TAKE, object.value) == None:

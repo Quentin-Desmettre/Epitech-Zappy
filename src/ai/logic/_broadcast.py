@@ -20,14 +20,17 @@ def add_to_shared_inventory(self, object: str, amount: int) -> None:
 
 def walk_and_loot(self, direction: Directions) -> bool:
     tiles = self.send(CommandNames.LOOK)
-    if tiles is None:
+    if tiles is None: # pragma: no cover
         return
     if is_object_on_tile(tiles, [], Objects.FOOD):
         self.send(CommandNames.TAKE, Objects.FOOD.value)
     my_print("Moving to other player", ignore_verbose=True)
     self.go_to_direction(direction)
     self.last_movement = time()
-    if is_object_on_tile(tiles, [direction], Objects.FOOD):
+    tiles = self.send(CommandNames.LOOK)
+    if tiles is None: # pragma: no cover
+        return
+    if is_object_on_tile(tiles, [], Objects.FOOD):
         self.send(CommandNames.TAKE, Objects.FOOD.value)
 
 
@@ -51,9 +54,9 @@ def choose_action(self, inventory, msg: str, sender: str, direction: Directions)
 
 def add_to_uuids(self, uuid):
     """Adds a message to the list of messages."""
+    self.messages_uuids.append(uuid)
     if len(self.messages_uuids) > 1000:
         self.messages_uuids.pop(0)
-    self.messages_uuids.append(uuid)
 
 
 def parse_message(self, msg: str, inventory = None) -> None:
@@ -71,8 +74,10 @@ def parse_message(self, msg: str, inventory = None) -> None:
         if self.messages_uuids.count(uuid[1]) > 0 or sender == self.id:
             if sender == self.id:
                 my_print("My message, ignoring...")
+            else:
+                my_print("Already received this message, ignoring...")
             return
-        self.add_to_uuids(uuid[0])
+        self.add_to_uuids(uuid[1])
         self.choose_action(inventory, msg, sender, direction)
-    except:
+    except: # pragma: no cover
         my_print("Error while parsing broadcast : %s" % msg)

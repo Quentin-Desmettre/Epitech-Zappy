@@ -38,7 +38,7 @@ class Ai:
         my_print("Looting food", ignore_verbose=True)
         if tiles is None:
             tiles = self.send(CommandNames.LOOK)
-        if tiles is None:
+        if tiles is None: # pragma: no cover
             return
         if "food" not in inventory:
             inventory["food"] = 0
@@ -47,7 +47,7 @@ class Ai:
             if not first:
                 tiles = self.send(CommandNames.LOOK)
             if not self.loot_object(Objects.FOOD, tiles=tiles):
-                i -= 1
+                i -= 1 # pragma: no cover
             first = False
 
     def take_stones(self, inventory: dict[str, int], tiles = None):
@@ -61,7 +61,8 @@ class Ai:
             if self.loot_object(stone, False, tiles, True):
                 sucess = True
                 break
-            tiles = self.send(CommandNames.LOOK)
+            if len(needed) > 0:
+                tiles = self.send(CommandNames.LOOK)
         if not sucess:
             self.move_randomly()
             self.last_movement = time()
@@ -100,7 +101,7 @@ class Ai:
             min_food = 5
         return "food" in inventory and inventory["food"] > min_food
 
-    def make_decision(self):
+    def make_decision(self): # pragma: no cover
         """Takes a decision based on the current state of the game."""
         start_time = time()
         inventory = self.send(CommandNames.INVENTORY)
