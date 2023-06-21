@@ -13,7 +13,6 @@
     #define NULL_IF_NEG(x) ((x) & ~((x) >> (sizeof(int) * 8 - 1)))
 
 // str array
-char **str_to_word_array(const char *str, const char *delim, int *len);
 void append_str_array(char ***array, char *what);
 void free_str_array(char **array);
 char **dupstrarray(const char **arr);
