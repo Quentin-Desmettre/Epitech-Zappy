@@ -17,7 +17,7 @@ class Graphic {
     public:
         Graphic(const Mateyak::Vec2f &mapSize, const Mateyak::Vec2f &windowSize, ServerInformations &serverInformations);
         ~Graphic();
-        void loop();
+        bool loop();
         bool menu(std::string &ip, std::string &port, bool isError);
         void drawTeams();
         void getTeamsPlace(Mateyak::Window &win);
