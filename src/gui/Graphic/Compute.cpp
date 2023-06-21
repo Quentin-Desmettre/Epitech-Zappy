@@ -9,6 +9,9 @@
 
 void Graphic::getTeamsPlace(Mateyak::Window &win)
 {
+    static bool isFirstTime = true;
+    _charSize = MeasureTextEx(win._font, "Z", isFirstTime ? 20 : 15, 1);
+
     for (auto &it : _serverInformations.getTeams()) {
         it.getName();
         Vector2 size = MeasureTextEx(win._font, it.getName().c_str(), 15, 1);
@@ -19,6 +22,7 @@ void Graphic::getTeamsPlace(Mateyak::Window &win)
     }
     _teamNumber = _serverInformations.getTeams().size();
     _boxSize = _maxSize * (_teamNumber / 4) + (_teamNumber % 4 > 0 ? _maxSize : 0);
+    isFirstTime = false;
 }
 
 void Graphic::setMapSize(const Mateyak::Vec2f &mapSize)
@@ -27,6 +31,7 @@ void Graphic::setMapSize(const Mateyak::Vec2f &mapSize)
     _cam = Mateyak::Camera({0.0f, 8.0f, 0.0f}, {mapSize.x * 5 / 3.f, 0.5f, mapSize.y * 5 / 3.f}, {0.0f, 1.0f, 0.0f}, 45.0f);
     _map = std::make_unique<Map>(mapSize * 10, 0.5);
     _shader.setUniform("lightsPos", {mapSize.x * 5.f / 3.f, 20.0f, mapSize.y * 5.f / 3.f});
+    getTeamsPlace(_win);
 }
 
 Graphic::Graphic(const Mateyak::Vec2f &mapSize, const Mateyak::Vec2f &windowSize, ServerInformations &serverInformations) :

@@ -18,7 +18,7 @@ class Graphic {
         Graphic(const Mateyak::Vec2f &mapSize, const Mateyak::Vec2f &windowSize, ServerInformations &serverInformations);
         ~Graphic();
         void loop();
-        bool menu(std::string &ip, std::string &port);
+        bool menu(std::string &ip, std::string &port, bool isError);
         void drawTeams();
         void getTeamsPlace(Mateyak::Window &win);
         void drawBroadCastMessage(Mateyak::Window &win);
@@ -26,8 +26,10 @@ class Graphic {
         void drawPlayerInformation(Mateyak::Window &win, Mateyak::Camera &cam);
         void setMapSize(const Mateyak::Vec2f &mapSize);
         void drawTimeUnit();
+        void DrawPort(std::string &port, int &textActive);
+        void DrawIp(std::string &ip, int &textActive);
 
-    private:
+private:
         ServerInformations &_serverInformations;
         float _windowWidth;
         float _windowHeight;
