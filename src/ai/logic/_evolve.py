@@ -39,15 +39,18 @@ def get_items_on_ground(self, tiles = None) -> dict[str, int]:
 
 def elevate(self, send_cmd: bool = True, msg: str = None):
     if send_cmd:
+        my_print("Starting incantation to level %d" % (self.level + 1), ignore_verbose=True)
         self.send(CommandNames.INCANTATION)
     elif msg.startswith("Current level:"):
         self.level = int(msg.split(" ")[2])
-        my_print("Elevated to level %d !!!" % self.level)
+        my_print("Elevated to level %d !!!" % self.level, ignore_verbose=True)
         if self.level == 8:
-            my_print("Congratulations, you won !!!")
+            my_print("Congratulations, you won !!!", ignore_verbose=True)
         self.shared_inventory = {}
+        self.leader = None
+        self.reader.empty_broadcast_queue()
     else:
-        my_print("Error: could not elevate")
+        my_print("Error: could not elevate", ignore_verbose=True)
 
 
 def can_evolve(self, inventory: dict[str, int], tiles = None):
@@ -71,7 +74,7 @@ def drop_elevation_stones(self, inventory = None, to_not_send: Objects = None):
                 else:
                     self.send(CommandNames.BROADCAST, "dropped~|" + self.team + "~|" + stone + "~|" + str(self.level))
                     sleep(self.delta)
-    my_print("Dropped all stones needed to evolve.")
+    my_print("Dropped all stones needed to evolve.", ignore_verbose=True)
 
 
 def check_requirements(self, inventory = None, tiles = None) -> bool:
@@ -81,10 +84,17 @@ def check_requirements(self, inventory = None, tiles = None) -> bool:
         return False
     ground = self.get_items_on_ground(tiles)
     total = merge_dicts(inventory, ground)
-    if len(self.get_needed_stones(total)) != 0:
-        my_print("Not enough stones to evolve : %s" % self.get_needed_stones(total))
+    needed = self.get_needed_stones(total)
+    if len(needed) != 0:
+        my_print("Not enough stones to evolve, missing : [ ", end="")
+        for stone in needed:
+            my_print(stone.value, end=" ")
+        my_print("]")
         return False
-    if ground[Objects.PLAYER.value] < get_elevation_needs(self.level)[Objects.PLAYER]: # temporary fix to ensure that all 6 players are on the same tile, original solution : get_elevation_needs(self.level)[Objects.PLAYER]
+    minimum = get_elevation_needs(self.level)[Objects.PLAYER]
+    if self.fast_mode:
+        minimum = 6
+    if ground[Objects.PLAYER.value] < minimum:
         my_print("Not enough players to evolve.")
         return False
     return True

@@ -84,8 +84,12 @@ class Reader:
         msg = self.get_next_match(type)
         if type == CommandNames.INCANTATION and msg == "ko":
             msg = self.get_next_match(type)
+            if msg == "ko":
+                my_print("Error: could not elevate", ignore_verbose=True)
         while match(PossibleResponsesRegex.INCANTATION.value[0], msg):
             msg = self.wait_end_incantation()
+            if msg == "ko":
+                my_print("Error: could not elevate", ignore_verbose=True)
         if msg == "ko":
             my_print("Command %s failed" % type.value)
             return None
@@ -133,7 +137,12 @@ class Reader:
         tmp_queue = Queue()
         while not self.broadcast_queue.empty():
             msg = self.broadcast_queue.get()
-            if not msg[0].count("incantation") == 0:
+            if msg[0].count("incantation") == 0:
                 tmp_queue.put(msg)
         while not tmp_queue.empty():
             self.broadcast_queue.put(tmp_queue.get())
+
+    def empty_broadcast_queue(self):
+        """Empties the broadcast queue."""
+        while not self.broadcast_queue.empty():
+            self.broadcast_queue.get()
