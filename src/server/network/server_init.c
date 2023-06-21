@@ -60,6 +60,8 @@ server_t *init_server(int ac, char **av, char **err)
         return NULL;
     server = my_calloc(1, sizeof(server_t));
     server->params = args;
+    if (args.help)
+        return server;
     server->trantor = init_trantor(args.width,
         args.height, args.names, args.slots);
     if (!init_server_network(server, err)) {
