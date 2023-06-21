@@ -31,6 +31,10 @@ Zappy is a project that aims to create a game in which you have to survive on a 
 - [**Unittest**](https://docs.python.org/3/library/unittest.html)
 - [**Coverage**](https://coverage.readthedocs.io/en/coverage-5.5/)
 
+#### DOCUMENTATION
+- [**Doxygen**](https://www.doxygen.nl/index.html)
+- [**Latex**](https://www.latex-project.org/)
+
 ### How to use
 - Clone the repository
 - Install the dependencies: boost, raylib, fmod (Those steps are described in the CMakelists.txt)
