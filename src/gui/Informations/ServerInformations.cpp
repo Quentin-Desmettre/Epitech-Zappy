@@ -373,6 +373,23 @@ void ServerInformations::audioActionsHandler(Mateyak::Camera &camera)
     }
 }
 
+void ServerInformations::clear()
+{
+    mapSize = {0, 0};
+    map = {};
+    _winner = "";
+    teams.clear();
+    players.clear();
+    broadCastMessage.clear();
+    _timeUnit = 0;
+    _newTimeUnit = -1;
+    _lastKeyPressedTime = std::chrono::system_clock::now();
+    _serverRunning = true;
+    audioAction.clear();
+    while (!_commandQueue.empty())
+        _commandQueue.pop();
+}
+
 ServerInformations::ServerInformations()
 {
     FMOD_RESULT result;

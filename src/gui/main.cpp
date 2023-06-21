@@ -62,6 +62,21 @@ void run_with_parameter(int ac, char **av)
     t.join();
 }
 
+void tmp(ServerInformations &serverInformations, const std::string &ip, const std::string &port, Graphic &graphic, bool &backMenu)
+{
+    GuiClient client(serverInformations, ip, port);
+    client.CheckValidServer();
+    graphic.setMapSize(serverInformations.getMapSize());
+    std::thread t(&GuiClient::compute, &client);
+    SetExitKey(0);
+    if (graphic.loop()) {
+        backMenu = 1;
+        SetExitKey(KEY_ESCAPE);
+    }
+    client.stop();
+    t.join();
+}
+
 void run_without_parameters()
 {
     ServerInformations serverInformations;
@@ -74,21 +89,12 @@ void run_without_parameters()
 
     while (true) {
         needToContinue = 0;
+        serverInformations.clear();
         if (!graphic.menu(ip, port, error))
             return;
         error = false;
         try {
-            GuiClient client(serverInformations, ip, port);
-            client.CheckValidServer();
-            graphic.setMapSize(serverInformations.getMapSize());
-            std::thread t(&GuiClient::compute, &client);
-            SetExitKey(0);
-            if (graphic.loop()) {
-                backMenu = 1;
-                SetExitKey(KEY_ESCAPE);
-            }
-            client.stop();
-            t.join();
+            tmp(serverInformations, ip, port, graphic, backMenu);
         } catch (const std::exception& ex) {
             needToContinue = 1;
         }

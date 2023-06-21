@@ -8,12 +8,12 @@
 #include "Graphic.hpp"
 #define MAX_PORT_LENGTH 6
 #define MAX_IP_LENGTH 16
-#define BG 2
-#define BUTTON_START 0
-#define BUTTON_QUIT 1
 
-void Graphic::DrawPort(std::string &port, int &textActive)
-{
+#define BG 0
+#define BUTTON_START 1
+#define BUTTON_QUIT 2
+
+void Graphic::DrawPort(std::string &port, int &textActive) {
     if (textActive == 1) {
         if (IsKeyPressed(KEY_BACKSPACE)) {
             if (!port.empty()) port.erase(port.size() - 1);
@@ -21,13 +21,16 @@ void Graphic::DrawPort(std::string &port, int &textActive)
         int key = GetCharPressed();
         if ((key > 0) && ((key >= '0' && key <= '9'))) {
             if (textActive == 1 && port.size() < MAX_PORT_LENGTH - 1)
-                port += (char)key;
+                port += (char) key;
         }
     }
 
-    DrawText("Enter a port:", 10, 10, 20, DARKGRAY);
-    DrawRectangleLines(10, 40, _charSize.x * MAX_PORT_LENGTH, _charSize.y, DARKGRAY);
-    DrawText((port + (textActive == 1 ? '|' : '\0')).c_str(), 15, 40, 20, MAROON);
+    DrawText("Enter a port:", _windowWidth / 2 - 160, _windowHeight / 2 - 100,
+             20, DARKGRAY);
+    DrawRectangleLines(_windowWidth / 2 + 50, _windowHeight / 2 - 100,
+                       _charSize.x * MAX_PORT_LENGTH, _charSize.y, DARKGRAY);
+    DrawText((port + (textActive == 1 ? '|' : '\0')).c_str(),
+             _windowWidth / 2 + 55, _windowHeight / 2 - 100, 20, MAROON);
 }
 
 void Graphic::DrawIp(std::string &ip, int &textActive)
@@ -43,19 +46,21 @@ void Graphic::DrawIp(std::string &ip, int &textActive)
         }
     }
 
-    DrawText("Enter a ip:", 10, 100, 20, DARKGRAY);
-    DrawRectangleLines(10, 130, _charSize.x * MAX_IP_LENGTH, _charSize.y, DARKGRAY);
-    DrawText((ip + (textActive == 2 ? '|' : '\0')).c_str(), 15, 130, 20, MAROON);
+    DrawText("Enter a ip:", _windowWidth / 2 - 160, _windowHeight / 2 - 50, 20, DARKGRAY);
+    DrawRectangleLines(_windowWidth / 2 + 50, _windowHeight / 2 - 50, _charSize.x * MAX_IP_LENGTH, _charSize.y, DARKGRAY);
+    DrawText((ip + (textActive == 2 ? '|' : '\0')).c_str(), _windowWidth / 2 + 65, _windowHeight / 2 - 50, 20, MAROON);
 }
 
 void Graphic::initMenu()
 {
+    _charSize = MeasureTextEx(_win._font, "Z", 20, 1);
     static bool isInit = false;
 
     if (isInit) return;
-    _menuImage.emplace_back(LoadImage("assets/GuiMenu/button.png"));
-    _menuImage.emplace_back(LoadImage("assets/GuiMenu/button.png"));
     _menuImage.emplace_back(LoadImage("assets/GuiMenu/bg.png"));
+    _menuImage.emplace_back(LoadImage("assets/GuiMenu/start.png"));
+    _menuImage.emplace_back(LoadImage("assets/GuiMenu/quit.png"));
+
     ImageResize(&_menuImage[BUTTON_START], 120, 50);
     ImageResize(&_menuImage[BUTTON_QUIT], 120, 50);
     ImageCrop(&_menuImage[BG], Rectangle{0, 0, _windowWidth, _windowHeight});
@@ -65,12 +70,14 @@ void Graphic::initMenu()
     _functions.emplace_back("bg");
 
     _textures.emplace_back(LoadTextureFromImage(_menuImage[BUTTON_START]));
-    _positions.emplace_back(Vector2{_windowWidth / 2 - _textures[BUTTON_START].width / 2 - 80, _windowHeight / 2 + 40});
+    _positions.emplace_back(Vector2{_windowWidth / 2 - _textures[BUTTON_START].width / 2.f - 80, _windowHeight / 2 + 40});
     _functions.emplace_back("start");
 
+
     _textures.emplace_back(LoadTextureFromImage(_menuImage[BUTTON_QUIT]));
-    _positions.emplace_back(Vector2{_windowWidth / 2 - _textures[BUTTON_QUIT].width / 2 + 150, _windowHeight / 2 + 40});
+    _positions.emplace_back(Vector2{_windowWidth / 2 - _textures[BUTTON_QUIT].width / 2.f + 150, _windowHeight / 2 + 40});
     _functions.emplace_back("quit");
+
     isInit = true;
 }
 
@@ -119,12 +126,14 @@ bool Graphic::menu(std::string &ip, std::string &port, bool isError) {
             return true;
         if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
             bool isMouseOnRec = CheckCollisionPointRec(GetMousePosition(),
-            {20, 40, static_cast<float>(_charSize.x * MAX_PORT_LENGTH), _charSize.y});
+            {_windowWidth / 2 + 65, _windowHeight / 2 - 100, static_cast<float>(_charSize.x * MAX_PORT_LENGTH), _charSize.y});
             textActive = isMouseOnRec;
             bool isMouseOnRec2 = CheckCollisionPointRec(GetMousePosition(),
-            {20, 130, static_cast<float>(_charSize.x * MAX_IP_LENGTH), _charSize.y});
+            {_windowWidth / 2 + 65, _windowHeight / 2 - 50, static_cast<float>(_charSize.x * MAX_IP_LENGTH), _charSize.y});
             textActive = isMouseOnRec2 ? 2 : textActive;
         }
+        DrawText(std::string("Zappy").c_str(), _windowWidth / 2 - 90, 50, 80, RED);
+        DrawRectangleLines(_windowWidth / 2 - 200, _windowHeight / 2 - 200, 480, 350, DARKGRAY);
         DrawPort(port, textActive);
         DrawIp(ip, textActive);
         if (isError == 1) {

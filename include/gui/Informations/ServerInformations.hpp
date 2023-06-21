@@ -40,6 +40,7 @@ class Message {
 class ServerInformations
 {
     public:
+        void clear();
         ServerInformations();
         ~ServerInformations();
 
