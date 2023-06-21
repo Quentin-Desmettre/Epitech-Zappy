@@ -189,3 +189,22 @@ Graphic::~Graphic()
     _system->close();
     _system->release();
 }
+
+void Graphic::DrawInfo()
+{
+    DrawFPS(10, 10);
+    drawTeams();
+    drawBroadCastMessage(_win);
+    drawTileInformation(_win, _cam);
+    drawPlayerInformation(_win, _cam);
+    drawTimeUnit();
+}
+
+void Graphic::handleEvent() {
+    if (IsKeyPressed(KEY_F1)) {
+        shaderEnabled = !shaderEnabled;
+        _shader.setUniform("shaderEnabled", shaderEnabled);
+    }
+    if (IsKeyPressed(KEY_F2))
+        drawGrid = !drawGrid;
+}
