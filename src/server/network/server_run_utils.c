@@ -72,4 +72,5 @@ void update_server_freq(server_t *server, int new_freq)
         ticks_left = server->actions[i]->data.ticks * ratio;
         server->actions[i]->end_time = get_end_time(ticks_left, new_freq, now);
     }
+    server->params.freq = new_freq;
 }
