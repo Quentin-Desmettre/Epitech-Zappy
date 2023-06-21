@@ -19,4 +19,3 @@ void send_message(const action_t *action, server_t *server, player_t *player,
     msg = my_asprintf("message %d, %s\n", direction, action->arg);
     safe_write_free(client->fd, msg);
 }
-
