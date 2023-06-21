@@ -3,7 +3,7 @@ from os import remove
 from unittest import TestCase
 from tests.ai.globals import ai, server
 from src.ai.commands import Directions
-from src.ai.utils import set_verbose, Colors
+from src.ai.utils import set_verbose
 
 
 class MovementTester(TestCase):
