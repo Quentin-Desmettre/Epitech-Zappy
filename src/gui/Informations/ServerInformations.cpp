@@ -52,6 +52,8 @@ void ServerInformations::setRunning(bool running)
 void ServerInformations::updatePlayer(std::unique_ptr<Player> &player)
 {
     Player::STATE state = player->getState();
+    player->ven.setLevel(player->getLevel());
+    player->ven.setState(player->getState());
     if (state == Player::STATE::NONE) {
         player->ven.move_ven(_timeUnit);
         return;
@@ -69,8 +71,6 @@ void ServerInformations::updatePlayer(std::unique_ptr<Player> &player)
         removePlayer(player->getName());
         return;
     }
-    player->ven.setLevel(player->getLevel());
-    player->ven.setState(player->getState());
 }
 
 void ServerInformations::setMapSize(int x, int y)
