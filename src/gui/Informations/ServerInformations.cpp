@@ -534,6 +534,12 @@ void ServerInformations::setWinner(const std::string &teamName)
     _winner = teamName;
 }
 
+const std::string ServerInformations::getWinner(void) const
+{
+    return _winner;
+}
+
+
 ServerInformations::~ServerInformations()
 {
     for (auto &action: audioAction) {

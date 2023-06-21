@@ -7,7 +7,6 @@
 
 #include "ErrorHandling.hpp"
 #include <thread>
-#include <iostream>
 #include <string>
 #include "Graphic.hpp"
 #include "Client/client.hpp"
@@ -20,7 +19,7 @@ void ErrorHandling::RunningLoop(const std::string &ip, const std::string &port, 
     std::thread t(&GuiClient::compute, &client);
     SetExitKey(0);
     if (graphic.loop()) {
-        backMenu = 1;
+        backMenu = true;
         SetExitKey(KEY_ESCAPE);
     }
     client.stop();
@@ -31,15 +30,20 @@ void ErrorHandling::run_without_parameters()
 {
     std::string ip = "127.0.0.1";
     std::string port = "4242";
-    Graphic graphic({0, 0}, {1920 / 1.3, 1080 / 1.3}, serverInformations);
+    Graphic graphic({0, 0}, {1920, 1080}, serverInformations);
     int needToContinue;
     bool backMenu = false;
     bool error = false;
 
     while (true) {
+        std::string winner = serverInformations.getWinner();
+        if (!winner.empty()) {
+            winner.insert(0, "The winner is ");
+            winner.insert(winner.size(), " !");
+        }
         needToContinue = 0;
         serverInformations.clear();
-        if (!graphic.menu(ip, port, error))
+        if (!graphic.menu(ip, port, error, winner))
             return;
         error = false;
         try {
@@ -60,12 +64,15 @@ void ErrorHandling::run_with_parameter()
 {
     GuiClient client(serverInformations, getIp(), getPort());
     client.CheckValidServer();
-    Mateyak::Vec2f mapSize = serverInformations.getMapSize();
-    Graphic graphic(mapSize, {1920 / 1.3, 1080 / 1.3}, serverInformations);
+    Graphic graphic(serverInformations.getMapSize(), {1920, 1080}, serverInformations);
     std::thread t(&GuiClient::compute, &client);
     graphic.loop();
     client.stop();
     t.join();
+    const std::string winner = serverInformations.getWinner();
+    if (!winner.empty()) {
+        std::cout << "The winner is " << winner << std::endl;
+    }
 }
 
 ErrorHandling::ErrorHandling(int ac, char **av) : _ac(ac), _av(av)

@@ -138,7 +138,7 @@ bool Graphic::DrawTextMenu(int &loop)
     return false;
 }
 
-bool Graphic::menu(std::string &ip, std::string &port, bool isError) {
+bool Graphic::menu(std::string &ip, std::string &port, bool isError, const std::string &winner) {
     int textActive = 0;
     int loop = true;
 
@@ -172,6 +172,9 @@ bool Graphic::menu(std::string &ip, std::string &port, bool isError) {
         DrawIp(ip, textActive);
         if (isError == 1) {
             DrawText(std::string("No Zappy server found at " + ip + " : " + port + " !\nCheck if the server you are trying to reach is online !").c_str(), 20, _windowHeight - 80, 20, RED);
+        }
+        if (!winner.empty()) {
+            DrawText(winner.c_str(), _windowWidth / 2 - (winner.size() * _charSize.y) / 5, _windowHeight / 3 - 20, 20, GREEN);
         }
         _win.endDrawing();
     }

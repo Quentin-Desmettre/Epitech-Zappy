@@ -87,6 +87,7 @@ class ServerInformations
 
         void updateTimeUnit();
         void setWinner(const std::string &teamName);
+        const std::string getWinner(void) const;
 
     private:
         FMOD::System *_systemAudio;
