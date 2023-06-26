@@ -22,15 +22,17 @@ class Ai:
         self.fast_mode = fast_mode
         self.reader = Reader(server, team)
 
-    def send(self, cmd: CommandNames, arg: str | None = None):
+    def send(self, cmd: CommandNames, arg: str | None = None, trapped: bool = False):
         """Sends a command to the server."""
-        if cmd == CommandNames.BROADCAST and not arg.endswith("§"):
-            arg = self.id + "|~" + str(uuid4()) + "|~" + arg
+        if cmd == CommandNames.BROADCAST and not trapped:
+            arg = self.id + "|~" + \
+                str(uuid4()) + "|~" + self.team + \
+                "~|" + arg + "~|" + str(self.level)
         return self.reader.send(cmd, arg)
 
     from ._finding import loot_object, go_to_object
     from ._broadcast import parse_message, walk_and_loot, add_to_uuids, choose_action, \
-        add_to_shared_inventory, remove_from_shared_inventory
+        add_to_shared_inventory, remove_from_shared_inventory, check_validity
     from ._movement import move_randomly, go_to_direction
     from ._evolve import get_needed_stones, can_evolve, elevate, drop_all_stones, \
         check_requirements, get_items_on_ground, is_enough_player, drop_stone
@@ -42,8 +44,7 @@ class Ai:
         if tiles is None:  # pragma: no cover
             return
         if self.leader == self.id:
-            self.send(CommandNames.BROADCAST, "leaving~|" +
-                      self.team + "~|" + str(self.level))
+            self.send(CommandNames.BROADCAST, "leaving")
             self.leader = None
         if "food" not in inventory:
             inventory["food"] = 0
@@ -75,8 +76,7 @@ class Ai:
                 return
         if not sucess:
             return self.move_randomly()
-        self.send(CommandNames.BROADCAST, "looted~|" +
-                  self.team + "~|" + stone.value + "~|" + str(self.level))
+        self.send(CommandNames.BROADCAST, "looted~|" + stone.value)
 
     def handle_broadcast(self, analyze_incantation, inventory: dict[str, int]):
         while self.reader.has_broadcast():
@@ -86,7 +86,7 @@ class Ai:
         if not analyze_incantation:
             return
         msg, time = self.reader.pop_incantation()
-        if time > self.last_movement and msg.count(str(self.level)) > 0:
+        if time > self.last_movement and msg.endswith(str(self.level)):
             my_print("Analyzing broadcast %s" % msg)
             self.parse_message(msg, inventory)
         else:
@@ -101,8 +101,7 @@ class Ai:
         elif self.reader.incantation_msg == "" and (self.leader is None or self.leader == self.id):
             if self.leader is None:
                 self.leader = self.id
-            self.send(CommandNames.BROADCAST, "incantation~|" +
-                      self.team + "~|" + str(self.level))
+            self.send(CommandNames.BROADCAST, "incantation")
             sleep(self.delta * 7)
 
     def can_survive(self, inventory: dict[str, int]):

@@ -69,8 +69,7 @@ def can_evolve(self, inventory: dict[str, int], tiles=None):
 def drop_stone(self, stone, amount, send: bool = True) -> int:
     for _ in range(amount):
         if send:
-            self.send(CommandNames.BROADCAST, "dropped~|" +
-                      self.team + "~|" + stone + "~|" + str(self.level))
+            self.send(CommandNames.BROADCAST, "dropped~|" + stone)
         self.send(CommandNames.SET, stone)
     return amount
 
@@ -100,7 +99,7 @@ def check_requirements(self, inventory=None, tiles=None) -> bool:
     if inventory is None:  # pragma: no cover
         return False
     ground = self.get_items_on_ground(tiles)
-    if not is_enough_player(self, ground):
+    if not is_enough_player(self, ground, False):
         return False
     total = merge_dicts(inventory, ground)
     needed = self.get_needed_stones(total)
@@ -115,13 +114,14 @@ def check_requirements(self, inventory=None, tiles=None) -> bool:
     return True
 
 
-def is_enough_player(self, ground=None, tiles=None):
+def is_enough_player(self, ground=None, tiles=None, print: bool = True):
     if ground is None:
         ground = self.get_items_on_ground(tiles)
     minimum = get_elevation_needs(self.level)[Objects.PLAYER]
     if self.fast_mode:
         minimum = 6
     if ground[Objects.PLAYER.value] < minimum:
-        my_print("Not enough players to evolve.")
+        if print:
+            my_print("Not enough players to evolve.")
         return False
     return True
