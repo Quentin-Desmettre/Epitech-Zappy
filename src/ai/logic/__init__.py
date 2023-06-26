@@ -24,38 +24,46 @@ class Ai:
 
     def send(self, cmd: CommandNames, arg: str | None = None):
         """Sends a command to the server."""
-        if cmd == CommandNames.BROADCAST and not arg.endswith("ø"):
+        if cmd == CommandNames.BROADCAST and not arg.endswith("§"):
             arg = self.id + "|~" + str(uuid4()) + "|~" + arg
         return self.reader.send(cmd, arg)
 
     from ._finding import loot_object, go_to_object
-    from ._broadcast import parse_message, walk_and_loot, add_to_uuids, choose_action
+    from ._broadcast import parse_message, walk_and_loot, add_to_uuids, choose_action, \
+        add_to_shared_inventory, remove_from_shared_inventory
     from ._movement import move_randomly, go_to_direction
-    from ._evolve import get_needed_stones, can_evolve, elevate, drop_elevation_stones, check_requirements, get_items_on_ground
+    from ._evolve import get_needed_stones, can_evolve, elevate, drop_all_stones, \
+        check_requirements, get_items_on_ground, is_enough_player, drop_stone
 
-    def take_food(self, inventory: dict[str, int], tiles = None):
-        """Takes food from the map until the player has 20 food."""
+    def take_food(self, inventory: dict[str, int]):
+        """Takes food from the map until the player has 20 food or 10 if there is a leader."""
         my_print("Looting food", ignore_verbose=True)
-        if tiles is None:
-            tiles = self.send(CommandNames.LOOK)
-        if tiles is None: # pragma: no cover
+        tiles = self.send(CommandNames.LOOK)
+        if tiles is None:  # pragma: no cover
             return
+        if self.leader == self.id:
+            self.send(CommandNames.BROADCAST, "leaving~|" +
+                      self.team + "~|" + str(self.level))
+            self.leader = None
         if "food" not in inventory:
             inventory["food"] = 0
-        first = True
-        for i in range(20 - inventory["food"]):
-            if not first:
+        to_reach = 20
+        if self.leader is not None:
+            to_reach = 10
+        while inventory["food"] < to_reach:
+            if self.loot_object(Objects.FOOD, tiles=tiles):
+                inventory["food"] += 1
+            if inventory["food"] < to_reach:
                 tiles = self.send(CommandNames.LOOK)
-            if not self.loot_object(Objects.FOOD, tiles=tiles):
-                i -= 1 # pragma: no cover
-            first = False
+            if self.reader.incantation_msg != "" and self.leader is None:
+                break
 
-    def take_stones(self, inventory: dict[str, int], tiles = None):
+    def take_stones(self, inventory: dict[str, int], tiles=None):
         """Takes stones from the map until the player has all the stones needed to evolve."""
         my_print("Looting stones", ignore_verbose=True)
         stone = None
         sucess = False
-        needed = self.get_needed_stones(inventory)
+        needed = self.get_needed_stones(inventory, True)
         while len(needed) > 0:
             stone = needed.pop()
             if self.loot_object(stone, False, tiles, True):
@@ -63,36 +71,38 @@ class Ai:
                 break
             if len(needed) > 0:
                 tiles = self.send(CommandNames.LOOK)
+            if self.reader.incantation_msg != "" and self.leader is None:
+                return
         if not sucess:
-            self.move_randomly()
-            self.last_movement = time()
+            return self.move_randomly()
+        self.send(CommandNames.BROADCAST, "looted~|" +
+                  self.team + "~|" + stone.value + "~|" + str(self.level))
+
+    def handle_broadcast(self, analyze_incantation, inventory: dict[str, int]):
+        while self.reader.has_broadcast():
+            msg = self.reader.broadcast_pop()
+            my_print("Analyzing broadcast %s" % msg)
+            self.parse_message(msg, inventory)
+        if not analyze_incantation:
             return
-        if stone.value not in inventory:
-            inventory[stone.value] = 0
-        inventory[stone.value] += 1
-        if self.can_evolve(inventory, self.send(CommandNames.LOOK)):
-            self.drop_elevation_stones(inventory, stone)
+        msg, time = self.reader.pop_incantation()
+        if time > self.last_movement and msg.count(str(self.level)) > 0:
+            my_print("Analyzing broadcast %s" % msg)
+            self.parse_message(msg, inventory)
         else:
-            self.send(CommandNames.BROADCAST, "looted~|" + self.team + "~|" + stone.value + "~|" + str(self.level))
-            sleep(self.delta)
+            my_print("Ignoring broadcast %s" % msg)
 
-    def handle_broadcast(self, msg, inventory: dict[str, int]):
-        if msg[0].count("incantation") == 0\
-        or (msg[1] > self.last_movement and msg[0].count(str(self.level)) > 0):
-            my_print("Analyzing broadcast %s" % msg[0])
-            self.parse_message(msg[0], inventory)
-        else:
-            my_print("Ignoring broadcast %s" % msg[0])
-
-    def handle_evolve(self, inventory: dict[str, int], tiles = None):
+    def handle_evolve(self, inventory: dict[str, int], tiles=None):
         my_print("Trying to evolve to level %d" % (self.level + 1))
-        if self.check_requirements(inventory, tiles):
-            self.drop_elevation_stones(inventory)
+        if self.is_enough_player(None, tiles):
+            self.drop_all_stones(inventory)
+        if self.leader == self.id and self.check_requirements(inventory, tiles):
             self.elevate()
-        elif not self.reader.broadcast_contains("incantation") and (self.leader is None or self.leader == self.id):
+        elif self.reader.incantation_msg == "" and (self.leader is None or self.leader == self.id):
             if self.leader is None:
                 self.leader = self.id
-            self.send(CommandNames.BROADCAST, "incantation~|" + self.team + "~|" + str(self.level))
+            self.send(CommandNames.BROADCAST, "incantation~|" +
+                      self.team + "~|" + str(self.level))
             sleep(self.delta * 7)
 
     def can_survive(self, inventory: dict[str, int]):
@@ -101,21 +111,23 @@ class Ai:
             min_food = 5
         return "food" in inventory and inventory["food"] > min_food
 
-    def make_decision(self): # pragma: no cover
+    def make_decision(self):  # pragma: no cover
         """Takes a decision based on the current state of the game."""
         start_time = time()
         inventory = self.send(CommandNames.INVENTORY)
         self.delta = time() - start_time
         if inventory is None:
             return
-        if not self.can_survive(inventory) or self.reader.has_broadcast():
+        set_color(Colors.OKCYAN)
+        self.handle_broadcast(False, inventory)
+        if not self.can_survive(inventory) or self.reader.incantation_msg != "":
             if not self.can_survive(inventory):
                 set_color(Colors.WARNING)
                 self.take_food(inventory)
                 self.can_send = True
             else:
                 set_color(Colors.OKCYAN)
-                self.handle_broadcast(self.reader.broadcast_pop(), inventory)
+                self.handle_broadcast(True, inventory)
             return
         tiles = self.send(CommandNames.LOOK)
         if tiles is None:

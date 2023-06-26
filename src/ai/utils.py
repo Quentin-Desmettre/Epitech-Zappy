@@ -79,14 +79,14 @@ def create_command_parsers(obj) -> dict[str, callable]:
 def send_to_server(server: socket.socket, msg: str) -> None:
     """Sends a message to the server."""
     my_print("Sending: %s" % msg)
-    server.send((msg + "\n").encode())
+    server.send((msg + "\n").encode("ISO-8859-2"))
 
 
 def recv_from_server(server: socket.socket) -> str:
     """Reads from the server until a newline is encountered."""
     msg = ""
     while not msg.endswith("\n"):
-        msg += server.recv(1).decode()
+        msg += server.recv(1).decode("ISO-8859-2")
     if msg == "dead\n":
         my_print("You died", ignore_verbose=True)
         exit(0)

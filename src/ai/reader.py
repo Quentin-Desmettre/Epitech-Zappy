@@ -15,9 +15,12 @@ class Reader:
         self.sock = sock
         self.queue = Queue()
         self.broadcast_queue = Queue()
+        self.incantation_msg = ""
+        self.incantation_time = 0
         self.buffer = ""
         self.team = team
-        self.mtx = Lock()
+        self.broadcast_mtx = Lock()
+        self.incantation_mtx = Lock()
         self.thread = Thread(target=self.launch, daemon=True)
         self.thread.start()
 
@@ -34,9 +37,7 @@ class Reader:
                     raise Exception("Server disconnected")
                 self.buffer += data
                 while "\n" in self.buffer:
-                    self.mtx.acquire()
                     self.parse_data()
-                    self.mtx.release()
         except Exception as e:
             self.queue.put("dead")
             self.queue.put(e)
@@ -51,8 +52,12 @@ class Reader:
             if msg.count(self.team) == 0 and randint(0, 3) != 0:
                 return
             if msg.count("incantation") > 0:
-                self.clean_broadcast_queue()
-            self.broadcast_queue.put([msg, time()])
+                self.set_incanation_msg(msg)
+                self.set_incanation_time(time())
+            else:
+                self.broadcast_mtx.acquire()
+                self.broadcast_queue.put(msg)
+                self.broadcast_mtx.release()
         else:
             my_print("Received: %s" % msg)
             self.queue.put(msg)
@@ -117,32 +122,33 @@ class Reader:
         """Pops a broadcast from the queue."""
         return self.broadcast_queue.get()
 
-    def broadcast_contains(self, msg: str) -> bool:
-        """Checks if the broadcast queue contains a message."""
-        tmp_queue = Queue()
-        found = False
-        self.mtx.acquire()
-        while not self.broadcast_queue.empty():
-            tmp = self.broadcast_queue.get()
-            if tmp[0].count(msg) > 0:
-                found = True
-            tmp_queue.put(tmp)
-        while not tmp_queue.empty():
-            self.broadcast_queue.put(tmp_queue.get())
-        self.mtx.release()
-        return found
-
-    def clean_broadcast_queue(self):
-        """Cleans broadcast queue from all messages stating with 'incantation'."""
-        tmp_queue = Queue()
-        while not self.broadcast_queue.empty():
-            msg = self.broadcast_queue.get()
-            if msg[0].count("incantation") == 0:
-                tmp_queue.put(msg)
-        while not tmp_queue.empty():
-            self.broadcast_queue.put(tmp_queue.get())
-
-    def empty_broadcast_queue(self):
+    def empty_broadcast_queue(self) -> Queue:
         """Empties the broadcast queue."""
+        self.broadcast_mtx.acquire()
+        tmp = Queue()
         while not self.broadcast_queue.empty():
-            self.broadcast_queue.get()
+            tmp.put(self.broadcast_queue.get())
+        self.broadcast_mtx.release()
+        return tmp
+
+    def set_incanation_msg(self, msg: str) -> None:
+        """Sets the incantation message."""
+        self.incantation_mtx.acquire()
+        self.incantation_msg = msg
+        self.incantation_mtx.release()
+
+    def set_incanation_time(self, time: float) -> None:
+        """Sets the incantation time."""
+        self.incantation_mtx.acquire()
+        self.incantation_time = time
+        self.incantation_mtx.release()
+
+    def pop_incantation(self) -> tuple[str, float]:
+        """Pops the incantation message."""
+        self.incantation_mtx.acquire()
+        msg = self.incantation_msg
+        time = self.incantation_time
+        self.incantation_msg = ""
+        self.incantation_time = 0
+        self.incantation_mtx.release()
+        return msg, time
