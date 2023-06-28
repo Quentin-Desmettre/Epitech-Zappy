@@ -13,6 +13,7 @@ class Reader:
 
     def __init__(self, sock: socket, team: str) -> None:
         self.sock = sock
+        self.cmd = Command(CommandNames.FORWARD)
         self.queue = Queue()
         self.broadcast_queue = Queue()
         self.incantation_msg = ""
@@ -84,8 +85,8 @@ class Reader:
 
     def send(self, type: CommandNames, arg: str | None = None):
         """Sends a command to the server."""
-        cmd = Command(type, arg)
-        send_to_server(self.sock, str(cmd))
+        self.cmd.__init__(type, arg)
+        send_to_server(self.sock, str(self.cmd))
         msg = self.get_next_match(type)
         if type == CommandNames.INCANTATION and msg == "ko":
             msg = self.get_next_match(type)
@@ -98,7 +99,7 @@ class Reader:
         if msg == "ko":
             my_print("Command %s failed" % type.value)
             return None
-        return cmd.parse_response(msg)
+        return self.cmd.parse_response(msg)
 
     def wait_end_incantation(self) -> str:
         """Waits for the end of the incantation."""

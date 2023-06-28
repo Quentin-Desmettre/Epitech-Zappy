@@ -38,25 +38,29 @@ def walk_and_loot(self, direction: Directions) -> bool:
         self.send(CommandNames.TAKE, Objects.FOOD.value)
 
 
-def choose_action(self, inventory, msg: str, sender: str, direction: Directions, old: bool = False):
-    if not msg.endswith(str(self.level - old)):
-        return
+def choose_action(self, inventory, msg: str, sender: str, direction: Directions):
     if msg.count("leaving") > 0:
         if sender == self.leader:
             self.leader = None
             self.reader.pop_incantation()
             my_print("Leader left")
+    elif msg.count("new") > 0:
+        if sender not in self.mates_uuids:
+            self.mates_uuids.append(sender)
+            self.mates_uuids.sort()
+            my_print("New mate: %s" % sender)
+            self.send(CommandNames.BROADCAST, "new")
     elif msg.count("looted") > 0:
         self.add_to_shared_inventory(msg.split('~|')[2])
     elif msg.count("dropped") > 0:
         self.remove_from_shared_inventory(msg.split('~|')[2])
-    elif msg.count("incantation") > 0:
-        if self.leader is None or sender > self.leader:
-            self.leader = sender
-            my_print("New leader: %s" % sender)
-        elif self.leader != sender:
+    elif msg.count("incantation") > 0 and len(self.mates_uuids) > 0:
+        if sender != self.mates_uuids[0]:
             my_print("Not the leader !!!")
             return
+        if self.leader is None:
+            self.leader = sender
+            my_print("New leader: %s" % sender)
         if direction == Directions.HERE:
             self.drop_all_stones(inventory)
         else:
@@ -84,7 +88,7 @@ def check_validity(self, msg: str) -> bool:
     return True
 
 
-def parse_message(self, msg: str, inventory=None, old: bool = False) -> None:
+def parse_message(self, msg: str, inventory=None) -> None:
     """Parses a broadcast response."""
     try:
         splitted = msg.split(', ')
@@ -102,8 +106,8 @@ def parse_message(self, msg: str, inventory=None, old: bool = False) -> None:
                 my_print("Already received this message, ignoring...")
             return
         self.add_to_uuids(uuid[1])
-        self.choose_action(inventory, msg, sender, direction, old)
-    except Exception as e:  # pragma: no cover
-        my_print("Error while parsing message: %s" % e)
+        self.choose_action(inventory, msg, sender, direction)
     except ElevationException as e:
         raise e
+    except Exception as e:  # pragma: no cover
+        my_print("Error while parsing message: %s" % e)

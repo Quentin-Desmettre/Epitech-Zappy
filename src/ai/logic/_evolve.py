@@ -52,10 +52,6 @@ def elevate(self, send_cmd: bool = True, msg: str = None):
         self.leader = None
         if self.reader.incantation_msg != "":
             self.reader.pop_incantation()
-        tmp_queue = self.reader.empty_broadcast_queue()
-        while not tmp_queue.empty():
-            my_print("Analyzing broadcast %s" % msg)
-            self.parse_message(tmp_queue.get(), old=True)
     else:
         my_print("Error: could not elevate", ignore_verbose=True)
 
@@ -99,7 +95,7 @@ def check_requirements(self, inventory=None, tiles=None) -> bool:
     if inventory is None:  # pragma: no cover
         return False
     ground = self.get_items_on_ground(tiles)
-    if not is_enough_player(self, ground, False):
+    if not is_enough_player(self, ground):
         return False
     total = merge_dicts(inventory, ground)
     needed = self.get_needed_stones(total)
@@ -117,9 +113,7 @@ def check_requirements(self, inventory=None, tiles=None) -> bool:
 def is_enough_player(self, ground=None, tiles=None, print: bool = True):
     if ground is None:
         ground = self.get_items_on_ground(tiles)
-    minimum = get_elevation_needs(self.level)[Objects.PLAYER]
-    if self.fast_mode:
-        minimum = 6
+    minimum = 6
     if ground[Objects.PLAYER.value] < minimum:
         if print:
             my_print("Not enough players to evolve.")

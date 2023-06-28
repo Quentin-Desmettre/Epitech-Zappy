@@ -9,25 +9,23 @@ from src.ai.reader import Reader
 class Ai:
     """Artificial intelligence class."""
 
-    def __init__(self, server: socket, team: str, fast_mode: bool = False) -> None:
+    def __init__(self, server: socket, team: str) -> None:
         self.id = str(uuid4())
         self.leader = None
         self.team = team
         self.level = 1
         self.delta = 0
+        self.mates_uuids = [self.id]
         self.messages_uuids = []
         self.shared_inventory = {}
         self.last_movement = time()
         self.can_send = True
-        self.fast_mode = fast_mode
         self.reader = Reader(server, team)
 
     def send(self, cmd: CommandNames, arg: str | None = None, trapped: bool = False):
         """Sends a command to the server."""
         if cmd == CommandNames.BROADCAST and not trapped:
-            arg = self.id + "|~" + \
-                str(uuid4()) + "|~" + self.team + \
-                "~|" + arg + "~|" + str(self.level)
+            arg = self.id + "|~" + str(uuid4()) + "|~" + self.team + "~|" + arg
         return self.reader.send(cmd, arg)
 
     from ._finding import loot_object, go_to_object
@@ -38,17 +36,17 @@ class Ai:
         check_requirements, get_items_on_ground, is_enough_player, drop_stone
 
     def take_food(self, inventory: dict[str, int]):
-        """Takes food from the map until the player has 20 food or 10 if there is a leader."""
+        """Takes food from the map until the player has 18 food or 10 if there is a leader."""
         my_print("Looting food", ignore_verbose=True)
         tiles = self.send(CommandNames.LOOK)
         if tiles is None:  # pragma: no cover
             return
-        if self.leader == self.id:
-            self.send(CommandNames.BROADCAST, "leaving")
-            self.leader = None
+        # if self.leader == self.id:
+        #     self.send(CommandNames.BROADCAST, "leaving")
+        #     self.leader = None
         if "food" not in inventory:
             inventory["food"] = 0
-        to_reach = 20
+        to_reach = 18
         if self.leader is not None:
             to_reach = 10
         while inventory["food"] < to_reach:
@@ -86,26 +84,28 @@ class Ai:
         if not analyze_incantation:
             return
         msg, time = self.reader.pop_incantation()
-        if time > self.last_movement and msg.endswith(str(self.level)):
+        if time > self.last_movement:
             my_print("Analyzing broadcast %s" % msg)
             self.parse_message(msg, inventory)
         else:
             my_print("Ignoring broadcast %s" % msg)
 
     def handle_evolve(self, inventory: dict[str, int], tiles=None):
-        my_print("Trying to evolve to level %d" % (self.level + 1))
-        if self.is_enough_player(None, tiles):
+        if self.is_enough_player(None, tiles, False):
             self.drop_all_stones(inventory)
-        if self.leader == self.id and self.check_requirements(inventory, tiles):
+        if self.id != self.mates_uuids[0]:
+            return
+        my_print("Trying to evolve to level %d" % (self.level + 1))
+        if self.check_requirements(inventory, tiles):
             self.elevate()
-        elif self.reader.incantation_msg == "" and (self.leader is None or self.leader == self.id):
+        else:
             if self.leader is None:
                 self.leader = self.id
             self.send(CommandNames.BROADCAST, "incantation")
             sleep(self.delta * 7)
 
     def can_survive(self, inventory: dict[str, int]):
-        min_food = 10
+        min_food = 9
         if self.leader is not None:
             min_food = 5
         return "food" in inventory and inventory["food"] > min_food
