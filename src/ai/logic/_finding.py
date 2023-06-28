@@ -98,7 +98,7 @@ def go_to_object(self, desired: Objects, tiles: list[list[str]] = None, loot_foo
         elif loot_food and desired is not Objects.FOOD and is_object_on_tile(tiles, moved, Objects.FOOD):
             self.send(CommandNames.TAKE, Objects.FOOD.value)
     if desired != Objects.PLAYER:
-        return self.send(CommandNames.TAKE, desired.value) != None
+        return self.send(CommandNames.TAKE, desired.value) == "ok"
     return True
 
 
@@ -110,13 +110,13 @@ def loot_object(self, object: Objects, can_move_randomly: bool = True, tiles = N
         return False
     if loot_food and object is not Objects.FOOD and is_object_on_tile(tiles, [], Objects.FOOD):
         self.send(CommandNames.TAKE, Objects.FOOD.value)
+    sucess = False
     if object.value in tiles[0]:
-        if self.send(CommandNames.TAKE, object.value) == None:
-            my_print("Error: could not loot %s" % object.name)
-            return False
-    elif self.go_to_object(object, tiles, loot_food) == False:
-        if can_move_randomly:
-            self.move_randomly()
+        sucess = self.send(CommandNames.TAKE, object.value) == "ok"
+    else:
+        sucess = self.go_to_object(object, tiles, loot_food)
+    if sucess:
         self.last_movement = time()
-        return False
-    return True
+    elif can_move_randomly:
+        self.move_randomly()
+    return sucess
