@@ -13,7 +13,6 @@ def make_guard_decison(self, inventory: dict[str, int]):
         return
     if self.can_eject:
         self.send(CommandNames.EJECT)
-        self.send(CommandNames.BROADCAST, "Ejecting !!!")
 
 
 def choose_guard_action(self, msg: str, sender: str, direction: Directions):
@@ -24,6 +23,7 @@ def choose_guard_action(self, msg: str, sender: str, direction: Directions):
         self.guards = []
         if self.reader.incantation_msg != "":
             self.reader.pop_incantation()
+        self.send(CommandNames.BROADCAST, "not_in_place")
     elif msg.count("you_shall_not_pass") > 0:
         self.can_eject = True
     elif msg.count("incantation") > 0 and len(self.mates_uuids) > 0 and not self.in_place:

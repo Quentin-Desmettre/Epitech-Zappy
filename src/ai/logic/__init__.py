@@ -51,6 +51,7 @@ class Ai:
             self.in_place = False
         if self.leader == self.id:
             self.send(CommandNames.BROADCAST, "stop_guarding")
+            self.guards = []
         if "food" not in inventory:
             inventory["food"] = 0
         to_reach = 18
@@ -116,6 +117,8 @@ class Ai:
         min_food = 9
         if self.leader is not None:
             min_food = 5
+            if self.is_guard():
+                min_food = 2
         return "food" in inventory and inventory["food"] > min_food
 
     def make_decision(self):  # pragma: no cover
