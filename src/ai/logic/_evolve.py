@@ -49,7 +49,10 @@ def elevate(self, send_cmd: bool = True, msg: str = None):
         if self.level == 8:
             my_print("Congratulations, you won !!!", ignore_verbose=True)
             return
+        if self.leader == self.id:
+            self.send(CommandNames.BROADCAST, "stop_guarding")
         self.leader = None
+        self.guards = []
         if self.reader.incantation_msg != "":
             self.reader.pop_incantation()
     else:
@@ -106,6 +109,9 @@ def check_requirements(self, inventory=None, tiles=None) -> bool:
             if stone.value in self.shared_inventory:
                 my_print("(shared) ", end="")
         my_print("]")
+        return False
+    if len(self.guards) != 4:
+        my_print("Not enough guards to evolve.")
         return False
     return True
 

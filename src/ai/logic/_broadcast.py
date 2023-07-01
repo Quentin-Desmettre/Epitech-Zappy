@@ -38,13 +38,28 @@ def walk_and_loot(self, direction: Directions) -> bool:
         self.send(CommandNames.TAKE, Objects.FOOD.value)
 
 
+def place_guard(self, msg: str, sender: str) -> None:
+    if msg.count("not_") > 0 and sender in self.guards:
+        self.guards.remove(sender)
+    elif msg.count("not_") == 0 and sender not in self.guards:
+        self.guards.append(sender)
+
+
+def parse_incantation(self, inventory, sender: str, direction: Directions):
+    if sender != self.mates_uuids[0]:
+        my_print("Not the leader !!!")
+        return
+    if self.leader is None:
+        self.leader = sender
+        my_print("New leader: %s" % sender)
+    if direction == Directions.HERE:
+        self.drop_all_stones(inventory)
+    else:
+        self.walk_and_loot(direction)
+
+
 def choose_action(self, inventory, msg: str, sender: str, direction: Directions):
-    if msg.count("leaving") > 0:
-        if sender == self.leader:
-            self.leader = None
-            self.reader.pop_incantation()
-            my_print("Leader left")
-    elif msg.count("new") > 0:
+    if msg.count("new") > 0:
         if sender not in self.mates_uuids:
             self.mates_uuids.append(sender)
             self.mates_uuids.sort()
@@ -54,17 +69,12 @@ def choose_action(self, inventory, msg: str, sender: str, direction: Directions)
         self.add_to_shared_inventory(msg.split('~|')[2])
     elif msg.count("dropped") > 0:
         self.remove_from_shared_inventory(msg.split('~|')[2])
+    elif msg.count("in_place") > 0:
+        self.place_guard(msg, sender)
+    elif self.is_guard():
+        self.choose_guard_action(msg, sender, direction)
     elif msg.count("incantation") > 0 and len(self.mates_uuids) > 0:
-        if sender != self.mates_uuids[0]:
-            my_print("Not the leader !!!")
-            return
-        if self.leader is None:
-            self.leader = sender
-            my_print("New leader: %s" % sender)
-        if direction == Directions.HERE:
-            self.drop_all_stones(inventory)
-        else:
-            self.walk_and_loot(direction)
+        self.parse_incantation(inventory, sender, direction)
     else:
         my_print("Unknown message: %s" % msg)
 

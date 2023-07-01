@@ -15,11 +15,13 @@ class Ai:
         self.team = team
         self.level = 1
         self.delta = 0
+        self.in_place = False
+        self.can_eject = False
         self.mates_uuids = [self.id]
+        self.guards = []
         self.messages_uuids = []
         self.shared_inventory = {}
         self.last_movement = time()
-        self.can_send = True
         self.reader = Reader(server, team)
 
     def send(self, cmd: CommandNames, arg: str | None = None, trapped: bool = False):
@@ -30,10 +32,13 @@ class Ai:
 
     from ._finding import loot_object, go_to_object
     from ._broadcast import parse_message, walk_and_loot, add_to_uuids, choose_action, \
-        add_to_shared_inventory, remove_from_shared_inventory, check_validity
+        add_to_shared_inventory, remove_from_shared_inventory, check_validity, \
+        place_guard, parse_incantation
     from ._movement import move_randomly, go_to_direction
     from ._evolve import get_needed_stones, can_evolve, elevate, drop_all_stones, \
         check_requirements, get_items_on_ground, is_enough_player, drop_stone
+    from ._guard import make_guard_decison, choose_guard_action, choose_tile, is_guard, \
+        can_place
 
     def take_food(self, inventory: dict[str, int]):
         """Takes food from the map until the player has 18 food or 10 if there is a leader."""
@@ -41,9 +46,11 @@ class Ai:
         tiles = self.send(CommandNames.LOOK)
         if tiles is None:  # pragma: no cover
             return
-        # if self.leader == self.id:
-        #     self.send(CommandNames.BROADCAST, "leaving")
-        #     self.leader = None
+        if self.is_guard() and self.in_place:
+            self.send(CommandNames.BROADCAST, "not_in_place")
+            self.in_place = False
+        if self.leader == self.id:
+            self.send(CommandNames.BROADCAST, "stop_guarding")
         if "food" not in inventory:
             inventory["food"] = 0
         to_reach = 18
@@ -97,6 +104,7 @@ class Ai:
             return
         my_print("Trying to evolve to level %d" % (self.level + 1))
         if self.check_requirements(inventory, tiles):
+            self.send(CommandNames.BROADCAST, "you_shall_not_pass")
             self.elevate()
         else:
             if self.leader is None:
@@ -119,11 +127,12 @@ class Ai:
             return
         set_color(Colors.OKCYAN)
         self.handle_broadcast(False, inventory)
+        if self.is_guard():
+            return self.make_guard_decison(inventory)
         if not self.can_survive(inventory) or self.reader.incantation_msg != "":
             if not self.can_survive(inventory):
                 set_color(Colors.WARNING)
                 self.take_food(inventory)
-                self.can_send = True
             else:
                 set_color(Colors.OKCYAN)
                 self.handle_broadcast(True, inventory)
