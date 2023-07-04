@@ -110,9 +110,12 @@ def check_requirements(self, inventory=None, tiles=None) -> bool:
                 my_print("(shared) ", end="")
         my_print("]")
         return False
-    if len(self.guards) != 4:
-        my_print("Not enough guards to evolve.")
+    if len(self.guards) < len(self.guard_heartbeats):
+        my_print("Not enough %i guards to evolve." %
+                 len(self.guard_heartbeats))
         return False
+    else:
+        my_print("All %i guards are here." % len(self.guard_heartbeats))
     return True
 
 

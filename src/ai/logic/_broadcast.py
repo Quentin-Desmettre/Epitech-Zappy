@@ -1,4 +1,3 @@
-from time import time
 from regex import match
 from src.ai.commands import Directions, CommandNames, Objects, PossibleResponsesRegex, ElevationException
 from src.ai.logic._finding import is_object_on_tile
@@ -58,24 +57,27 @@ def parse_incantation(self, inventory, sender: str, direction: Directions):
         self.walk_and_loot(direction)
 
 
-def choose_action(self, inventory, msg: str, sender: str, direction: Directions):
-    if msg.count("new") > 0:
-        if sender not in self.mates_uuids:
-            self.mates_uuids.append(sender)
-            self.mates_uuids.sort()
-            my_print("New mate: %s" % sender)
-            self.send(CommandNames.BROADCAST, "new")
-    elif msg.count("looted") > 0:
+def choose_action(self, inventory, msg: str, sender: str, direction: Directions, time=None):
+    if sender not in self.mates_uuids:
+        self.mates_uuids.append(sender)
+        self.mates_uuids.sort()
+        my_print("New mate: %s" % sender)
+        self.send(CommandNames.BROADCAST, "new")
+    if msg.count("looted") > 0:
         self.add_to_shared_inventory(msg.split('~|')[2])
     elif msg.count("dropped") > 0:
         self.remove_from_shared_inventory(msg.split('~|')[2])
     elif msg.count("in_place") > 0:
         self.place_guard(msg, sender)
-    elif self.is_guard():
+    elif msg.count("heartbeat") > 0 and len(self.mates_uuids) > 0:
+        if self.id != self.mates_uuids[0] and not self.is_guard():
+            return
+        self.guard_heartbeats[sender] = time
+    elif self.is_guard(): # not analyzed by guards under this line !!!
         self.choose_guard_action(msg, sender, direction)
     elif msg.count("incantation") > 0 and len(self.mates_uuids) > 0:
         self.parse_incantation(inventory, sender, direction)
-    else:
+    elif msg.count("new") == 0:
         my_print("Unknown message: %s" % msg)
 
 
@@ -98,7 +100,7 @@ def check_validity(self, msg: str) -> bool:
     return True
 
 
-def parse_message(self, msg: str, inventory=None) -> None:
+def parse_message(self, msg: str, inventory=None, time=None) -> None:
     """Parses a broadcast response."""
     try:
         splitted = msg.split(', ')
@@ -116,7 +118,7 @@ def parse_message(self, msg: str, inventory=None) -> None:
                 my_print("Already received this message, ignoring...")
             return
         self.add_to_uuids(uuid[1])
-        self.choose_action(inventory, msg, sender, direction)
+        self.choose_action(inventory, msg, sender, direction, time)
     except ElevationException as e:
         raise e
     except Exception as e:  # pragma: no cover

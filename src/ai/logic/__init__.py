@@ -20,6 +20,7 @@ class Ai:
         self.mates_uuids = [self.id]
         self.guards = []
         self.messages_uuids = []
+        self.guard_heartbeats = {}
         self.shared_inventory = {}
         self.last_movement = time()
         self.reader = Reader(server, team)
@@ -89,6 +90,9 @@ class Ai:
             msg = self.reader.broadcast_pop()
             my_print("Analyzing broadcast %s" % msg)
             self.parse_message(msg, inventory)
+        while self.reader.has_heartbeat():
+            msg, time = self.reader.heartbeat_pop()
+            self.parse_message(msg, inventory, time)
         if not analyze_incantation:
             return
         msg, time = self.reader.pop_incantation()
@@ -111,7 +115,6 @@ class Ai:
             if self.leader is None:
                 self.leader = self.id
             self.send(CommandNames.BROADCAST, "incantation")
-            sleep(self.delta * 7)
 
     def can_survive(self, inventory: dict[str, int]):
         min_food = 9
@@ -120,6 +123,17 @@ class Ai:
             if self.is_guard():
                 min_food = 2
         return "food" in inventory and inventory["food"] > min_food
+
+    def clean_guards(self):
+        if self.id != self.mates_uuids[0] and not self.is_guard():
+            return
+        now = time()
+        keys = list(self.guard_heartbeats.keys())
+        for key in keys:
+            if now - self.guard_heartbeats[key] > self.delta * 100:
+                my_print("Removing guard %s" % key, ignore_verbose=True)
+                self.guard_heartbeats.pop(key)
+                self.mates_uuids.remove(key)
 
     def make_decision(self):  # pragma: no cover
         """Takes a decision based on the current state of the game."""
@@ -130,6 +144,7 @@ class Ai:
             return
         set_color(Colors.OKCYAN)
         self.handle_broadcast(False, inventory)
+        self.clean_guards()
         if self.is_guard():
             return self.make_guard_decison(inventory)
         if not self.can_survive(inventory) or self.reader.incantation_msg != "":

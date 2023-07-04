@@ -1,8 +1,10 @@
+from time import time
 from src.ai.utils import my_print, set_color, Colors
 from src.ai.commands import CommandNames, Directions, Objects
 
 
 def make_guard_decison(self, inventory: dict[str, int]):
+    self.send(CommandNames.BROADCAST, "heartbeat")
     if not self.can_survive(inventory) or (self.reader.incantation_msg != "" and not self.in_place):
         if not self.can_survive(inventory):
             set_color(Colors.WARNING)
@@ -66,10 +68,9 @@ def can_place(self) -> bool:
 
 
 def is_guard(self):
-    nb_uuids = len(self.mates_uuids)
     index = 0
     for uuid in self.mates_uuids:
         if self.id == uuid:
-            return index >= nb_uuids - 4
+            return index > 5
         index += 1
     return False

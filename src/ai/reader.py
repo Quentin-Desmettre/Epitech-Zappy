@@ -16,11 +16,11 @@ class Reader:
         self.cmd = Command(CommandNames.FORWARD)
         self.queue = Queue()
         self.broadcast_queue = Queue()
+        self.heartbeat_queue = Queue()
         self.incantation_msg = ""
         self.incantation_time = 0
         self.buffer = ""
         self.team = team
-        self.broadcast_mtx = Lock()
         self.incantation_mtx = Lock()
         self.thread = Thread(target=self.launch, daemon=True)
         self.thread.start()
@@ -32,9 +32,9 @@ class Reader:
                 data = self.sock.recv(4096)
                 try:
                     data = data.decode("utf-8")
-                except UnicodeDecodeError: # pragma: no cover
+                except UnicodeDecodeError:  # pragma: no cover
                     data = data.decode("ISO-8859-2")
-                if not data or data == "": # pragma: no cover
+                if not data or data == "":  # pragma: no cover
                     raise Exception("Server disconnected")
                 self.buffer += data
                 while "\n" in self.buffer:
@@ -55,10 +55,10 @@ class Reader:
             if msg.count("incantation") > 0:
                 self.set_incanation_msg(msg)
                 self.set_incanation_time(time())
+            elif msg.count("heartbeat") > 0:
+                self.heartbeat_queue.put([msg, time()])
             else:
-                self.broadcast_mtx.acquire()
                 self.broadcast_queue.put(msg)
-                self.broadcast_mtx.release()
         else:
             my_print("Received: %s" % msg)
             self.queue.put(msg)
@@ -119,18 +119,18 @@ class Reader:
         """Returns True if there is a broadcast in the queue."""
         return not self.broadcast_queue.empty()
 
+    def has_heartbeat(self) -> bool:
+        """Returns True if there is a heartbeat in the queue."""
+        return not self.heartbeat_queue.empty()
+
     def broadcast_pop(self) -> str:
         """Pops a broadcast from the queue."""
         return self.broadcast_queue.get()
 
-    def empty_broadcast_queue(self) -> Queue:
-        """Empties the broadcast queue."""
-        self.broadcast_mtx.acquire()
-        tmp = Queue()
-        while not self.broadcast_queue.empty():
-            tmp.put(self.broadcast_queue.get())
-        self.broadcast_mtx.release()
-        return tmp
+    def heartbeat_pop(self) -> tuple[str, float]:
+        """Pops a heartbeat from the queue."""
+        heartbeat = self.heartbeat_queue.get()
+        return heartbeat[0], heartbeat[1]
 
     def set_incanation_msg(self, msg: str) -> None:
         """Sets the incantation message."""
