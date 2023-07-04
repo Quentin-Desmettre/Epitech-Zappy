@@ -53,6 +53,7 @@ def elevate(self, send_cmd: bool = True, msg: str = None):
             self.send(CommandNames.BROADCAST, "stop_guarding")
         self.leader = None
         self.guards = []
+        self.here = []
         if self.reader.incantation_msg != "":
             self.reader.pop_incantation()
     else:
@@ -98,7 +99,7 @@ def check_requirements(self, inventory=None, tiles=None) -> bool:
     if inventory is None:  # pragma: no cover
         return False
     ground = self.get_items_on_ground(tiles)
-    if not is_enough_player(self, ground):
+    if not is_enough_player(self):
         return False
     total = merge_dicts(inventory, ground)
     needed = self.get_needed_stones(total)
@@ -119,11 +120,9 @@ def check_requirements(self, inventory=None, tiles=None) -> bool:
     return True
 
 
-def is_enough_player(self, ground=None, tiles=None, print: bool = True):
-    if ground is None:
-        ground = self.get_items_on_ground(tiles)
+def is_enough_player(self, print: bool = True):
     minimum = 6
-    if ground[Objects.PLAYER.value] < minimum:
+    if len(self.here) < minimum - 1:
         if print:
             my_print("Not enough players to evolve.")
         return False

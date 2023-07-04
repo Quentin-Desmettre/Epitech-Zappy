@@ -18,6 +18,7 @@ class Ai:
         self.in_place = False
         self.can_eject = False
         self.mates_uuids = [self.id]
+        self.here = []
         self.guards = []
         self.messages_uuids = []
         self.guard_heartbeats = {}
@@ -53,6 +54,9 @@ class Ai:
         if self.leader == self.id:
             self.send(CommandNames.BROADCAST, "stop_guarding")
             self.guards = []
+            self.here = []
+        elif self.leader is not None:
+            self.send(CommandNames.BROADCAST, "not_here")
         if "food" not in inventory:
             inventory["food"] = 0
         to_reach = 18
@@ -103,7 +107,7 @@ class Ai:
             my_print("Ignoring broadcast %s" % msg)
 
     def handle_evolve(self, inventory: dict[str, int], tiles=None):
-        if self.is_enough_player(None, tiles, False):
+        if self.is_enough_player(False):
             self.drop_all_stones(inventory)
         if self.id != self.mates_uuids[0]:
             return

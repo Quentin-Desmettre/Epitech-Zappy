@@ -52,6 +52,7 @@ def parse_incantation(self, inventory, sender: str, direction: Directions):
         self.leader = sender
         my_print("New leader: %s" % sender)
     if direction == Directions.HERE:
+        self.send(CommandNames.BROADCAST, "here")
         self.drop_all_stones(inventory)
     else:
         self.walk_and_loot(direction)
@@ -63,7 +64,14 @@ def choose_action(self, inventory, msg: str, sender: str, direction: Directions,
         self.mates_uuids.sort()
         my_print("New mate: %s" % sender)
         self.send(CommandNames.BROADCAST, "new")
-    if msg.count("looted") > 0:
+    if msg.count("here") > 0:
+        if self.leader != self.id:
+            return
+        if msg.count("not_here") > 0 and sender in self.here:
+            self.here.remove(sender)
+        elif sender not in self.here:
+            self.here.append(sender)
+    elif msg.count("looted") > 0:
         self.add_to_shared_inventory(msg.split('~|')[2])
     elif msg.count("dropped") > 0:
         self.remove_from_shared_inventory(msg.split('~|')[2])
@@ -94,9 +102,10 @@ def check_validity(self, msg: str) -> bool:
     uuid = msg.split('|~')
     if len(uuid) != 3 or not match(PossibleResponsesRegex.MY_MESSAGE.value[0], msg) \
             or not uuid[2].startswith(self.team + "~|"):
-        my_print("Not my team, broadcasting...")
-        set_trapped(True)
-        self.send(CommandNames.BROADCAST, msg, True)
+        if not msg.endswith("Â"):
+            my_print("Not my team, broadcasting...")
+            set_trapped(True)
+            self.send(CommandNames.BROADCAST, msg, True)
         return False
     return True
 

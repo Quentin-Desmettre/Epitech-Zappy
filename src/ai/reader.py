@@ -50,7 +50,7 @@ class Reader:
             my_print("Received: %s" % msg)
             raise Exception("You died")
         if match(PossibleResponsesRegex.MESSAGE.value[0], msg):
-            if msg.count(self.team) == 0 and randint(0, 3) != 0:
+            if msg.count("~|" + self.team + "~|") == 0 and randint(0, 3) != 0:
                 return
             if msg.count("incantation") > 0:
                 self.set_incanation_msg(msg)
