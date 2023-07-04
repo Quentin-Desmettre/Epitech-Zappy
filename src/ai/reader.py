@@ -31,7 +31,7 @@ class Reader:
             while True:
                 data = self.sock.recv(4096)
                 try:
-                    data = data.decode("utf-8")
+                    data = data.decode()
                 except UnicodeDecodeError:  # pragma: no cover
                     data = data.decode("ISO-8859-2")
                 if not data or data == "":  # pragma: no cover

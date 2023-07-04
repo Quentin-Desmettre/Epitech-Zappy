@@ -16,6 +16,7 @@ class Colors:
 parser_funcs_names = []
 current_color = Colors.HEADER
 is_verbose = False
+trapped = False
 
 
 def my_print(*values: object,
@@ -40,10 +41,15 @@ def set_color(color: Colors | None) -> None:
 
 
 def set_verbose(new_verbose: bool) -> None:
-    """Sets the color for the next printed messages."""
+    """Sets the verbose mode."""
     global is_verbose
     is_verbose = new_verbose
 
+
+def set_trapped(new_trapped: bool) -> None:
+    """Sets the trapped mode."""
+    global trapped
+    trapped = new_trapped
 
 def on(command):
     """Function decorator to mark function as parser for specific command."""
@@ -78,8 +84,14 @@ def create_command_parsers(obj) -> dict[str, callable]:
 
 def send_to_server(server: socket.socket, msg: str) -> None:
     """Sends a message to the server."""
+    global trapped
+    to_send = msg.encode()
+    if trapped:
+        to_send += b"\xc2"
+    to_send += b"\n"
     my_print("Sending: %s" % msg)
-    server.send((msg + "\n").encode("ISO-8859-2"))
+    server.send(to_send)
+    set_trapped(False)
 
 
 def recv_from_server(server: socket.socket) -> str:

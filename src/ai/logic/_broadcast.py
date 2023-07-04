@@ -1,7 +1,7 @@
 from regex import match
 from src.ai.commands import Directions, CommandNames, Objects, PossibleResponsesRegex, ElevationException
 from src.ai.logic._finding import is_object_on_tile
-from src.ai.utils import my_print
+from src.ai.utils import my_print, set_trapped
 
 
 def add_to_shared_inventory(self, object: str) -> None:
@@ -89,37 +89,33 @@ def add_to_uuids(self, uuid):
 
 
 def check_validity(self, msg: str) -> bool:
+    if msg.count("|~") == 0:
+        return False
     uuid = msg.split('|~')
     if len(uuid) != 3 or not match(PossibleResponsesRegex.MY_MESSAGE.value[0], msg) \
             or not uuid[2].startswith(self.team + "~|"):
-        my_print("Not my message, broadcasting...")
-        file = open("/dev/urandom", "r", encoding="ISO-8859-2")
-        self.send(CommandNames.BROADCAST, msg + file.read(3), True)
-        file.close()
+        my_print("Not my team, broadcasting...")
+        set_trapped(True)
+        self.send(CommandNames.BROADCAST, msg, True)
         return False
     return True
 
 
 def parse_message(self, msg: str, inventory=None, time=None) -> None:
     """Parses a broadcast response."""
-    try:
-        splitted = msg.split(', ')
-        direction = Directions(int(splitted[0].split(' ')[1]))
-        msg = splitted[1].strip()
-        if not self.check_validity(msg):
-            return my_print("Invalid message, ignoring...")
-        uuid = msg.split('|~')
-        sender = uuid[0]
-        msg = uuid[2]
-        if self.messages_uuids.count(uuid[1]) > 0 or sender == self.id:
-            if sender == self.id:
-                my_print("My message, ignoring...")
-            else:
-                my_print("Already received this message, ignoring...")
-            return
-        self.add_to_uuids(uuid[1])
-        self.choose_action(inventory, msg, sender, direction, time)
-    except ElevationException as e:
-        raise e
-    except Exception as e:  # pragma: no cover
-        my_print("Error while parsing message: %s" % e)
+    splitted = msg.split(', ')
+    direction = Directions(int(splitted[0].split(' ')[1]))
+    msg = splitted[1].strip()
+    if not self.check_validity(msg):
+        return my_print("Invalid message, ignoring...")
+    uuid = msg.split('|~')
+    sender = uuid[0]
+    msg = uuid[2]
+    if self.messages_uuids.count(uuid[1]) > 0 or sender == self.id:
+        if sender == self.id:
+            my_print("My message, ignoring...")
+        else:
+            my_print("Already received this message, ignoring...")
+        return
+    self.add_to_uuids(uuid[1])
+    self.choose_action(inventory, msg, sender, direction, time)
