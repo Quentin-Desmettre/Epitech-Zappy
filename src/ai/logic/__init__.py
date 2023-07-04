@@ -53,6 +53,7 @@ class Ai:
             self.in_place = False
         if self.leader == self.id:
             self.send(CommandNames.BROADCAST, "stop_guarding")
+            self.leader = None
             self.guards = []
             self.here = []
         elif self.leader is not None:
