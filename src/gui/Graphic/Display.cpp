@@ -52,9 +52,17 @@ void Graphic::drawTeams()
     int x = _windowWidth - _boxSize - (numberTeams * 20);
     int y = 20;
 
-    Mateyak::Window::drawBox(x - 10, y - 10, _boxSize + numberTeams * 20, 4 * 20 + 20, {0, 39, 97, 110});
+    Mateyak::Window::drawBox(x - 10, y - 10, _boxSize + (numberTeams + 1) * 20, 4 * 20 + 20, {0, 39, 97, 110});
     for (auto &it : _serverInformations.getTeams()) {
-        Mateyak::Window::draw(it.getName(), x, y, 15, it.getColor());
+        int maxlvl = 0;
+
+        for (auto &it2 : _serverInformations.getPlayers()) {
+            if (it2->getTeam() == it.getName()) {
+                if (it2->getLevel() > maxlvl)
+                    maxlvl = it2->getLevel();
+            }
+        }
+        Mateyak::Window::draw(it.getName() + ": " + std::to_string(maxlvl), x, y, 15, it.getColor());
         if (y == 80) {
             x += _maxSize + 20;
             y = 20;
