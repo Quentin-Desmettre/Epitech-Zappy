@@ -88,19 +88,18 @@ def go_to_object(self, desired: Objects, tiles: list[list[str]] = None, loot_foo
     if tiles is None: # pragma: no cover
         return False
     directions = get_object_path(desired, tiles)
+    if len(directions) == 0:
+        return False
     moved = []
-    if loot_food and desired is not Objects.FOOD and is_object_on_tile(tiles, moved, Objects.FOOD):
-        self.send(CommandNames.TAKE, Objects.FOOD.value)
     for direction in directions:
         moved.append(direction)
         if self.send(direction) is None:
             return False
         elif loot_food and desired is not Objects.FOOD and is_object_on_tile(tiles, moved, Objects.FOOD):
             self.send(CommandNames.TAKE, Objects.FOOD.value)
-    if len(directions) != 0 and desired != Objects.PLAYER\
-    and (desired == Objects.FOOD or not is_object_on_tile(tiles, moved, Objects.PLAYER)):
-        self.send(CommandNames.TAKE, desired.value)
-    return len(directions) != 0
+    if desired != Objects.PLAYER:
+        return self.send(CommandNames.TAKE, desired.value) == "ok"
+    return True
 
 
 def loot_object(self, object: Objects, can_move_randomly: bool = True, tiles = None, loot_food = False) -> bool:
@@ -109,13 +108,15 @@ def loot_object(self, object: Objects, can_move_randomly: bool = True, tiles = N
         tiles = self.send(CommandNames.LOOK)
     if tiles is None: # pragma: no cover
         return False
-    if object.value in tiles[0] and (object == Objects.FOOD or tiles[0].count(Objects.PLAYER.value) == 1):
-        if self.send(CommandNames.TAKE, object.value) == None:
-            my_print("Error: could not loot %s" % object.name)
-            return False
-    elif self.go_to_object(object, tiles, loot_food) == False:
-        if can_move_randomly:
-            self.move_randomly()
+    if loot_food and object is not Objects.FOOD and is_object_on_tile(tiles, [], Objects.FOOD):
+        self.send(CommandNames.TAKE, Objects.FOOD.value)
+    sucess = False
+    if object.value in tiles[0]:
+        sucess = self.send(CommandNames.TAKE, object.value) == "ok"
+    else:
+        sucess = self.go_to_object(object, tiles, loot_food)
+    if sucess:
         self.last_movement = time()
-        return False
-    return True
+    elif can_move_randomly:
+        self.move_randomly()
+    return sucess

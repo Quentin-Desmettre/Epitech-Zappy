@@ -1,16 +1,18 @@
-import random
+from random import randint
+from time import time
 from src.ai.commands import CommandNames, Directions
 
 
 def move_randomly(self): # pragma: no cover
     """Moves and turns the player randomly."""
-    rand = random.randint(1, 3)
-    if rand == 1:
+    rand = randint(0, 7)
+    if rand <= 1:
         self.send(CommandNames.FORWARD)
-    elif rand == 2:
+    elif rand <= 4:
         self.send(CommandNames.RIGHT)
     else:
         self.send(CommandNames.LEFT)
+    self.last_movement = time()
 
 
 def go_to_direction(self, direction: Directions) -> None:
@@ -36,4 +38,4 @@ def go_to_direction(self, direction: Directions) -> None:
     elif direction == Directions.BOTTOM_LEFT:
         self.go_to_direction(Directions.LEFT)
         self.go_to_direction(Directions.LEFT)
-
+    self.last_movement = time()

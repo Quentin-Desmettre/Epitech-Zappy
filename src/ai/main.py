@@ -8,12 +8,11 @@ from src.ai.logic import Ai
 
 
 def print_usage(exit_code=84):
-    my_print("""USAGE: ./zappy_ai -p port -n name [-h machine] [--verbose] [--fast]
+    my_print("""USAGE: ./zappy_ai -p port -n name [-h machine] [--verbose]
         port\t\tis the port number
         name\t\tis the name of the team
         machine\t\tis the name of the machine; localhost by default
-        --verbose\tprints all the messages from the server
-        --fast\t\tevolves in group of 6 players instead of 1, 2 or 4 players""",
+        --verbose\tprints all the messages from the server""",
        ignore_verbose=True)
     exit(exit_code)
 
@@ -30,9 +29,8 @@ def arg_handling():
     port = -1
     name = ""
     machine = "localhost"
-    fast_mode = "--fast" in sys_argv
     set_verbose("--verbose" in sys_argv)
-    argv = [arg for arg in sys_argv if arg != "--verbose" and arg != "--fast"]
+    argv = [arg for arg in sys_argv if arg != "--verbose"]
     if len(argv) == 2 and argv[1] == "-help":
         print_usage(0)
     elif len(argv) != 7 and len(argv) != 5:
@@ -50,7 +48,7 @@ def arg_handling():
             print_usage()
     if port == -1 or name == "":
         print_usage()
-    return port, name, machine, fast_mode
+    return port, name, machine
 
 
 def read_first_messages(server: socket, name: str):
@@ -68,15 +66,16 @@ def read_first_messages(server: socket, name: str):
 
 
 def main():
-    port, name, machine, fast_mode = arg_handling()
+    port, name, machine = arg_handling()
     server = socket(AF_INET, SOCK_STREAM)
     server.connect((machine, port))
 
     read_first_messages(server, name)
 
     exception = None
-    ai = Ai(server, name, fast_mode)
+    ai = Ai(server, name)
     ai.send(CommandNames.FORK)
+    ai.send(CommandNames.BROADCAST, "new")
     while ai.level < 8:
         try:
             if exception is not None:

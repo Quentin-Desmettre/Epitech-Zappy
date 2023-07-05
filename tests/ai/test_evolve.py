@@ -78,9 +78,9 @@ class EvolveTester(TestCase):
         result = self.ai.can_evolve({Objects.FOOD.value: 8})
         self.assertFalse(result)
 
-    def test_drop_elevation_stones(self):
+    def test_drop_all_stones(self):
         inventory = {"food": 8, "deraumere": 1, "sibur": 1}
-        self.ai.drop_elevation_stones(inventory)
+        self.ai.drop_all_stones(inventory)
         output = self.output.read()
         self.assertIn("Dropped all stones needed to evolve.", output)
         self.assertTrue(output.count("Broadcast") == 2)
@@ -88,14 +88,14 @@ class EvolveTester(TestCase):
         self.assertIn("Set sibur", output)
 
         inventory = {"food": 8, "deraumere": 1, "sibur": 1}
-        self.ai.drop_elevation_stones(inventory, Objects.DERAUMERE)
+        self.ai.drop_all_stones(inventory, Objects.DERAUMERE)
         output = self.output.read()
         self.assertIn("Dropped all stones needed to evolve.", output)
         self.assertTrue(output.count("Broadcast") == 1)
         self.assertIn("Set deraumere", output)
         self.assertIn("Set sibur", output)
 
-        self.ai.drop_elevation_stones()
+        self.ai.drop_all_stones()
         output = self.output.read()
         self.assertIn("Dropped all stones needed to evolve.", output)
         self.assertNotIn("Broadcast", output)
@@ -111,4 +111,3 @@ class EvolveTester(TestCase):
 
         server.set_response("Look", "[ player, food, ,  ]")
         self.assertFalse(self.ai.check_requirements())
-

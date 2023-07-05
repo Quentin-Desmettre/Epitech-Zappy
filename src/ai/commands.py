@@ -114,6 +114,7 @@ class PossibleResponsesRegex(Enum):
     SET = [r"^ok$", r"^ko$"]
     INCANTATION = [r"^Elevation underway$", r"^Current level: [0-9]+$", r"^ko$"]
     MESSAGE = [r"^message [0-9]+, .+$"]
+    MY_MESSAGE = [r"[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}(\|\~[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})*"]
 
 
 def get_regexes(cmd: CommandNames) -> list[Pattern]:
