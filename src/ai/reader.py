@@ -31,9 +31,9 @@ class Reader:
             while True:
                 data = self.sock.recv(4096)
                 try:
-                    data = data.decode()
-                except UnicodeDecodeError:  # pragma: no cover
                     data = data.decode("ISO-8859-2")
+                except UnicodeDecodeError:  # pragma: no cover
+                    continue
                 if not data or data == "":  # pragma: no cover
                     raise Exception("Server disconnected")
                 self.buffer += data
@@ -51,7 +51,7 @@ class Reader:
             my_print("Received: %s" % msg)
             raise Exception("You died")
         if match(PossibleResponsesRegex.MESSAGE.value[0], msg):
-            if msg.count("|~" + self.team + "~|") == 0 and randint(0, 100) != 0:
+            if msg.count("|~" + self.team + "~|") == 0 and randint(0, 10) != 0:
                 return
             if msg.count("incantation") > 0:
                 self.set_incanation_msg(msg)

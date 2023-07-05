@@ -58,6 +58,7 @@ class Ai:
             self.here = []
         elif self.leader is not None:
             self.send(CommandNames.BROADCAST, "not_here")
+            self.in_place = False
         if "food" not in inventory:
             inventory["food"] = 0
         to_reach = 18

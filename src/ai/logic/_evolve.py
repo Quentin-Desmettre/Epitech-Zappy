@@ -51,6 +51,7 @@ def elevate(self, send_cmd: bool = True, msg: str = None):
             return
         if self.leader == self.id:
             self.send(CommandNames.BROADCAST, "stop_guarding")
+        self.in_place = False
         self.leader = None
         self.guards = []
         self.here = []

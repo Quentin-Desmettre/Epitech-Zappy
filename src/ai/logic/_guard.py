@@ -1,10 +1,12 @@
 from time import time
+from random import randint
 from src.ai.utils import my_print, set_color, Colors
 from src.ai.commands import CommandNames, Directions, Objects
 
 
 def make_guard_decison(self, inventory: dict[str, int]):
-    self.send(CommandNames.BROADCAST, "heartbeat")
+    if randint(0, 1) == 1:
+        self.send(CommandNames.BROADCAST, "heartbeat")
     if not self.can_survive(inventory) or (self.reader.incantation_msg != "" and not self.in_place):
         if not self.can_survive(inventory):
             set_color(Colors.WARNING)

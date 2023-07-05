@@ -52,9 +52,10 @@ def parse_incantation(self, inventory, sender: str, direction: Directions):
         self.leader = sender
         my_print("New leader: %s" % sender)
     if direction == Directions.HERE:
+        self.in_place = True
         self.send(CommandNames.BROADCAST, "here")
         self.drop_all_stones(inventory)
-    else:
+    elif not self.in_place:
         self.walk_and_loot(direction)
 
 
@@ -85,6 +86,8 @@ def choose_action(self, inventory, msg: str, sender: str, direction: Directions,
         self.choose_guard_action(msg, sender, direction)
     elif msg.count("incantation") > 0 and len(self.mates_uuids) > 0:
         self.parse_incantation(inventory, sender, direction)
+    elif msg.count("stop_guarding") > 0:
+        self.in_place = False
     elif msg.count("new") == 0:
         my_print("Unknown message: %s" % msg)
 
