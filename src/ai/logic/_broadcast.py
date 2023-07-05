@@ -99,13 +99,13 @@ def add_to_uuids(self, uuid):
         self.messages_uuids.pop(0)
 
 
-def check_validity(self, msg: str) -> bool:
+def check_validity(self, msg: str, inventory) -> bool:
     if msg.count("|~") == 0:
         return False
     uuid = msg.split('|~')
     if len(uuid) != 3 or not match(PossibleResponsesRegex.MY_MESSAGE.value[0], msg) \
             or not uuid[2].startswith(self.team + "~|"):
-        if not msg.endswith("Â"):
+        if not msg.endswith("Â") and self.can_survive(inventory):
             my_print("Not my team, broadcasting...")
             set_trapped(True)
             self.send(CommandNames.BROADCAST, msg, True)
@@ -113,12 +113,12 @@ def check_validity(self, msg: str) -> bool:
     return True
 
 
-def parse_message(self, msg: str, inventory=None, time=None) -> None:
+def parse_message(self, msg: str, inventory, time=None) -> None:
     """Parses a broadcast response."""
     splitted = msg.split(', ')
     direction = Directions(int(splitted[0].split(' ')[1]))
     msg = splitted[1].strip()
-    if not self.check_validity(msg):
+    if not self.check_validity(msg, inventory):
         return my_print("Invalid message, ignoring...")
     uuid = msg.split('|~')
     sender = uuid[0]
