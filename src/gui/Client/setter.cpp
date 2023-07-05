@@ -154,10 +154,6 @@ void GuiClient::PlayerExpulse(std::vector<std::string> parameters)
     }
 
     std::string name = parameters[0];
-    if (name[0] == '#')
-        name.erase(0, 1);
-    // TODO: Verifier si le fait de le rendre mort est suffisant ou s'il faut vraiment l'expulser
-    _serverInformations.setPlayerDead(name);
 }
 
 void GuiClient::PlayerFork(std::vector<std::string> parameters)
